@@ -1,0 +1,45 @@
+BRIDGES — SOCIAL CONTENT + CARTOON CHANNEL PLAN
+=================================================
+
+PART A — SOCIAL CONTENT CALENDAR (start this week, free)
+Post 5x/week, rotate these 5 pillars:
+  MON  "Market Monday" — one Tampa Bay stat or price trend (from your data)
+  TUE  "Tour Tuesday" — a live/recorded home or apartment walkthrough
+  WED  "Wisdom Wednesday" — a relocation tip + Proverbs 24:3 brand line
+  THU  "New Construction Thursday" — a builder incentive spotlight
+  FRI  "Feature Friday" — a neighborhood or a client win/testimonial
+Each post ends with: "DM me or visit live.bridgesglobal.co"
+Cross-post everywhere at once with RESTREAM.IO or STREAMYARD (~$20/mo):
+  one recording -> YouTube + TikTok + Instagram + Facebook simultaneously.
+
+PART B — CARTOON CHANNEL ("Dorota animated series")
+GOAL: a recurring animated character (you) that teaches real estate in a
+fun, Flintstones-style world — builds a household name + huge reach.
+
+RECOMMENDED TOOLS (2026, verified):
+  1. CHARACTER (consistent Dorota): Neolemon or LTX Studio "Elements"
+     — turn your real photo into a cartoon character that stays identical
+     across every episode (the #1 hard problem — these solve it).
+  2. ANIMATION + VOICE + LIP-SYNC: Google Veo 3.1 (native audio/lip-sync)
+     or Kling AI 3.0, or MagicLight for easy episodic consistency.
+  3. VOICE: ElevenLabs (clone your voice, English + Polish).
+  4. SCRIPT: write with Claude (bring me the topic, I write the episode).
+  5. EDIT: CapCut or Descript (free/cheap).
+
+WORKFLOW PER EPISODE (once set up, ~1-2 hrs each):
+  1. Claude writes a 60-90 sec script (e.g. "Dorota explains builder
+     incentives in Bedrock").
+  2. Neolemon/LTX generates the Dorota character + 2-3 backgrounds.
+  3. Veo/Kling animates the scenes; ElevenLabs voices it.
+  4. CapCut assembles + captions -> post via Restream to all platforms.
+
+FIRST 3 EPISODE IDEAS:
+  - "Why your Zillow estimate is wrong" (valuation)
+  - "The apartment secret: the landlord pays ME, not you" (locating)
+  - "Watch before you fly: touring Tampa from anywhere" (relocation)
+
+LEGAL NOTE (2026): purely AI-generated content isn't copyrightable without
+  human authorship — your scripts + edits + voice provide that authorship.
+
+BUDGET TO START: ElevenLabs ~$5/mo, Neolemon/LTX ~$20-40/mo,
+  Veo/Kling ~$20-50/mo, Restream ~$20/mo. Under ~$120/mo total.

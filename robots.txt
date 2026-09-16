@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Sitemap: https://live.bridgesglobal.co/sitemap.xml
+
+# Allow AI crawlers (AIO)
+User-agent: GPTBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /

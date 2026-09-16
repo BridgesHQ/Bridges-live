@@ -1,0 +1,33 @@
+BRIDGES — HOW TO CONNECT REAL DATA (your part)
+================================================
+
+NEW CONSTRUCTION — ✅ ALREADY LIVE
+  Your ShowingNew feed (showingnew.com/dorota) is embedded on /new-construction.
+  Real builders, real inventory, real prices. Every enquiry routes to you.
+  → Just update your license on ShowingNew from SL3519799 to BK3519799.
+
+APARTMENTS — needs a data source (pick one):
+  BEST: RentCast API (~$50-200/mo, real live rentals, auto-updates)
+    1. Sign up: rentcast.io → get API key
+    2. Open /apartment-locating/index.html
+    3. Find: const RENTCAST_API_KEY=""
+    4. Paste your key between the quotes. Done — real rentals appear + auto-update.
+  Alt: Apartment IDX vendor (embed code) — send it to me, I paste it.
+
+MLS LISTINGS (buy-side) — IDX:
+  1. Sign up with IDX Broker / Realtyna / Spark API (~$60/mo)
+  2. They give you an embed code OR API key
+  3. Send it to me → I wire it to your search (same as ShowingNew)
+  Lofty's IDX stays on Lofty; this is a SEPARATE widget for the new site.
+
+GOOGLE REVIEWS (your 25 reviews):
+  1. Google Cloud → enable Places API → get key
+  2. Send me the key + your Place ID → I pull live reviews onto the site.
+
+EMAIL (dd@bridgesglobal.co):
+  Cloudflare → your domain → Email → Email Routing → add dd@ → forward to your inbox.
+
+DOMAIN:
+  Cloudflare → Pages → bridges-live project → Custom domains → add live.bridgesglobal.co
+
+ORLANDO + MIAMI: say the word — I add market pages (content ready, same template).

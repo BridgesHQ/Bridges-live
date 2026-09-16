@@ -1,0 +1,44 @@
+WHAT YOUR DEVELOPER MUST DO (plain steps)
+==========================================
+The website + all screens are built. To make the "bogus" parts (admin login,
+live video, deposits) actually FUNCTION, your developer does these:
+
+1. REAL LOGIN (admin dashboard)
+   - Replace the demo password with Supabase Auth (email/password login).
+   - Set a Supabase Row-Level-Security read policy so /admin can pull leads.
+   - Result: only you (and approved agents) can log in and see real leads.
+
+2. LIVE VIDEO ENGINE (the multi-stream grid)
+   - Sign up for Amazon IVS (or Mux/Agora).
+   - Create a channel per streamer; give each agent a stream key.
+   - Mount the IVS player into the "LIVE VIDEO SLOT" div already in the code
+     (/live-marketplace full-screen view).
+   - Result: real agents stream live into the grid from their phones.
+
+3. DEPOSITS (reserve a unit)
+   - Set up Stripe Connect.
+   - Wire the "Reserve / Deposit" button to a Stripe checkout for a refundable
+     hold; route funds to broker escrow per state rules.
+   - Result: buyers place real refundable deposits.
+
+4. STREAMER VERIFICATION (stop scammers)
+   - Add ID/KYC (e.g., Stripe Identity or Persona) to /become-a-streamer.
+   - Auto-check license vs FL DBPR / TX TREC.
+   - Result: only verified licensed pros can stream.
+
+5. DATA (already mostly done)
+   - RealtyAPI key goes in Cloudflare env var REALTYAPI_KEY (secure).
+   - Supabase is already connected for leads.
+
+GIVE YOUR DEVELOPER THIS PROMPT:
+"Build a multi-broadcaster live real estate streaming marketplace (Kuaishou
+Ideal Home model). Agents stream live property tours simultaneously in a
+browsable grid; viewers watch, chat, submit lead + refundable deposit
+in-stream; leads route to a broker and track to commission. Use Amazon IVS
+for real-time multi-host video, Supabase for auth/leads (already set up:
+suwphgvhhohvvudkbiii.supabase.co), Stripe Connect for deposits/escrow, and
+wire into the existing HTML/JS front-end I provide (grid, full-screen stream
+view, chat, reserve/deposit, admin dashboard, streamer KYC already built).
+Add per-host analytics and Stripe Identity + state-license verification."
+
+TIMELINE/COST: ~2-6 weeks, ~$8,000-$30,000 depending on scope.

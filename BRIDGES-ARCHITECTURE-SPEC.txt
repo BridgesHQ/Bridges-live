@@ -1,0 +1,121 @@
+BRIDGES LIVE — PLATFORM ARCHITECTURE & BUILD SPECIFICATION
+===========================================================
+For: Dorota Maslowska, Bridges Global (FL BK3519799 / TX)
+Model: Kuaishou "Ideal Home" for the US market
+Build order (per strategy): ARCHITECTURE → ONBOARDING → CONTENT → SCALE
+
+═══════════════════════════════════════════════════════════
+THE CORE FLOW (what the platform does)
+═══════════════════════════════════════════════════════════
+Agent → Brokerage → License → Property → Authorization → Show →
+Stream → Social Channels → Viewer → Lead → Appointment →
+Transaction → Revenue
+
+The rule (build the SMALLEST working loop first, prove it, then scale):
+  Agent LIVE → property attached → viewer watches → viewer raises hand
+  → lead routed → appointment → attribution → revenue.
+
+═══════════════════════════════════════════════════════════
+SYSTEM LAYERS
+═══════════════════════════════════════════════════════════
+DISTRIBUTION  = Social platforms (TikTok/YouTube/IG/FB) + Bridges grid
+MARKETPLACE   = Bridges Live (aggregates all live shows)
+INVENTORY     = MLS / IDX property database
+RELATIONSHIP  = CRM (HubSpot/Salesforce)
+AUTOMATION    = AI (Claude API) + Zapier/Make
+MONETIZATION  = Payments + transaction attribution
+
+═══════════════════════════════════════════════════════════
+TECH STACK (developer sets up)
+═══════════════════════════════════════════════════════════
+Cloud:        AWS (or GCP)
+Database:     PostgreSQL (Supabase — already connected)
+Video:        Amazon IVS (multi-host) — or Mux / LiveKit
+Payments:     Stripe + Stripe Connect (agent payouts, deposits/escrow)
+CRM:          HubSpot (start) → Salesforce (scale)
+Automation:   Zapier / Make
+Analytics:    PostHog / Mixpanel
+KYC/ID:       Stripe Identity or Persona
+Social APIs:  YouTube Live API, Meta (FB/IG) API, Twitch API
+              (TikTok = limited API, mostly manual/Restream)
+Real estate:  RealtyAPI (connected) + Showing/appointment system
+AI:           Claude API — descriptions, lead qualification, moderation,
+              transcription, auto-clips
+E-sign:       DocuSign/Dropbox Sign (later, for contracts)
+
+═══════════════════════════════════════════════════════════
+COMPONENTS THE DEVELOPER MUST BUILD
+═══════════════════════════════════════════════════════════
+1. AGENT ONBOARDING
+   - Application form (built: /become-a-streamer)
+   - Connect social accounts (OAuth: YouTube, Meta)
+   - Connect Stripe (agent payout account)
+
+2. LICENSE VERIFICATION
+   - Auto-check license # vs FL DBPR / TX TREC databases
+   - Store license status + expiry per agent
+
+3. BROKER APPROVAL
+   - Admin queue (built: /admin > streamer approvals)
+   - Manual approve/reject + KYC (Stripe Identity/Persona)
+   - Grant streaming permission on approval
+
+4. PROPERTY AUTHORIZATION
+   - Agent attaches a property (from MLS/IDX or manual)
+   - Broker/system confirms agent is authorized to show it
+   - Compliance log entry
+
+5. MULTI-AGENT PERMISSIONS (the 5,000-agent goal)
+   - Role model: viewer / agent / broker-admin
+   - Each agent = own stream channel (Amazon IVS stage)
+   - Supabase Row-Level Security enforces who sees/does what
+
+6. STREAMING CREDENTIALS
+   - Amazon IVS: create a channel/stage per approved agent
+   - Give each agent a stream key
+   - Bridges Live grid aggregates all active stages
+
+7. SOCIAL INTEGRATIONS
+   - Simulcast via Restream OR direct YouTube/Meta Live APIs
+   - Embed live + pull comments where APIs allow
+
+8. LEAD ROUTING
+   - Viewer "raises hand"/Reserve → lead created (built → Supabase)
+   - Route to the streaming agent + notify (SMS/email)
+   - Push to CRM
+
+9. CRM
+   - Sync leads → HubSpot; track stage lead→tour→contract→close
+
+10. ANALYTICS
+    - PostHog events: watch, reserve, lead, appointment, close
+    - Per-agent leaderboard + per-stream conversion
+
+11. REVENUE ATTRIBUTION
+    - Tie each closed deal back to the stream/agent/lead
+    - Commission-split calc (KuaiCommission-style)
+
+12. COMPLIANCE / AUDIT LOGS
+    - Log authorizations, approvals, deposits, disclosures
+    - Written buyer-agreement capture (post-NAR-settlement)
+    - Earnest money → broker trust/title escrow (NOT Stripe)
+
+═══════════════════════════════════════════════════════════
+IMPORTANT LEGAL (build these in)
+═══════════════════════════════════════════════════════════
+- "Reserve" = express interest + refundable hold via Stripe.
+  It is NOT a property reservation/contract. Copy must say so.
+- Earnest money must go to broker trust account or licensed
+  title/escrow — never held in Stripe.
+- Written buyer agreement with specific compensation BEFORE showing.
+- Referral compensation only between licensed agents/brokers (RESPA).
+
+═══════════════════════════════════════════════════════════
+STAGED ROLLOUT (don't build everything at once)
+═══════════════════════════════════════════════════════════
+STAGE 1 (now, ~$100-200/mo): Dorota simulcasts solo via Restream →
+  embed on site → capture leads (Supabase) → prove the loop earns.
+STAGE 2 ($30-80K dev): Amazon IVS native stream + Stripe Connect +
+  KYC/license verify + CRM. Recruit 2-5 agents.
+STAGE 3 ($150-400K): Full multi-agent marketplace, commission
+  settlement, analytics, mobile apps → scale toward 5,000 agents.

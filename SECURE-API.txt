@@ -1,0 +1,19 @@
+PROTECT YOUR API KEY (do this so no one can steal it)
+======================================================
+Your key is currently in the code (anyone can view-source and see it).
+To hide it server-side:
+
+1. In /apartment-locating/index.html, set REALTYAPI_KEY="" (empty) —
+   this forces the site to use the secure proxy instead.
+2. Deploy to Cloudflare Pages.
+3. Cloudflare → your Pages project → Settings → Environment variables
+   → add:  Name = REALTYAPI_KEY   Value = rt_OgeE8H0Tf02BTxd2EMrH1vBx
+4. Redeploy. The included function (functions/api/apartments.js) now
+   calls RealtyAPI with your key SERVER-SIDE — the key never appears
+   in the public page. Visitors only see /api/apartments.
+
+ALSO: rotate your key once in RealtyAPI → Settings (it was shared in chat),
+   then use the NEW key as the environment variable value above.
+
+REFRESH: data auto-updates on every search; the proxy caches 30 min
+   to save your API credits (free tier = 250/month, so caching matters).

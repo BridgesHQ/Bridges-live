@@ -1,0 +1,33 @@
+BRIDGES — APARTMENT DATA (final, in priority order)
+=====================================================
+
+#1 RECOMMENDED — RealtyAPI.io (FREE tier, NO credit card)
+   - Real Apartments.com unit-level rent data (exact rent per unit)
+   - Free: 250 requests/month (enough to start)
+   1. Go to realtyapi.io → sign up (no card for free tier)
+   2. Copy your API key
+   3. Open /apartment-locating/index.html → find: REALTYAPI_KEY=""
+   4. Paste key inside quotes → save → redeploy
+   → Real Tampa Bay / Orlando / Miami rentals go live
+
+   (3 vendors are wired — the site tries them in this order automatically:
+    RealtyAPI → RentCast → Apify. Paste whichever key you have.)
+
+NEW CONSTRUCTION — ✅ already live (ShowingNew = BDX/Zonda network)
+MLS RESALE (optional) — SimplyRETS $99 setup + $49/mo (you qualify as broker)
+
+NOTE ON "how much PMs pay in commission":
+   No public data feed has this — it's private. You get it from:
+   (a) your own agreements with property managers, or
+   (b) apartment-locator networks you join.
+   CoStar/MRI are enterprise ($500+/mo, call for quote) and still won't
+   hand you commission rates — they're PM software, not a public feed.
+
+═══════════════════════════════════════════
+YOUR KEY IS ALREADY WIRED: rt_OgeE8H0Tf02BTxd2EMrH1vBx
+  (in /apartment-locating/index.html — REALTYAPI_KEY)
+SECURITY: rotate this key in RealtyAPI → Settings after launch,
+  since it was shared in chat. Paste the new one in the same spot.
+TO VERIFY FIELDS: in the RealtyAPI playground, open the Apartments
+  tab → search/bylocation → Test → copy the RESPONSE JSON → send it
+  to me so I map the exact field names (price, photos, beds).

@@ -1,0 +1,71 @@
+BRIDGES — FULL ACTIVATION GUIDE (make it function like Whatnot/TikTok Live)
+============================================================================
+
+WHAT WORKS NOW (no setup):
+  ✅ New Construction — real builder inventory (ShowingNew embed, live)
+  ✅ Lead capture — every form + AI chat saves to your Supabase
+  ✅ Bridges Live app — the live-streaming marketplace UI is built
+  ✅ Blog (12 articles), all community pages, SEO schema
+
+═══════════════════════════════════════════════════════════
+STEP 1 — DEPLOY (10 min) — makes the site live
+═══════════════════════════════════════════════════════════
+  Cloudflare → Pages → "bridges-live" project → Create deployment
+  → upload this ZIP's contents → Custom domains → add live.bridgesglobal.co
+
+═══════════════════════════════════════════════════════════
+STEP 2 — MAKE LIVE STREAMING WORK (like Whatnot/TikTok Live)
+═══════════════════════════════════════════════════════════
+The Bridges Live app (/live/) is built to stream. To go live:
+  A) SIMPLE (works today, free):
+     - Seller taps "List & Go Live" → starts a YouTube Live on their phone
+     - Pastes the YouTube link → it appears live on your marketplace feed
+     - Buyers watch, chat, and "claim" (= lead to you). Already wired.
+  B) PRO (low-latency, real Whatnot feel) — add Amazon IVS:
+     1. AWS account → Amazon IVS → create a channel → get Stream Key + Playback URL
+     2. Send me the Playback URL → I wire the low-latency player (code already stubbed)
+     3. Sellers stream via any RTMP app (Larix, OBS mobile) to your IVS channel
+  Property managers: they sign up on /live/ → you approve → they stream their units.
+
+═══════════════════════════════════════════════════════════
+STEP 3 — CONNECT REAL DATA
+═══════════════════════════════════════════════════════════
+  NEW CONSTRUCTION: ✅ done (ShowingNew). Just fix your license there SL→BK.
+
+  APARTMENTS (real rentals, auto-update):
+     1. rentcast.io → subscribe → copy API key
+     2. /apartment-locating/index.html → find: const RENTCAST_API_KEY=""
+     3. Paste key → real rentals appear + refresh automatically
+
+  MLS BUY-SIDE (IDX):
+     1. Sign up IDX Broker / Realtyna / Spark (~$60/mo)
+     2. They give an embed code (like ShowingNew) OR API key
+     3. Send it to me → I embed on a new /listings page
+     Note: Lofty's IDX stays on Lofty; this is a separate widget for the new site.
+
+  GOOGLE REVIEWS (your 22):
+     1. Google Cloud → enable Places API → API key
+     2. Find your Place ID (developers.google.com/maps place-id finder)
+     3. Send me key + Place ID → live reviews on the site
+     (If reviews dropped 25→22: Google filtered some. Google Business support can review.)
+
+═══════════════════════════════════════════════════════════
+STEP 4 — TURN ON THE MONEY
+═══════════════════════════════════════════════════════════
+  - Stripe: /live/index.html top → STRIPE = {} → paste Payment Links (seller plans)
+  - Affiliate/advertiser: search #REPLACE-AFFILIATE-LINK → paste partner URLs
+  - Email dd@: Cloudflare → Email Routing → add dd@ → forward to your inbox
+  - Matcha commerce: already links to bridgeshq.co
+
+═══════════════════════════════════════════════════════════
+STEP 5 — GET FOUND (SEO/AI)
+═══════════════════════════════════════════════════════════
+  - Google Search Console → add live.bridgesglobal.co → submit sitemap.xml
+  - Google Business Profile → set website to live.bridgesglobal.co
+  - Get more Google + Yelp reviews (ask every closed client)
+  - Your schema already lists all profiles (Yelp/Zillow/ShowingNew/IG/LinkedIn)
+
+ORLANDO + MIAMI: say the word — market pages added same day.
+
+BuilderBoost Book: it's a flip-magazine for agents (promotions), not a data feed —
+  no API. ShowingNew already gives you the same builders' live inventory.

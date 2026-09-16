@@ -1,0 +1,59 @@
+═══════════════════════════════════════════════════════════════
+BRIDGES — START HERE. Do these in order. Each = one action.
+═══════════════════════════════════════════════════════════════
+
+#1 — DEPLOY THE SITE (makes it live) — 10 min, FREE
+   WHERE: Cloudflare dashboard → Pages → "bridges-live" project
+   WHAT:  Create deployment → drag in this ZIP's contents → Save
+   THEN:  Custom domains → add: live.bridgesglobal.co
+   RESULT: your site is live. Everything below makes it MORE powerful.
+
+#2 — REAL APARTMENTS (auto-updating rentals) — 30 min, ~$50-200/mo
+   WHERE: rentcast.io → sign up → API Keys → copy key
+   WHAT:  open /apartment-locating/index.html → find RENTCAST_API_KEY=""
+          → paste your key inside the quotes → save → redeploy
+   RESULT: real Tampa Bay rentals appear + refresh automatically.
+
+#3 — MLS LISTINGS / IDX (buy-side homes) — 1 hr, ~$60/mo
+   WHERE: sign up at idxbroker.com (or Realtyna/Spark)
+   WHAT:  they give you an EMBED CODE → send it to me → I add a /listings page
+   NOTE:  keep Lofty's IDX where it is; this is a separate widget.
+
+#4 — YOUR GOOGLE REVIEWS (show your 22 live) — 30 min, FREE
+   WHERE: console.cloud.google.com → enable Places API → create API key
+   WHAT:  get your Place ID (google "place id finder") → send me key + Place ID
+   RESULT: your real Google reviews show on the site (not hardcoded).
+
+#5 — LIVE STREAMING (Whatnot/TikTok-style) 
+   FREE NOW: seller taps "List & Go Live" in /live/ → starts YouTube Live →
+             pastes link → appears on your marketplace. Works today.
+   PRO (low-latency, real Whatnot feel) — ~$0.10-2/hr:
+     WHERE: AWS console → Amazon IVS → create channel
+     WHAT:  copy the Playback URL → send it to me → I wire the fast player
+             copy the Stream Key → sellers stream from phone (Larix/OBS app)
+
+#6 — TURN ON MONEY
+   STRIPE:   /live/index.html top → STRIPE = {} → paste Payment Links
+   AFFILIATE: search project for #REPLACE-AFFILIATE-LINK → paste partner URLs
+   EMAIL dd@: Cloudflare → your domain → Email → Email Routing → add dd@
+
+#7 — GET FOUND (SEO / AI search)
+   Google Search Console → add site → submit sitemap.xml
+   Google Business Profile → set website = live.bridgesglobal.co
+   Ask every client for a Google review (you have 22, filtered from 25 —
+     Google Business support can review the missing 3).
+
+═══════════════════════════════════════════════════════════════
+DO YOU NEED A DEVELOPER?
+   Site itself: NO — deploy + paste keys (above).
+   Steps #3 and #5-PRO: a developer for 2-3 hrs helps wire & test,
+     but not required — instructions are step-by-step.
+   Send me the keys/embed codes and I do the wiring.
+
+WHAT ONLY YOU CAN PROVIDE (I can't fetch these):
+   - Real photos of you + Conrad (upload in chat) → I place them
+   - API keys above (RentCast, IDX, Google, AWS) → I wire them
+   - bridgeshq.co images: upload the ones you want → I place them
+     (I cannot pull images from external sites — all blocked in my tools)
+
+ORLANDO + MIAMI market pages: say the word, added same day.

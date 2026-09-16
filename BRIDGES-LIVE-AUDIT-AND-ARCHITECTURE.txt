@@ -1,0 +1,263 @@
+═══════════════════════════════════════════════════════════════════
+BRIDGES LIVE — SYSTEM AUDIT & ARCHITECTURE (per Build Spec §29)
+Prepared for: Dorota Maslowska / Bridges Global + your developer
+═══════════════════════════════════════════════════════════════════
+HONEST STATEMENT: What exists today is a FRONT-END PROTOTYPE (static
+HTML/JS deployed to Cloudflare Pages) + real data integrations. It is
+NOT the full multi-tenant application the spec describes. Nothing is
+"deployed and verified" as a production platform. This document audits
+what's real and specifies what the developer must build.
+
+───────────────────────────────────────────────────────────────────
+1. CURRENT SYSTEM AUDIT
+───────────────────────────────────────────────────────────────────
+Frontend:        Static HTML/CSS/JS (no framework). Hand-built pages.
+Backend:         NONE (no server app). Cloudflare Pages Functions only
+                 (1 serverless proxy for RealtyAPI).
+Database:        Supabase (PostgreSQL) — used for a single `leads` table.
+Authentication:  NONE real. Admin page uses a demo password in JS.
+User management:  NONE. No roles, no accounts.
+Hosting:         Cloudflare Pages (project: bridges-live).
+DNS:             Cloudflare. live.bridgesglobal.co → Active, SSL on.
+Env variables:   REALTYAPI_KEY (in Cloudflare, server-side).
+APIs:            RealtyAPI (apartments/listings) via serverless proxy.
+Property/MLS:    RealtyAPI (Apartments.com data) + ShowingNew embed
+                 (new construction). No true MLS/IDX broker feed.
+CRM:             NONE. Leads sit in Supabase only.
+Payments:        NONE live. Stripe referenced, not connected.
+Analytics:       GA4 tag present (G-NN5K59SYSJ). No PostHog/event model.
+Livestream tech: NONE real. UI prototype only. No IVS/Mux/video pipes.
+Social integr.:  NONE via API. Manual/embed only (Restream recommended).
+Media storage:   Cloudflare static assets. No user uploads.
+Email/SMS:       NONE. Forms write to Supabase; no auto-send.
+Security:        API key server-side ✓. No MFA, RBAC, tenant isolation.
+Mobile:          Responsive CSS ✓.
+SEO:             Meta + RealEstateAgent schema + sitemap ✓.
+Performance:     Static = fast. No build pipeline.
+Deployment:      Manual ZIP upload to Cloudflare Pages. No Git/CI/CD.
+CI/CD:           NONE.
+Monitoring:      NONE.
+Error tracking:  NONE.
+Backups:         Supabase managed backups only.
+
+AUDIT VERDICT:
+  KEEP:    Cloudflare hosting, Supabase (Postgres), RealtyAPI, ShowingNew,
+           SEO/schema, responsive front-end, the lead-capture pattern,
+           the UI/UX prototypes (marketplace grid, onboarding, admin).
+  CHANGE:  Admin auth → real Supabase Auth. Static pages → a real app
+           framework (Next.js) once backend exists. Lead table → full schema.
+  REMOVE:  Demo password. Any copy implying consumers can "reserve/hold"
+           a property (compliance).
+  BUILD:   Everything in sections 2-20 below (backend, roles, video, etc.)
+  RISKS:   No auth/RBAC, no tenant isolation, no real video, no payments,
+           no CRM, no monitoring. Legal: deposit/escrow handling, buyer
+           agreements, RESPA referral rules.
+  MISSING: Backend app, database schema/ERD, video infra, social OAuth,
+           CRM, attribution, analytics events, CI/CD, staging.
+  INFRA:   Need AWS (IVS), a Postgres app schema, Stripe Connect, a CRM,
+           an analytics pipeline, and a Git+CI/CD workflow.
+
+───────────────────────────────────────────────────────────────────
+2. CURRENT ARCHITECTURE
+───────────────────────────────────────────────────────────────────
+Browser → Cloudflare Pages (static HTML/JS)
+        → Cloudflare Function → RealtyAPI (listings)
+        → Supabase REST (leads insert)
+        → ShowingNew (iframe embed, new construction)
+That's it. No server, no auth, no video backend.
+
+───────────────────────────────────────────────────────────────────
+3. PROBLEMS FOUND
+───────────────────────────────────────────────────────────────────
+- No real authentication or user accounts.
+- No roles / RBAC / tenant isolation (spec §5,6 mandatory).
+- No database schema beyond one leads table (spec §4 needs ~25 entities).
+- No real livestream engine (spec §9).
+- No social OAuth integrations (spec §10).
+- No CRM, attribution, or analytics event model (spec §13,16,21).
+- No payments/monetization plumbing (spec §19).
+- No CI/CD, staging, monitoring, backups strategy (spec §27).
+- Compliance gaps: deposit/escrow, buyer agreements, RESPA.
+
+───────────────────────────────────────────────────────────────────
+4. RECOMMENDED ARCHITECTURE
+───────────────────────────────────────────────────────────────────
+Frontend:   Next.js (React) — SEO pages + app dashboards.
+Backend:    Node/TypeScript API (or Next.js API routes) + Postgres.
+Database:   Postgres (Supabase or AWS RDS) with full schema + RLS.
+Auth:       Supabase Auth (email/OAuth), JWT, role claims.
+Video:      Amazon IVS (multi-host stages) behind an abstraction layer
+            so provider can swap (Mux/LiveKit) later. (spec §9)
+Social:     Adapter per platform (YouTube Live API, Meta API); Restream
+            for simulcast in early stages. (spec §10)
+Payments:   Stripe + Stripe Connect (agent payouts, deposits).
+CRM:        HubSpot (start) via API/Zapier → Salesforce later.
+Analytics:  PostHog/Mixpanel event pipeline.
+AI:         Claude API — transcription, clips, descriptions, lead-qual,
+            moderation. (spec §17)
+Infra:      AWS (IVS + optional RDS/S3), Cloudflare CDN, queues/workers.
+Deploy:     Git → CI/CD → staging → smoke tests → production. (spec §27)
+
+───────────────────────────────────────────────────────────────────
+5. DATABASE DESIGN (core entities, spec §4)
+───────────────────────────────────────────────────────────────────
+Users, Agents, Brokerages, Offices, Teams, Licenses, Properties,
+Listings, PropertyAuthorizations, Shows, Streams, StreamDestinations,
+SocialAccounts, Viewers, EngagementEvents, Leads, Appointments,
+Campaigns, Transactions, RevenueEvents, Subscriptions, Payments,
+Notifications, AuditLogs.
+Standards: UUID PKs, foreign keys, indexes, created_at/updated_at,
+soft-delete (deleted_at), tenant_id on every tenant-scoped row, audit
+history on compliance actions.
+
+───────────────────────────────────────────────────────────────────
+6. ERD (relationships — build visual before coding)
+───────────────────────────────────────────────────────────────────
+Brokerage 1─* Office 1─* Team 1─* Agent
+Agent 1─* License · Agent 1─* SocialAccount
+Agent *─* Property via PropertyAuthorization (status, date)
+Property 1─* Listing
+Show *─1 Agent(host) · Show *─* Property · Show 1─1 Stream
+Stream 1─* StreamDestination (youtube/tiktok/ig/fb/bridges)
+Viewer 1─* EngagementEvent *─1 Show
+EngagementEvent → Lead 1─* Appointment 1─* Transaction 1─* RevenueEvent
+Campaign 1─* Show · Brokerage 1─* Subscription 1─* Payment
+Every important write → AuditLog.
+(Developer: render this as a real ERD in dbdiagram.io / mermaid.)
+
+───────────────────────────────────────────────────────────────────
+7. USER ROLES (spec §6)
+───────────────────────────────────────────────────────────────────
+Platform Admin, Broker, Brokerage Admin, Office Admin, Team Leader,
+Licensed Agent, Co-host, Producer, Unlicensed Media User, Viewer.
+
+───────────────────────────────────────────────────────────────────
+8. PERMISSION MODEL (RBAC)
+───────────────────────────────────────────────────────────────────
+Role-based, permissions configurable (not hard-coded). Enforced at API
++ Postgres Row-Level Security. Unlicensed roles CANNOT perform acts
+requiring a license (showing, representing, negotiating). Track per
+agent: state, license#, status, expiration, brokerage, broker approval,
+role, permissions. Audit logs on all compliance actions.
+
+───────────────────────────────────────────────────────────────────
+9. PROPERTY AUTHORIZATION MODEL (spec §7)
+───────────────────────────────────────────────────────────────────
+Property = first-class object. A Show cannot use a Property unless a
+PropertyAuthorization row exists (agent authorized to market/show it),
+with status + date + source (MLS/IDX/builder). Supports single/multi-
+property shows, open houses, new construction, apartments, builder,
+relocation, investment tours.
+
+───────────────────────────────────────────────────────────────────
+10. LIVESTREAM ARCHITECTURE (spec §9)
+───────────────────────────────────────────────────────────────────
+Do NOT build video from scratch. Use Amazon IVS (multi-host stages) via
+an abstraction layer. Support RTMP(S)/HLS/WebRTC, low latency, recording,
+webhooks, stream health, viewer concurrency, CDN, autoscale, failover.
+Show (business object) is separate from Stream (technical session).
+
+───────────────────────────────────────────────────────────────────
+11. SOCIAL DISTRIBUTION ARCHITECTURE (spec §10)
+───────────────────────────────────────────────────────────────────
+Adapter pattern: AgentProduction → Bridges Distribution Service →
+Bridges Live + YouTube + TikTok + Facebook + Instagram + Twitch.
+Each connector uses ONLY real official-API capabilities (OAuth, token
+storage/refresh, stream create, publish, monitor, disconnect, errors).
+Never invent API features. TikTok API is limited — simulcast via Restream.
+
+───────────────────────────────────────────────────────────────────
+12. CRM ARCHITECTURE (spec §16)
+───────────────────────────────────────────────────────────────────
+Leads → CRM (HubSpot/Salesforce) via API. Automations: New lead → CRM →
+agent notify → email → SMS → follow-up task. Post-show → recording →
+transcript → clips → social → analytics → lead processing. Plus license-
+expiry warnings, stream-failure alerts/retry, appointment reminders.
+
+───────────────────────────────────────────────────────────────────
+13. LEAD ATTRIBUTION MODEL (spec §13)
+───────────────────────────────────────────────────────────────────
+Chain: Viewer → Show → Property → Agent → Brokerage → Campaign →
+Social Source → Action → Appointment → Outcome → Revenue.
+Every lead answers: which stream/property/agent/brokerage/platform/
+campaign/action/appointment/transaction/revenue.
+
+───────────────────────────────────────────────────────────────────
+14. MONETIZATION ARCHITECTURE (spec §19)
+───────────────────────────────────────────────────────────────────
+Revenue streams: agent subs, brokerage subs, qualified-lead fees,
+lawful referral/transaction revenue, developer/builder campaigns,
+sponsored shows, ads, premium placement, analytics/AI/marketing services.
+Stripe (+Connect). Track revenue by agent/brokerage/property/show/
+campaign/lead/appointment/transaction. Compensation rules CONFIGURABLE,
+never hard-coded. Earnest money → broker trust/title escrow, NOT Stripe.
+
+───────────────────────────────────────────────────────────────────
+15. ANALYTICS ARCHITECTURE (spec §21)
+───────────────────────────────────────────────────────────────────
+Events at platform/brokerage/agent/show/property/campaign/channel level.
+Track viewers, watch time, engagement, leads, qualified leads,
+appointments, conversions, transactions, revenue. Primary metric:
+QUALIFIED INTENT + REVENUE PER SHOW (not vanity views). Use PostHog/Mixpanel.
+
+───────────────────────────────────────────────────────────────────
+16. SECURITY RISKS (spec §22)
+───────────────────────────────────────────────────────────────────
+Current gaps: no MFA, no RBAC, no tenant isolation, no secret mgmt beyond
+one key, no rate limiting, no webhook verification, no monitoring/backups.
+Must implement all + never expose social tokens, stream keys, payment
+secrets, private brokerage data, credentials, API secrets.
+
+───────────────────────────────────────────────────────────────────
+17. SCALABILITY PLAN (spec §23)
+───────────────────────────────────────────────────────────────────
+Design for 5k→10k→50k agents: autoscaling, CDN, queues, workers, caching,
+DB optimization/indexing, object storage, event-driven processing. Use
+managed infra. Don't overbuild before product-market validation.
+
+───────────────────────────────────────────────────────────────────
+18. MVP BUILD PLAN (smallest working loop first)
+───────────────────────────────────────────────────────────────────
+Prove ONE loop before the network:
+  Agent LIVE → property attached → viewer watches → viewer raises hand
+  → lead routed → appointment → attribution → revenue.
+MVP scope: Supabase Auth (agent+broker+viewer roles), core tables
+(Agent, Property, PropertyAuthorization, Show, Stream, Lead, Appointment,
+AuditLog), Amazon IVS single/multi stream, lead capture+routing, Stripe
+deposit, basic attribution + analytics, broker approval queue.
+Target: 50-100 agents, then scale (spec §28).
+
+───────────────────────────────────────────────────────────────────
+19. EXACT FILES/COMPONENTS TO CHANGE (from current prototype)
+───────────────────────────────────────────────────────────────────
+- /admin: replace demo password with Supabase Auth + RLS.
+- /become-a-streamer: wire to Agents table + license verify + KYC.
+- /live-marketplace: back the grid with Shows/Streams from DB + IVS player.
+- Supabase: expand from `leads` to full schema (§5).
+- Add: property authorization service, lead-routing service, attribution
+  service, social OAuth adapters, Stripe Connect, CRM sync, analytics events.
+- Remove: any "reserve/hold property" consumer copy (compliance).
+- Migrate static pages into a Next.js app once backend exists.
+
+───────────────────────────────────────────────────────────────────
+20. DEPLOYMENT PLAN (spec §27)
+───────────────────────────────────────────────────────────────────
+Set up: Git repo, hosting (Vercel/Cloudflare/AWS), DB hosting, DNS,
+env vars, staging + production, CI/CD.
+Pipeline: Git → CI/CD → tests → staging → smoke tests → production.
+Pre-prod test: auth, RBAC, broker isolation, license workflow, property
+authorization, livestream, social, lead capture, CRM, payments, webhooks,
+mobile, security, performance. Add backups, rollback, health checks,
+monitoring, logging, alerts.
+NEVER call it "deployed" until deployed AND verified.
+
+═══════════════════════════════════════════════════════════════════
+BUILD ORDER (spec §28) — do NOT skip ahead:
+Audit → Architecture → DB → ERD → RBAC → Multi-tenant → Property auth →
+Integrations → Monetization → Agent onboarding → Property mgmt → Live Show
+→ Streaming → 1st social → Lead capture → CRM → Attribution → Analytics →
+Broker dashboard → Automation → AI/content → more social → Payments →
+Staging → Testing → Production → Monitoring → recruit 50-100 agents → scale.
+Do NOT build the YouTube content calendar first.
+Do NOT recruit 5,000 agents before the platform is proven.
+═══════════════════════════════════════════════════════════════════
