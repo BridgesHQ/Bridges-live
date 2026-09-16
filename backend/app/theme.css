@@ -1,0 +1,14 @@
+/* Bridges Live — Theme tokens. Trust (light) default, Luxury (dark) via [data-theme="luxury"] */
+:root, [data-theme="trust"] {
+  --bg:#FAFAFA; --surface:#FFFFFF; --surface-2:#F2F3F6;
+  --text:#1A1A1A; --muted:#5A6270; --line:#E6E8EE;
+  --brand:#0E1E52; --accent:#C9A84C; --cta:#1A5C3A; --live:#D2352A;
+  --shadow:0 8px 30px rgba(14,30,82,.06);
+}
+[data-theme="luxury"] {
+  --bg:#0B0C10; --surface:#131720; --surface-2:#0f1420;
+  --text:#F1F1EC; --muted:#8a97b5; --line:#1e2740;
+  --brand:#0E1E52; --accent:#CBB26A; --cta:#1A5C3A; --live:#D2352A;
+  --shadow:0 20px 50px rgba(0,0,0,.5);
+}
+body{background:var(--bg);color:var(--text);transition:background .3s,color .3s}
