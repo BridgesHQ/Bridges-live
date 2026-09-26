@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bridges Admin</title>
-<meta name="description" content="List your community on Bridges — new-construction builders, apartment communities, and property managers fill units faster with live video tours and qualified lead capture. Free to list.">>
+<meta name="description" content="List your community on Bridges — new-construction builders, apartment communities, and property managers fill units faster with live video tours and qualified lead capture. Free to list.">
 <meta name="keywords" content="sell my home Tampa, list my house Austin, live streamed open house, sell to international buyers">
-<link rel="canonical" href="https://live.bridgesglobal.co/list-with-us">>
+<link rel="canonical" href="https://live.bridgesglobal.co/list-with-us">
 <meta property="og:title" content="Sell Your Home with Live-Streamed Showings | Bridges Global">
 <meta property="og:description" content="Sell your Tampa Bay or Austin home with live-streamed open houses that reach relocation and international buyers. Multilingual marketing.">
 <meta property="og:type" content="website">
@@ -287,7 +287,7 @@ img{transition:transform .5s ease}
   <a class="bglogo" href="/" style="display:flex;align-items:center;text-decoration:none;flex-shrink:0"><img src="/assets/logo-nav.svg" alt="Bridges Global" style="height:40px;width:auto;object-fit:contain;display:block"></a>
   <button class="bgburger" aria-label="Menu" onclick="document.getElementById('bgmenu').classList.toggle('open')"><span></span><span></span><span></span></button>
   <div class="bgmenu" id="bgmenu">
-    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/brandon">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
+    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/riverview">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
     <a href="/apartment-locating">Apartments</a>
     <a href="/live-marketplace" class="nav-live"><span class="nav-dot"></span>Bridges Live</a>
     <a href="/relocation">Relocation</a>
@@ -332,7 +332,7 @@ img{transition:transform .5s ease}
 <input id="pw" type="password" placeholder="Password" onkeydown="if(event.key===&#39;Enter&#39;)adminLogin()">
 <button onclick="adminLogin()">Log in</button>
 <p id="err" style="color:#D2352A;margin-top:10px;font-size:13px"></p>
-<p style="font-size:12px;color:#8a93a2;margin-top:14px">Demo: <b>bridges2026</b> · production uses Supabase Auth</p>
+<p id="pwhint" style="font-size:12px;color:#8a93a2;margin-top:14px">Demo: <b>bridges2026</b> · production uses Supabase Auth</p>
 </div>
 
 <div id="ad-app" style="display:none">
@@ -343,7 +343,9 @@ img{transition:transform .5s ease}
 <div class="ad-tab" onclick="tab(&#39;pipeline&#39;,this)">💰 Commission pipeline</div>
 <div class="ad-tab" onclick="tab(&#39;streams&#39;,this)">🔴 Live streams</div>
 <div class="ad-tab" onclick="tab(&#39;streamers&#39;,this)">✓ Streamer approvals</div>
-<div class="ad-tab" onclick="tab(&#39;deposits&#39;,this)">🏦 Deposits</div>
+<div class="ad-tab" onclick="tab(&#39;showings&#39;,this)">🏦 Showings &amp; holds</div>
+<div class="ad-tab" onclick="tab(&#39;orders&#39;,this)">🛒 Orders (matcha)</div>
+<div class="ad-tab" onclick="tab(&#39;cc&#39;,this)">🛡 Command Center</div>
 </div>
 <div class="ad-main">
 <div id="p-leads" class="ad-panel on">
@@ -363,8 +365,8 @@ img{transition:transform .5s ease}
 </div>
 <div id="p-streams" class="ad-panel">
 <h2 style="font-family:Marcellus,serif;color:#0E1E52;font-size:24px;margin-bottom:20px">Live streams</h2>
-<div class="ad-stats"><div class="ad-stat"><div class="l">Live now</div><div class="v" style="color:#D2352A">3</div></div><div class="ad-stat"><div class="l">Total viewers</div><div class="v" style="color:#0E1E52">687</div></div><div class="ad-stat"><div class="l">Showings today</div><div class="v" style="color:#1A5C3A">14</div></div></div>
-<div class="ad-table"><div class="ad-th" style="grid-template-columns:1.5fr 1fr 1fr 1fr"><div>Stream</div><div>Agent</div><div>Viewers</div><div>Showings</div></div>
+<div class="ad-stats"><div class="ad-stat"><div class="l">Live now</div><div class="v" style="color:#D2352A" id="st-live">3</div></div><div class="ad-stat"><div class="l">Total viewers</div><div class="v" style="color:#0E1E52" id="st-view">687</div></div><div class="ad-stat"><div class="l">Showings today</div><div class="v" style="color:#1A5C3A" id="st-show">14</div></div></div>
+<div class="ad-table" id="st-table"><div class="ad-th" style="grid-template-columns:1.5fr 1fr 1fr 1fr"><div>Stream</div><div>Agent</div><div>Viewers</div><div>Showings</div></div>
 <div class="ad-tr" style="grid-template-columns:1.5fr 1fr 1fr 1fr"><div>Triple Creek Model B</div><div>Dorota M.</div><div>242</div><div style="color:#1A5C3A;font-weight:700">6</div></div>
 <div class="ad-tr" style="grid-template-columns:1.5fr 1fr 1fr 1fr"><div>Waterfront Apollo Beach</div><div>Dorota M.</div><div>389</div><div style="color:#1A5C3A;font-weight:700">5</div></div>
 <div class="ad-tr" style="grid-template-columns:1.5fr 1fr 1fr 1fr"><div>Channelside Lofts</div><div>Emerald</div><div>156</div><div style="color:#1A5C3A;font-weight:700">3</div></div></div>
@@ -380,17 +382,63 @@ img{transition:transform .5s ease}
 <div class="ad-table"><div class="ad-th" style="grid-template-columns:1.3fr 1.5fr 1fr 1fr"><div>Buyer</div><div>Property</div><div>Amount</div><div>Status</div></div>
 <div class="ad-tr" style="grid-template-columns:1.3fr 1.5fr 1fr 1fr"><div>James P.</div><div>Waterset $420K</div><div style="font-weight:700">$500</div><div><span class="pill" style="background:#C9A84C1a;color:#C9A84C">Held</span></div></div>
 <div class="ad-tr" style="grid-template-columns:1.3fr 1.5fr 1fr 1fr"><div>Anna W.</div><div>Epperson Lagoon</div><div style="font-weight:700">$1,000</div><div><span class="pill" style="background:#1A5C3A1a;color:#1A5C3A">Applied to close</span></div></div></div>
-<p style="color:#8a93a2;font-size:13px;margin-top:14px">Showing requests are logged; any future deposit flow processes through Stripe Connect (developer connects). Broker escrow rules apply.</p>
+<div id="holdrows"></div>
+<p style="color:#8a93a2;font-size:13px;margin-top:14px">Reserve holds are PayPal <b>authorizations</b> — funds are held, never captured automatically. Void a hold to release it. Earnest money never runs through this platform (Earnnest/Payload → escrow). Broker/attorney sign-off required before live mode.</p>
+</div>
+<div id="p-orders" class="ad-panel">
+<h2 style="font-family:Marcellus,serif;color:#0E1E52;font-size:24px;margin-bottom:20px">Orders — Matcha pilot</h2>
+<div class="ad-stats"><div class="ad-stat"><div class="l">Paid orders</div><div class="v" style="color:#1A5C3A" id="o-n">—</div></div><div class="ad-stat"><div class="l">Revenue</div><div class="v" style="color:#C9A84C" id="o-rev">—</div></div><div class="ad-stat"><div class="l">PayPal</div><div class="v" style="color:#0E1E52;font-size:18px" id="o-mode">—</div></div></div>
+<div class="ad-table"><div class="ad-th" style="grid-template-columns:1.2fr 1.6fr .8fr .9fr 1fr"><div>Buyer</div><div>Items</div><div>Amount</div><div>Status</div><div>When</div></div><div id="orderrows"><div style="padding:30px;text-align:center;color:#8a93a2">Log in with the server admin token to see live orders.</div></div></div>
+</div>
+<div id="p-cc" class="ad-panel">
+<h2 style="font-family:Marcellus,serif;color:#0E1E52;font-size:24px;margin-bottom:8px">Command Center</h2>
+<p style="color:#8a93a2;font-size:13px;margin-bottom:18px">Every live-chat comment, auto-classified by intent. Spam/abuse is held automatically — approve or hide with one click.</p>
+<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap" id="ccfilters"></div>
+<div class="ad-table"><div class="ad-th" style="grid-template-columns:1fr 2.4fr .8fr .8fr 1fr"><div>Author</div><div>Comment</div><div>Intent</div><div>Status</div><div>Action</div></div><div id="ccrows"><div style="padding:30px;text-align:center;color:#8a93a2">Log in with the server admin token to see comments.</div></div></div>
 </div>
 </div></div></div>
 
 <script>
 var SBU="https://suwphgvhhohvvudkbiii.supabase.co",SBK="sb_publishable_D9YQPfVnBjRokyHlfNeuBA_TR7npJbb";
-function adminLogin(){var pw=document.getElementById("pw").value;if(pw==="bridges2026"){document.getElementById("ad-login").style.display="none";document.getElementById("ad-app").style.display="block";loadLeads();renderPipe();}else{document.getElementById("err").textContent="Wrong password.";}}
+var ADM=null; // server admin token (when running the Bridges Live server)
+function esc(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function admApi(path,body){return fetch("/api/admin"+path,{method:body?"POST":"GET",headers:{Authorization:"Bearer "+ADM,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined}).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||r.status);return j;});});}
+function enterApp(){document.getElementById("ad-login").style.display="none";document.getElementById("ad-app").style.display="block";loadLeads();renderPipe();if(ADM){loadOrders();loadCC();loadStreams();}}
+async function adminLogin(){var pw=document.getElementById("pw").value,err=document.getElementById("err");err.textContent="";
+  var cfg=null;try{var c=await fetch("/api/config");if(c.ok)cfg=await c.json();}catch(e){}
+  if(cfg){ // server mode: the password is the server's ADMIN_TOKEN (checked server-side)
+    ADM=pw;try{await admApi("/summary");try{sessionStorage.setItem("bl_adm",pw)}catch(e){}enterApp();}catch(e){ADM=null;err.textContent=/503/.test(e.message)||/ADMIN_TOKEN/.test(e.message)?"Set ADMIN_TOKEN in the server .env first.":"Wrong password.";}
+    return;}
+  if(pw==="bridges2026"){enterApp();}else{err.textContent="Wrong password.";}}
+fetch("/api/config").then(function(r){if(r.ok){var h=document.getElementById("pwhint");if(h)h.textContent="Use the ADMIN_TOKEN from the server .env";var t=null;try{t=sessionStorage.getItem("bl_adm")}catch(e){}if(t){document.getElementById("pw").value=t;adminLogin();}}}).catch(function(){});
+function fmtWhen(t){try{return new Date(t).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return ""}}
+function pill(txt,col){return "<span class=\"pill\" style=\"background:"+col+"1a;color:"+col+"\">"+esc(txt)+"</span>";}
+async function loadOrders(){try{var sum=await admApi("/summary"),o=(await admApi("/orders")).orders;
+  document.getElementById("o-n").textContent=sum.purchases;document.getElementById("o-rev").textContent="$"+sum.revenue.toFixed(2);document.getElementById("o-mode").textContent=sum.paypal;
+  var buys=o.filter(function(x){return x.kind==="purchase"}),holds=o.filter(function(x){return x.kind==="hold"});
+  var col={paid:"#1A5C3A",pending:"#8a93a2",failed:"#D2352A",refunded:"#D2352A",authorized:"#C9A84C",voided:"#8a93a2"};
+  document.getElementById("orderrows").innerHTML=buys.length?buys.map(function(x){return "<div class=\"ad-tr\" style=\"grid-template-columns:1.2fr 1.6fr .8fr .9fr 1fr\"><div style=\"font-weight:600;color:#0E1E52\">"+esc(x.buyer_name||"—")+"<br><span style=\"font-weight:400;font-size:12px;color:#43506e\">"+esc(x.buyer_email||"")+"</span></div><div style=\"color:#43506e;font-size:13px\">"+esc((x.items||[]).map(function(i){return i.name}).join(" + "))+"</div><div style=\"font-weight:700\">$"+Number(x.amount).toFixed(2)+"</div><div>"+pill(x.status,col[x.status]||"#0E1E52")+"</div><div style=\"font-size:12px;color:#43506e\">"+fmtWhen(x.created_at)+"</div></div>";}).join(""):"<div style=\"padding:30px;text-align:center;color:#8a93a2\">No orders yet — tap Buy now on the matcha stream.</div>";
+  document.getElementById("holdrows").innerHTML=holds.length?"<h3 style=\"font-family:Marcellus,serif;color:#0E1E52;margin:22px 0 10px\">Live reserve holds</h3><div class=\"ad-table\"><div class=\"ad-th\" style=\"grid-template-columns:1.2fr 1.6fr .7fr .9fr .9fr\"><div>Buyer</div><div>Property</div><div>Amount</div><div>Status</div><div>Action</div></div>"+holds.map(function(x){return "<div class=\"ad-tr\" style=\"grid-template-columns:1.2fr 1.6fr .7fr .9fr .9fr\"><div style=\"font-weight:600;color:#0E1E52\">"+esc(x.buyer_name||"—")+"<br><span style=\"font-weight:400;font-size:12px;color:#43506e\">"+esc(x.buyer_email||"")+" "+esc(x.buyer_phone||"")+"</span></div><div style=\"color:#43506e;font-size:13px\">"+esc(((x.items||[])[0]||{}).name||"")+"</div><div style=\"font-weight:700\">$"+Number(x.amount).toFixed(0)+"</div><div>"+pill(x.status,col[x.status]||"#0E1E52")+"</div><div>"+(x.status==="authorized"?"<button onclick=\"voidHold('"+esc(x.id)+"')\" style=\"background:#D2352A;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer\">Void / release</button>":"—")+"</div></div>";}).join("")+"</div>":"";
+}catch(e){console.warn(e)}}
+async function voidHold(id){if(!confirm("Release this hold? The buyer's PayPal authorization is voided."))return;try{await admApi("/holds/"+id+"/void",{});loadOrders();}catch(e){alert(e.message)}}
+var CCF={};
+async function loadCC(){try{var q=Object.keys(CCF).map(function(k){return k+"="+encodeURIComponent(CCF[k])}).join("&");var rows=(await admApi("/comments"+(q?"?"+q:""))).comments,sum=await admApi("/summary");
+  var f=[["All",{}],["Buy",{intent:"buy"}],["Reserve",{intent:"reserve"}],["Showing",{intent:"showing"}],["Price",{intent:"price"}],["Questions",{intent:"question"}],["Held ("+sum.flagged+")",{moderation:"hidden"}]];
+  document.getElementById("ccfilters").innerHTML=f.map(function(x,i){var on=JSON.stringify(x[1])===JSON.stringify(CCF);return "<button onclick='CCF="+JSON.stringify(x[1])+";loadCC()' style=\"border:1px solid #0E1E52;background:"+(on?"#0E1E52":"#fff")+";color:"+(on?"#fff":"#0E1E52")+";padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer\">"+esc(x[0])+(x[1].intent&&sum.intents[x[1].intent]?" ("+sum.intents[x[1].intent]+")":"")+"</button>"}).join("");
+  var ic={buy:"#1A5C3A",reserve:"#C9A84C",showing:"#1A5C3A",price:"#0E4FA3",question:"#0E1E52",none:"#8a93a2"};
+  document.getElementById("ccrows").innerHTML=rows.length?rows.map(function(c){return "<div class=\"ad-tr\" style=\"grid-template-columns:1fr 2.4fr .8fr .8fr 1fr\"><div style=\"font-weight:600;color:#0E1E52\">"+esc(c.author)+"<br><span style=\"font-weight:400;font-size:11px;color:#8a93a2\">"+esc(c.platform)+" · "+fmtWhen(c.created_at)+"</span></div><div style=\"color:#43506e;font-size:13px\">"+esc(c.body)+"</div><div>"+pill(c.intent,ic[c.intent]||"#8a93a2")+"</div><div>"+pill(c.moderation,c.moderation==="visible"?"#1A5C3A":"#D2352A")+"</div><div>"+(c.moderation==="visible"?"<button onclick=\"moderate('"+esc(c.id)+"','hide')\" style=\"background:#fff;border:1px solid #D2352A;color:#D2352A;padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer\">Hide</button>":"<button onclick=\"moderate('"+esc(c.id)+"','approve')\" style=\"background:#1A5C3A;border:none;color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer\">Approve</button>")+"</div></div>";}).join(""):"<div style=\"padding:30px;text-align:center;color:#8a93a2\">No comments yet.</div>";
+}catch(e){console.warn(e)}}
+async function moderate(id,action){try{await admApi("/comments/"+id,{action:action});loadCC();}catch(e){alert(e.message)}}
+async function loadStreams(){try{var l=(await (await fetch("/api/streams")).json()).streams;
+  document.getElementById("st-live").textContent=l.length;document.getElementById("st-view").textContent=l.reduce(function(a,s){return a+s.viewers},0);
+  var leads=(await admApi("/leads")).leads,t=new Date().toISOString().slice(0,10);
+  document.getElementById("st-show").textContent=leads.filter(function(x){return /showing|hold/i.test(x.source||"")&&(x.created_at||"").slice(0,10)===t}).length;
+  var tbl=document.getElementById("st-table");tbl.innerHTML="<div class=\"ad-th\" style=\"grid-template-columns:1.5fr 1fr 1fr 1fr\"><div>Stream</div><div>Host</div><div>Viewers</div><div>Watch</div></div>"+l.map(function(s){return "<div class=\"ad-tr\" style=\"grid-template-columns:1.5fr 1fr 1fr 1fr\"><div>"+esc(s.title)+"</div><div>"+esc(s.host)+"</div><div>"+s.viewers+"</div><div><a href=\"/live-marketplace?stream="+esc(s.id)+"\" target=\"_blank\" style=\"color:#1A5C3A;font-weight:700\">Open →</a></div></div>"}).join("");
+}catch(e){console.warn(e)}}
 function tab(id,el){document.querySelectorAll(".ad-panel").forEach(function(p){p.classList.remove("on");});document.querySelectorAll(".ad-tab").forEach(function(t){t.classList.remove("on");});document.getElementById("p-"+id).classList.add("on");el.classList.add("on");}
 var PIPE=[{b:"Marta K.",p:"Triple Creek B",st:"Tour booked",c:"$10,500",ag:"Dorota M."},{b:"James P.",p:"Waterset $420K",st:"Under contract",c:"$11,200",ag:"Dorota M."},{b:"Yuki T.",p:"Bexley (JP relo)",st:"Showing booked",c:"$12,000",ag:"Dorota M."},{b:"Anna W.",p:"Epperson Lagoon",st:"CLOSED — due",c:"$10,800",ag:"NRR Homes"}];
 function renderPipe(){var g=document.getElementById("piperows");if(!g)return;g.innerHTML=PIPE.map(function(x){var col=/closed/i.test(x.st)?"#1A5C3A":/contract/i.test(x.st)?"#C9A84C":"#0E1E52";return "<div class=\"ad-tr\" style=\"grid-template-columns:1.3fr 1fr 1fr 1fr 1fr\"><div style=\"font-weight:600;color:#0E1E52\">"+x.b+"</div><div style=\"color:#43506e;font-size:13px\">"+x.p+"</div><div><span class=\"pill\" style=\"background:"+col+"1a;color:"+col+"\">"+x.st+"</span></div><div style=\"color:#1A5C3A;font-weight:700\">"+x.c+"</div><div style=\"color:#43506e;font-size:13px\">"+x.ag+"</div></div>";}).join("");}
-async function loadLeads(){try{var r=await fetch(SBU+"/rest/v1/leads?select=*&order=created_at.desc&limit=100",{headers:{apikey:SBK,Authorization:"Bearer "+SBK}});var rows=r.ok?await r.json():[];if(!Array.isArray(rows))rows=[];document.getElementById("s-total").textContent=rows.length;var t=new Date().toISOString().slice(0,10);document.getElementById("s-today").textContent=rows.filter(function(x){return (x.created_at||"").slice(0,10)===t;}).length;document.getElementById("s-hot").textContent=rows.filter(function(x){return /high/i.test(x.priority||"");}).length;document.getElementById("s-week").textContent=rows.length;var g=document.getElementById("leadrows");if(!rows.length){g.innerHTML="<div style=\"padding:30px;text-align:center;color:#8a93a2\">No leads yet — they appear here instantly when someone submits a form or reserves.</div>";return;}g.innerHTML=rows.map(function(x){return "<div class=\"ad-tr\" style=\"grid-template-columns:1.3fr 1.5fr 1.4fr 1fr\"><div style=\"font-weight:600;color:#0E1E52\">"+(x.first_name||"—")+"</div><div style=\"color:#43506e;font-size:13px\">"+(x.phone||"")+"<br>"+(x.email||"")+"</div><div style=\"color:#43506e;font-size:12px\">"+(x.source||"")+"</div><div><span class=\"pill\" style=\"background:#1A5C3A1a;color:#1A5C3A\">"+(x.stage||"New")+"</span></div></div>";}).join("");}catch(e){document.getElementById("leadrows").innerHTML="<div style=\"padding:30px;text-align:center;color:#D2352A\">Could not load — set Supabase read policy (developer).</div>";}}
+async function loadLeads(){try{var rows;if(ADM){rows=(await admApi("/leads")).leads;}else{var r=await fetch(SBU+"/rest/v1/leads?select=*&order=created_at.desc&limit=100",{headers:{apikey:SBK,Authorization:"Bearer "+SBK}});rows=r.ok?await r.json():[];}if(!Array.isArray(rows))rows=[];document.getElementById("s-total").textContent=rows.length;var t=new Date().toISOString().slice(0,10);document.getElementById("s-today").textContent=rows.filter(function(x){return (x.created_at||"").slice(0,10)===t;}).length;document.getElementById("s-hot").textContent=rows.filter(function(x){return /high/i.test(x.priority||"");}).length;document.getElementById("s-week").textContent=rows.length;var g=document.getElementById("leadrows");if(!rows.length){g.innerHTML="<div style=\"padding:30px;text-align:center;color:#8a93a2\">No leads yet — they appear here instantly when someone submits a form or reserves.</div>";return;}g.innerHTML=rows.map(function(x){return "<div class=\"ad-tr\" style=\"grid-template-columns:1.3fr 1.5fr 1.4fr 1fr\"><div style=\"font-weight:600;color:#0E1E52\">"+esc(x.first_name||"—")+"</div><div style=\"color:#43506e;font-size:13px\">"+esc(x.phone||"")+"<br>"+esc(x.email||"")+"</div><div style=\"color:#43506e;font-size:12px\">"+esc(x.source||"")+"</div><div><span class=\"pill\" style=\"background:#1A5C3A1a;color:#1A5C3A\">"+esc(x.stage||"New")+"</span></div></div>";}).join("");}catch(e){document.getElementById("leadrows").innerHTML="<div style=\"padding:30px;text-align:center;color:#D2352A\">Could not load — set Supabase read policy (developer).</div>";}}
 </script>
 <footer><div class="wrap">
   <div class="foot-links"><a href="/">Home</a><a href="/apartment-locating">Apartment Locating</a><a href="/new-construction">New Construction</a><a href="/relocation">Relocation</a><a href="/sell">Sell</a>

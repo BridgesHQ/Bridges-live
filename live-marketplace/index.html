@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bridges Live — Multi-Stream Marketplace</title>
-<meta name="description" content="List your community on Bridges — new-construction builders, apartment communities, and property managers fill units faster with live video tours and qualified lead capture. Free to list.">>
+<meta name="description" content="List your community on Bridges — new-construction builders, apartment communities, and property managers fill units faster with live video tours and qualified lead capture. Free to list.">
 <meta name="keywords" content="sell my home Tampa, list my house Austin, live streamed open house, sell to international buyers">
-<link rel="canonical" href="https://live.bridgesglobal.co/live-marketplace">>>
+<link rel="canonical" href="https://live.bridgesglobal.co/live-marketplace">
 <meta property="og:title" content="Sell Your Home with Live-Streamed Showings | Bridges Global">
 <meta property="og:description" content="Sell your Tampa Bay or Austin home with live-streamed open houses that reach relocation and international buyers. Multilingual marketing.">
 <meta property="og:type" content="website">
@@ -310,7 +310,7 @@ img{transition:transform .5s ease}
   <a class="bglogo" href="/" style="display:flex;align-items:center;text-decoration:none;flex-shrink:0"><img src="/assets/logo-nav.svg" alt="Bridges Global" style="height:40px;width:auto;object-fit:contain;display:block"></a>
   <button class="bgburger" aria-label="Menu" onclick="document.getElementById('bgmenu').classList.toggle('open')"><span></span><span></span><span></span></button>
   <div class="bgmenu" id="bgmenu">
-    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/brandon">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
+    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/riverview">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
     <a href="/apartment-locating">Apartments</a>
     <a href="/live-marketplace" class="nav-live"><span class="nav-dot"></span>Bridges Live</a>
     <a href="/relocation">Relocation</a>
@@ -347,19 +347,22 @@ img{transition:transform .5s ease}
 </div>
 <!-- top bar -->
 <div style="position:absolute;top:0;left:0;right:0;padding:14px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(rgba(0,0,0,.6),transparent);z-index:3">
-<div style="display:flex;align-items:center;gap:8px"><img src="/assets/dorota.webp" style="width:38px;height:38px;border-radius:50%;border:2px solid #D8BC6A" onerror="this.style.display=\'none\'"><div><div id="fs-name" style="font-weight:700;font-size:14px">Dorota M.</div><div style="font-size:11px;color:#D8BC6A">✓ Verified Broker · <span id="fs-likes">2,801</span> likes</div></div><button style="background:#D2352A;border:none;color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;margin-left:6px">Follow</button></div>
+<div style="display:flex;align-items:center;gap:8px"><img src="/assets/dorota.webp" style="width:38px;height:38px;border-radius:50%;border:2px solid #D8BC6A" onerror="this.style.display=\'none\'"><div><div id="fs-name" style="font-weight:700;font-size:14px">Dorota M.</div><div style="font-size:11px;color:#D8BC6A">✓ Verified Broker · <span id="fs-likes">2,801</span> likes · 👁 <span id="fs-viewers">0</span></div></div><button id="fs-follow" onclick="toggleFollow()" style="background:#D2352A;border:none;color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;margin-left:6px">Follow</button></div>
 <button onclick="closeStream()" style="background:rgba(0,0,0,.5);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer">✕</button>
 </div>
 <!-- LIVE CHAT (left, Chinese-model) -->
-<div id="fs-chat" style="position:absolute;left:12px;bottom:150px;width:70%;max-height:40%;overflow:hidden;z-index:3;display:flex;flex-direction:column;justify-content:flex-end;gap:6px"></div>
+<div id="fs-chat" style="position:absolute;left:12px;bottom:168px;width:70%;max-height:40%;overflow:hidden;z-index:3;display:flex;flex-direction:column;justify-content:flex-end;gap:6px"></div>
 <!-- reserve promo card (bottom, Chinese-model "60 booked / Book Now") -->
 <div style="position:absolute;bottom:76px;left:12px;right:12px;z-index:3;background:rgba(10,14,26,.85);backdrop-filter:blur(10px);border:1px solid rgba(216,188,106,.4);border-radius:14px;padding:14px;display:flex;align-items:center;justify-content:space-between">
-<div><div style="font-size:11px;color:#D8BC6A;font-weight:700">● EXPLAINING NOW</div><div id="fs-prop" style="font-size:15px;font-weight:700;margin:2px 0">Triple Creek — Model B</div><div style="font-size:12px;color:rgba(255,255,255,.7)"><span id="fs-booked">60</span> showings requested</div></div>
-<button onclick="openShowing()" style="background:#1A5C3A;border:none;color:#fff;font-weight:700;padding:12px 22px;border-radius:10px;cursor:pointer;white-space:nowrap">Request a showing</button>
+<div><div style="font-size:11px;color:#D8BC6A;font-weight:700">● EXPLAINING NOW</div><div id="fs-prop" style="font-size:15px;font-weight:700;margin:2px 0">Triple Creek — Model B</div><div style="font-size:12px;color:rgba(255,255,255,.7)"><span id="fs-price" style="color:#D8BC6A;font-weight:600"></span> <span id="fs-booked">60</span> <span id="fs-booked-l">showings requested</span></div></div>
+<div style="display:flex;flex-direction:column;gap:6px;align-items:stretch">
+<button id="fs-cta" onclick="openShowing()" style="background:#1A5C3A;border:none;color:#fff;font-weight:700;padding:12px 22px;border-radius:10px;cursor:pointer;white-space:nowrap">Request a showing</button>
+<button id="fs-hold" onclick="openHold()" style="display:none;background:transparent;border:1px solid rgba(216,188,106,.6);color:#D8BC6A;font-weight:700;font-size:12px;padding:7px 12px;border-radius:10px;cursor:pointer;white-space:nowrap">Reserve hold ($500)</button>
+</div>
 </div>
 <!-- chat input -->
 <div style="position:absolute;bottom:12px;left:12px;right:12px;z-index:3;display:flex;gap:8px">
-<input id="fs-input" placeholder="Say something…" style="flex:1;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:11px 14px;border-radius:24px;font-size:14px">
+<input id="fs-input" maxlength="280" onkeydown="if(event.key==='Enter')sendChat()" placeholder="Say something…" style="flex:1;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:11px 14px;border-radius:24px;font-size:14px">
 <button onclick="sendChat()" style="background:#D8BC6A;border:none;color:#0a0e1a;font-weight:700;padding:0 18px;border-radius:24px;cursor:pointer">Send</button>
 </div>
 </div>
@@ -384,6 +387,7 @@ img{transition:transform .5s ease}
 .fs-msg b{color:#D8BC6A}
 @keyframes fsup{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
 </style>
+<script src="/assets/js/bridges-live.js"></script>
 <script>
 // MANY simultaneous streams (this is the multi-stream architecture)
 var STREAMS=[
@@ -443,40 +447,96 @@ var STREAMS=[
 {n:'Bridges TX',p:'Waterfront Estate — Apollo Beach #4',pr:'$1.2M',w:425,l:5731,b:74,img:'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=500&q=80',cat:'lux',catlabel:'Luxury'}
 ];
 
+var chatTimer=null,cur=null,curStream=null,liveMode=false,lvCat='all',bookedN=0,following={};
+try{following=JSON.parse(localStorage.getItem('bl_follow')||'{}')}catch(e){}
+function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function renderStreams(cat){
+  lvCat=cat||'all';
   var rows=STREAMS.filter(function(s){return !cat||cat==='all'||s.cat===cat;});
-  document.getElementById('streamgrid').innerHTML=rows.map(function(s){
+  document.getElementById('streamgrid').innerHTML=rows.length?rows.map(function(s){
     var idx=STREAMS.indexOf(s);
     return '<div class="sg-card" onclick="openStream('+idx+')">'
-      +'<div class="sg-thumb"><span class="sg-live"><span class="d"></span>LIVE \u00b7 '+s.w+'</span><img src="'+s.img+'" onerror="this.style.display=\'none\'"></div>'
+      +'<div class="sg-thumb"><span class="sg-live"><span class="d"></span>LIVE · <span class="sg-w" data-id="'+esc(s.id||'')+'">'+s.w+'</span></span><img src="'+esc(s.img)+'" onerror="this.style.display=\'none\'"></div>'
       +'<div class="sg-body">'
-      +'<h4>'+s.p+'</h4>'
-      +'<div class="sg-meta">'+(s.catlabel||s.cat||'')+' \u00b7 <span class="pr">'+s.pr+'</span></div>'
-      +'<div class="sg-agent"><img src="/assets/dorota.webp" onerror="this.style.display=\'none\'"><span class="nm">'+s.n+'</span><span class="ap">\u2713 Bridges Approved</span></div>'
-      +'<span class="sg-watch">WATCH LIVE \u2192</span>'
+      +'<h4>'+esc(s.p)+'</h4>'
+      +'<div class="sg-meta">'+esc(s.catlabel||s.cat||'')+' · <span class="pr">'+esc(s.pr)+'</span></div>'
+      +'<div class="sg-agent"><img src="/assets/dorota.webp" onerror="this.style.display=\'none\'"><span class="nm">'+esc(s.n)+'</span><span class="ap">✓ Bridges Approved</span></div>'
+      +'<span class="sg-watch">'+(s.cta==='buy'?'SHOP LIVE →':'WATCH LIVE →')+'</span>'
       +'</div></div>';
-  }).join('');
+  }).join(''):'<div style="color:#8fa0c0;padding:30px 0">No live streams in this category right now.</div>';
 }
 function lvFilter(el,cat){document.querySelectorAll('.lvchip').forEach(function(c){c.classList.remove('lvon')});el.classList.add('lvon');renderStreams(cat);}
 renderStreams('all');
 
+// Live data: pull real streams from the API; keep the static list if the API is offline.
+function fromApi(x){return{id:x.id,n:x.host,p:x.title,pr:x.priceLabel,w:x.viewers,l:x.likes,b:0,img:x.image,cat:x.category,catlabel:x.categoryLabel,cta:x.cta,api:x};}
+BL.available.then(function(ok){
+  if(!ok)return;
+  BL.streams().then(function(list){
+    liveMode=true;STREAMS=list.map(fromApi);
+    var chip=document.createElement('button');chip.className='lvchip';chip.textContent='Live Commerce';chip.onclick=function(){lvFilter(chip,'commerce')};
+    var chips=document.querySelector('.lvchip').parentNode;chips.insertBefore(chip,chips.children[1]);
+    renderStreams(lvCat);
+    BL.lobby();
+    var q=new URLSearchParams(location.search).get('stream');
+    if(q){var i=STREAMS.findIndex(function(s){return s.id===q});if(i>=0)openStream(i);}
+  });
+});
+BL.on('counts',function(m){
+  STREAMS.forEach(function(s){if(s.id&&m.counts[s.id]!=null)s.w=m.counts[s.id];});
+  document.querySelectorAll('.sg-w').forEach(function(el){var n=m.counts[el.dataset.id];if(n!=null)el.textContent=n;});
+});
+BL.on('viewer_count',function(m){if(curStream&&m.streamId===curStream.id)document.getElementById('fs-viewers').textContent=m.count;});
+BL.on('history',function(m){if(!curStream||m.streamId!==curStream.id)return;document.getElementById('fs-chat').innerHTML='';bookedN=0;m.events.forEach(function(e){handleEvt(e,true)});});
+['chat_message','item_purchased','hold_reserved','showing_requested'].forEach(function(t){BL.on(t,function(m){
+  if(curStream&&m.streamId===curStream.id)handleEvt(m,false);
+  else if(t!=='chat_message'){var d=BL.describe(m);if(d)BL.toast(d);}
+});});
+BL.on('error',function(m){if(curStream)addMsg('Bridges: '+m.error);});
+function handleEvt(m,old){
+  if(m.type==='chat_message'){addMsg(m.name+': '+m.body+(m.held?' (held for review)':''));return;}
+  var d=BL.describe(m);if(!d)return;
+  if((curStream.cta==='buy'&&m.type==='item_purchased')||(curStream.cta!=='buy'&&m.type!=='item_purchased')){bookedN++;document.getElementById('fs-booked').textContent=bookedN;}
+  addMsg('★: '+d,true);if(!old)BL.toast(d);
+}
+
 function openStream(i){
-  cur=i;var s=STREAMS[i];
+  cur=i;var s=STREAMS[i];curStream=s.api||null;
   document.getElementById('fs-name').textContent=s.n;
-  document.getElementById('fs-likes').textContent=s.l.toLocaleString();
+  document.getElementById('fs-likes').textContent=(s.l||0).toLocaleString();
   document.getElementById('fs-prop').textContent=s.p;
-  document.getElementById('fs-booked').textContent=s.b;
+  document.getElementById('fs-viewers').textContent=s.w;
+  var f=document.getElementById('fs-follow');f.textContent=following[s.n]?'Following':'Follow';
+  var buy=s.cta==='buy';
+  document.getElementById('fs-price').textContent=buy?'$30 ·':'';
+  document.getElementById('fs-booked-l').textContent=buy?'bought this stream':(liveMode?'showings & holds this stream':'showings requested');
+  var cta=document.getElementById('fs-cta');cta.textContent=buy?'Buy now':'Request a showing';cta.style.background=buy?'#D8BC6A':'#1A5C3A';cta.style.color=buy?'#0a0e1a':'#fff';
   document.getElementById('fullstream').style.display='block';
   document.getElementById('fs-chat').innerHTML='';
+  clearInterval(chatTimer);
+  if(liveMode&&curStream){
+    bookedN=0;document.getElementById('fs-booked').textContent='0';
+    BL.config().then(function(c){document.getElementById('fs-hold').style.display=(!buy&&c&&c.holds.enabled)?'block':'none';});
+    BL.mountPlayer(document.getElementById('videoslot'),curStream);
+    BL.join(curStream.id);
+    history.replaceState(null,'','?stream='+curStream.id);
+    return;
+  }
+  // offline fallback (static hosting): original demo behaviour
+  document.getElementById('fs-booked').textContent=s.b;
   var demo=['小张: How is this house sold?','Marta: Is there a pool?','Yuki: Smallest villa price?','德: Cheaper layouts?','Ana: Reserving now'];
-  var idx=0;clearInterval(chatTimer);
+  var idx=0;
   chatTimer=setInterval(function(){if(idx<demo.length){addMsg(demo[idx]);idx++;}else{var r=['Still available?','Pet friendly?','Move-in date?','Claiming this one'];addMsg(['Jason','Priya','Carlos','Deb'][Math.random()*4|0]+': '+r[Math.random()*4|0]);}},1800);
 }
-function addMsg(t){var c=document.getElementById('fs-chat');var d=document.createElement('div');d.className='fs-msg';var parts=t.split(': ');d.innerHTML='<b>'+parts[0]+'</b> '+(parts[1]||'');c.appendChild(d);while(c.children.length>6)c.removeChild(c.firstChild);}
-function sendChat(){var v=document.getElementById('fs-input').value;if(v){addMsg('You: '+v);document.getElementById('fs-input').value='';}}
-function closeStream(){document.getElementById('fullstream').style.display='none';clearInterval(chatTimer);}
-function openShowing(){window.location.href='/live/';}
-renderStreams('all');
+function addMsg(t,sys){var c=document.getElementById('fs-chat');var d=document.createElement('div');d.className='fs-msg';var k=t.indexOf(': ');var b=document.createElement('b');b.textContent=k>0?t.slice(0,k):'';d.appendChild(b);d.appendChild(document.createTextNode(' '+(k>0?t.slice(k+2):t)));if(sys)d.style.border='1px solid rgba(216,188,106,.5)';c.appendChild(d);while(c.children.length>6)c.removeChild(c.firstChild);}
+function sendChat(){var el=document.getElementById('fs-input'),v=el.value.trim();if(!v)return;el.value='';
+  if(liveMode&&curStream){if(!BL.name()){var n=prompt('Your first name for the chat?','');if(n)BL.setName(n.trim().slice(0,40));}BL.chat(v);}
+  else addMsg('You: '+v);}
+function closeStream(){document.getElementById('fullstream').style.display='none';clearInterval(chatTimer);
+  if(liveMode){BL.leave();document.getElementById('videoslot').innerHTML='';curStream=null;history.replaceState(null,'',location.pathname);}}
+function openShowing(){if(liveMode&&curStream)return BL.primaryAction(curStream);window.location.href='/live-show';}
+function openHold(){if(liveMode&&curStream)BL.reserveHold(curStream);}
+function toggleFollow(){var s=STREAMS[cur];if(!s)return;following[s.n]=!following[s.n];try{localStorage.setItem('bl_follow',JSON.stringify(following))}catch(e){}document.getElementById('fs-follow').textContent=following[s.n]?'Following':'Follow';}
 </script>
 <div class="wrap" style="max-width:900px;padding:40px 0"><div style="background:#f7f8fb;border-radius:16px;padding:30px">
 <h2 style="font-family:Marcellus,serif;color:#0E1E52;font-size:24px;margin-bottom:16px">How to go live (verified agents)</h2>

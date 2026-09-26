@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 48" width="270" height="48" role="img" aria-label="Bridges Global">
+  <g fill="none" stroke="#D8BC6A" stroke-width="2.2" stroke-linecap="round">
+    <path d="M4 34 Q22 8 40 34"/>
+    <path d="M2 34 H42"/>
+    <path d="M13 34 V24 M22 34 V19 M31 34 V24"/>
+  </g>
+  <text x="52" y="31" font-family="Marcellus, Georgia, 'Times New Roman', serif" font-size="20" letter-spacing="2" fill="#FFFFFF" textLength="104" lengthAdjust="spacingAndGlyphs">BRIDGES</text>
+  <text x="166" y="31" font-family="Marcellus, Georgia, 'Times New Roman', serif" font-size="20" letter-spacing="2" fill="#D8BC6A" textLength="98" lengthAdjust="spacingAndGlyphs">GLOBAL</text>
+</svg>

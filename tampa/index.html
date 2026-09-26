@@ -291,7 +291,7 @@ img{transition:transform .5s ease}
   <a class="bglogo" href="/" style="display:flex;align-items:center;text-decoration:none;flex-shrink:0"><img src="/assets/logo-nav.svg" alt="Bridges Global" style="height:40px;width:auto;object-fit:contain;display:block"></a>
   <button class="bgburger" aria-label="Menu" onclick="document.getElementById('bgmenu').classList.toggle('open')"><span></span><span></span><span></span></button>
   <div class="bgmenu" id="bgmenu">
-    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/brandon">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
+    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/riverview">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
     <a href="/apartment-locating">Apartments</a>
     <a href="/live-marketplace" class="nav-live"><span class="nav-dot"></span>Bridges Live</a>
     <a href="/relocation">Relocation</a>
@@ -376,9 +376,9 @@ async function submitLead(e,label,market){
   const f=e.target, d=Object.fromEntries(new FormData(f).entries());
   const payload={first_name:d.name,email:d.email||'noemail@bridgeshq.co',phone:d.phone||'',market:market||d.where||'Web',stage:'New',priority:'High',source:'Website — '+label,notes:'From '+market+' page. Moving from: '+(d.where||'n/a')+'. Timeframe: '+(d.timeframe||'n/a')+'. '+(d.notes||'')};
   try{
-    const r=await fetch(SB_URL+'/rest/v1/leads',{method:'POST',headers:{'apikey':SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});
+    const r=await fetch(SB_URL+'/rest/v1/leads',{method:'POST',headers:{'apikey':SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});if(!r.ok)throw new Error('HTTP '+r.status);
     if(typeof gtag==='function')gtag('event','generate_lead',{source:label});
-  }catch(err){}
+  }catch(err){alert("Sorry, we couldn\u2019t send your request. Please call/text (813) 781-8888 or email dd@bridgesglobal.co.");return false;}
   const wrap=f.closest('.leadform');
   wrap.querySelector('.lf-in').style.display='none';
   wrap.querySelector('.ok').style.display='block';
@@ -438,7 +438,7 @@ async function bgChatSend(){
     bgLead.email=v;bgStage=3;bgBot("And a phone or WhatsApp? (optional — type 'skip')");
   }else if(bgStage===3){
     bgLead.phone=(low==='skip')?'':v;bgStage=4;
-    await bgSaveLead();
+    if(!(await bgSaveLead())){bgBot("Sorry, I couldn\u2019t save your details just now. Please call/text (813) 781-8888 or email dd@bridgesglobal.co and Dorota will take it from there.");return;}
     bgBot("Perfect — you're all set. Dorota will personally reach out shortly with matched listings and next steps. Meanwhile, want to watch homes live? Tap 'Watch Live' up top. 🏡");
   }else{
     bgBot("Dorota will follow up personally on that. Anything else I can note for her?");
@@ -447,11 +447,13 @@ async function bgChatSend(){
 }
 async function bgSaveLead(update){
   try{
-    await fetch(CHAT_SB_URL+"/rest/v1/leads",{method:"POST",headers:{apikey:CHAT_SB_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({
+    const r=await fetch(CHAT_SB_URL+"/rest/v1/leads",{method:"POST",headers:{apikey:CHAT_SB_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({
       first_name:bgLead.name||"Chat lead",email:bgLead.email||"noemail@bridgeshq.co",phone:bgLead.phone||"",market:"AI Concierge",stage:"New",priority:"High",source:"Website — AI Concierge Chat",notes:"Interest: "+(bgLead.interest||"")+". "+(bgLead.notes||"")
     })});
+    if(!r.ok)throw new Error("HTTP "+r.status);
     if(typeof gtag==="function")gtag("event","generate_lead",{source:"ai-concierge"});
-  }catch(e){}
+    return true;
+  }catch(e){return false;}
 }
 </script>
 </body>

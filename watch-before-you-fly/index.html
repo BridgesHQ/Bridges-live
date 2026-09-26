@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Watch Homes Live Before You Fly In | Tampa Bay Relocation | Bridges Global</title>
-<meta name="description" content="Relocating to Tampa Bay? Watch real homes live on camera in your time zone before you fly in — free live-tour matching with a licensed bilingual broker. The only service of its kind.">>
+<meta name="description" content="Relocating to Tampa Bay? Watch real homes live on camera in your time zone before you fly in — free live-tour matching with a licensed bilingual broker. The only service of its kind.">
 <meta name="keywords" content="relocation Tampa, moving to Austin, Polish speaking realtor Florida, international relocation, moving to Texas">
-<link rel="canonical" href="https://live.bridgesglobal.co/watch-before-you-fly">>
+<link rel="canonical" href="https://live.bridgesglobal.co/watch-before-you-fly">
 <meta property="og:title" content="Relocation to Tampa Bay and Austin | Bilingual Real Estate | Bridges Global">
 <meta property="og:description" content="Relocating to Florida or Texas? Bilingual English &amp; Polish, dual-state licensed relocation help. Tour homes live before you arrive.">
 <meta property="og:type" content="website">
@@ -286,7 +286,7 @@ img{transition:transform .5s ease}
   <a class="bglogo" href="/" style="display:flex;align-items:center;text-decoration:none;flex-shrink:0"><img src="/assets/logo-nav.svg" alt="Bridges Global" style="height:40px;width:auto;object-fit:contain;display:block"></a>
   <button class="bgburger" aria-label="Menu" onclick="document.getElementById('bgmenu').classList.toggle('open')"><span></span><span></span><span></span></button>
   <div class="bgmenu" id="bgmenu">
-    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/brandon">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
+    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/riverview">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
     <a href="/apartment-locating">Apartments</a>
     <a href="/live-marketplace" class="nav-live"><span class="nav-dot"></span>Bridges Live</a>
     <a href="/relocation">Relocation</a>
@@ -336,7 +336,7 @@ img{transition:transform .5s ease}
 async function submitRelo(e){
   e.preventDefault();var f=e.target,d=Object.fromEntries(new FormData(f).entries());
   var payload={first_name:d.name,email:d.email,phone:d.phone||"",market:"Relocation - "+(d.from||""),stage:"New",priority:"High",source:"Website - Watch Before You Fly In (RELO)",notes:"From: "+d.from+". Goal: "+(d.goal||"")+". When: "+(d.when||"")+". Budget: "+(d.budget||"")+". Areas: "+(d.area||"")};
-  try{await fetch("https://suwphgvhhohvvudkbiii.supabase.co/rest/v1/leads",{method:"POST",headers:{apikey:"sb_publishable_D9YQPfVnBjRokyHlfNeuBA_TR7npJbb","Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(payload)});if(typeof gtag==="function")gtag("event","generate_lead",{source:"relo-live-match"});}catch(err){}
+  try{const r=await fetch("https://suwphgvhhohvvudkbiii.supabase.co/rest/v1/leads",{method:"POST",headers:{apikey:"sb_publishable_D9YQPfVnBjRokyHlfNeuBA_TR7npJbb","Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(payload)});if(!r.ok)throw new Error('HTTP '+r.status);if(typeof gtag==="function")gtag("event","generate_lead",{source:"relo-live-match"});}catch(err){alert("Sorry, we couldn\u2019t send your request. Please call/text (813) 781-8888 or email dd@bridgesglobal.co.");return false;}
   f.closest(".leadform").querySelector(".lf-in").style.display="none";
   f.closest(".leadform").querySelector(".ok").style.display="block";return false;
 }

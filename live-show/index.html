@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Live Show | Bridges Live</title>
-<meta name="description" content="List your community on Bridges — new-construction builders, apartment communities, and property managers fill units faster with live video tours and qualified lead capture. Free to list.">>
+<meta name="description" content="List your community on Bridges — new-construction builders, apartment communities, and property managers fill units faster with live video tours and qualified lead capture. Free to list.">
 <meta name="keywords" content="sell my home Tampa, list my house Austin, live streamed open house, sell to international buyers">
-<link rel="canonical" href="https://live.bridgesglobal.co/live-show">>>
+<link rel="canonical" href="https://live.bridgesglobal.co/live-show">
 <meta property="og:title" content="Sell Your Home with Live-Streamed Showings | Bridges Global">
 <meta property="og:description" content="Sell your Tampa Bay or Austin home with live-streamed open houses that reach relocation and international buyers. Multilingual marketing.">
 <meta property="og:type" content="website">
@@ -286,7 +286,7 @@ img{transition:transform .5s ease}
   <a class="bglogo" href="/" style="display:flex;align-items:center;text-decoration:none;flex-shrink:0"><img src="/assets/logo-nav.svg" alt="Bridges Global" style="height:40px;width:auto;object-fit:contain;display:block"></a>
   <button class="bgburger" aria-label="Menu" onclick="document.getElementById('bgmenu').classList.toggle('open')"><span></span><span></span><span></span></button>
   <div class="bgmenu" id="bgmenu">
-    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/brandon">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
+    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/riverview">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
     <a href="/apartment-locating">Apartments</a>
     <a href="/live-marketplace" class="nav-live"><span class="nav-dot"></span>Bridges Live</a>
     <a href="/relocation">Relocation</a>
@@ -315,8 +315,8 @@ img{transition:transform .5s ease}
 </div></div>
 </div>
 <div style="margin-top:16px">
-<h1 style="font-family:Marcellus,serif;font-weight:400;font-size:26px;margin:0 0 4px">Triple Creek — Model B</h1>
-<div style="color:#8fa0c0;font-size:14px">New Construction · Riverview, FL · <span style="color:#D8BC6A;font-weight:600">From the $340s</span></div>
+<h1 id="ls-title" style="font-family:Marcellus,serif;font-weight:400;font-size:26px;margin:0 0 4px">Triple Creek — Model B</h1>
+<div id="ls-meta" style="color:#8fa0c0;font-size:14px">New Construction · Riverview, FL · <span style="color:#D8BC6A;font-weight:600">From the $340s</span></div>
 <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
 <img src="/assets/dorota.webp" style="width:38px;height:38px;border-radius:50%;border:1px solid #C9A84C" onerror="this.style.display='none'">
 <div><div style="font-weight:600;font-size:14px">Dorota Maslowska</div><div style="font-size:11px;color:#D8BC6A">✓ Bridges Approved · FL BK3519799</div></div>
@@ -343,6 +343,7 @@ img{transition:transform .5s ease}
 </div>
 </div>
 <style>@keyframes LVd{0%,100%{opacity:1}50%{opacity:.3}}@media(max-width:820px){#showgrid{grid-template-columns:1fr!important}}</style>
+<script src="/assets/js/bridges-live.js"></script>
 <script>
 function ytId(u){var m=u.match(/(?:v=|youtu\.be\/|\/live\/|embed\/)([\w-]{11})/);return m?m[1]:null;}
 function loadStream(){
@@ -353,13 +354,30 @@ function loadStream(){
   else if(u.includes('tiktok.com')){p.innerHTML='<div style="text-align:center;color:#fff;padding:30px"><div style="font-size:14px">TikTok live opened in a new tab.</div><a href="'+u+'" target="_blank" style="color:#D8BC6A">Open TikTok live →</a></div>';window.open(u,'_blank');}
   else{alert('Paste a valid YouTube Live or TikTok live URL.');}
 }
+var LS_STREAM=null;
 async function submitLive(e){
   e.preventDefault();var f=e.target,d=Object.fromEntries(new FormData(f).entries());
-  var payload={first_name:d.name,email:d.email,phone:d.phone||"",market:"Triple Creek — Model B",stage:"New",priority:"High",source:"Website - Live Show (tour request)",notes:"LIVE SHOW lead. Q: "+(d.q||"")};
-  try{await fetch("https://suwphgvhhohvvudkbiii.supabase.co/rest/v1/leads",{method:"POST",headers:{apikey:"sb_publishable_D9YQPfVnBjRokyHlfNeuBA_TR7npJbb","Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(payload)});if(typeof gtag==="function")gtag("event","generate_lead",{source:"live-show"});}catch(err){}
-  f.closest("div").querySelector(".lf-in").style.display="none";
+  var btn=f.querySelector('button[type=submit]');btn.disabled=true;
+  try{
+    if(LS_STREAM){
+      await BL.api('/showings',{streamId:LS_STREAM.id,name:d.name,email:d.email,phone:d.phone||'',message:d.q||''});
+    }else{
+      var payload={first_name:d.name,email:d.email,phone:d.phone||"",market:document.getElementById('ls-title').textContent,stage:"New",priority:"High",source:"Website - Live Show (tour request)",notes:"LIVE SHOW lead. Q: "+(d.q||"")};
+      var r=await fetch("https://suwphgvhhohvvudkbiii.supabase.co/rest/v1/leads",{method:"POST",headers:{apikey:"sb_publishable_D9YQPfVnBjRokyHlfNeuBA_TR7npJbb","Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(payload)});
+      if(!r.ok)throw new Error("HTTP "+r.status);
+    }
+    if(typeof gtag==="function")gtag("event","generate_lead",{source:"live-show"});
+  }catch(err){btn.disabled=false;alert("Sorry, we couldn\u2019t send your request. Please call/text (813) 781-8888 or email dd@bridgesglobal.co.");return false;}
+  document.getElementById("lf-live").style.display="none";
   document.getElementById("ok-live").style.display="block";return false;
 }
+// ?stream=<id> → load that live stream (player + title) from the Bridges Live API
+(function(){var id=new URLSearchParams(location.search).get('stream');if(!id||!window.BL)return;
+  BL.api('/streams/'+encodeURIComponent(id)).then(function(st){LS_STREAM=st;
+    document.getElementById('ls-title').textContent=st.title;
+    document.getElementById('ls-meta').innerHTML=BL.esc(st.categoryLabel)+' · '+BL.esc(st.location)+' · <span style="color:#D8BC6A;font-weight:600">'+BL.esc(st.priceLabel)+'</span>';
+    if(st.playbackUrl)BL.mountPlayer(document.getElementById('player'),st,{controls:true});
+  }).catch(function(){});})();
 </script>
 <footer><div class="wrap">
   <div class="foot-links"><a href="/">Home</a><a href="/apartment-locating">Apartment Locating</a><a href="/new-construction">New Construction</a><a href="/relocation">Relocation</a><a href="/sell">Sell</a>

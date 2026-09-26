@@ -6,7 +6,7 @@
 <title>Miami Real Estate 2026: Luxury Condos, Waterfront & Relocation | Bridges Global</title>
 <meta name="description" content="Miami real estate guide for 2026 — luxury condos, waterfront homes, international buyers, and relocation help from a bilingual broker. Watch homes live before you fly in.">
 <meta name="keywords" content="Sarasota real estate, downtown Sarasota condos, Sarasota new construction, The Quay Sarasota, Sarasota luxury condos, moving to Sarasota, Sarasota investment">
-<link rel="canonical" href="https://live.bridgesglobal.co/miami">>
+<link rel="canonical" href="https://live.bridgesglobal.co/miami">
 <meta property="og:title" content="Sarasota, FL Real Estate &amp; Downtown Condos (2026) | Bridges Global"><meta property="og:description" content="Downtown Sarasota is in a luxury condo boom — The Quay, Ritz-Carlton Residences, One Park and more, with buyer-favorable conditions in 2026. Tour Sarasota live with Bridges Global."><meta property="og:type" content="article">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@1,400;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
@@ -284,7 +284,7 @@ img{transition:transform .5s ease}
   <a class="bglogo" href="/" style="display:flex;align-items:center;text-decoration:none;flex-shrink:0"><img src="/assets/logo-nav.svg" alt="Bridges Global" style="height:40px;width:auto;object-fit:contain;display:block"></a>
   <button class="bgburger" aria-label="Menu" onclick="document.getElementById('bgmenu').classList.toggle('open')"><span></span><span></span><span></span></button>
   <div class="bgmenu" id="bgmenu">
-    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/brandon">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
+    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/riverview">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
     <a href="/apartment-locating">Apartments</a>
     <a href="/live-marketplace" class="nav-live"><span class="nav-dot"></span>Bridges Live</a>
     <a href="/relocation">Relocation</a>
@@ -316,7 +316,7 @@ img{transition:transform .5s ease}
 <span class="eyebrow">Work with Dorota</span>
 <h3>Get help with Tampa</h3>
 <p>Tell us what you're looking for. Dorota is a licensed FL &amp; TX broker, speaks English &amp; Polish, and works with buyers and renters relocating from across the U.S. and around the world.</p>
-<form onsubmit="return submitLead(event,'Tampa','Tampa Bay')">
+<form onsubmit="return submitLead(event,'Miami','Miami')">
 <input name="name" placeholder="Full name" required aria-label="Full name">
 <input name="email" type="email" placeholder="Email" required aria-label="Email">
 <input name="phone" type="tel" placeholder="Phone / WhatsApp" aria-label="Phone or WhatsApp">
@@ -335,9 +335,9 @@ async function submitLead(e,label,market){
   const f=e.target, d=Object.fromEntries(new FormData(f).entries());
   const payload={first_name:d.name,email:d.email||'noemail@bridgeshq.co',phone:d.phone||'',market:market||d.where||'Web',stage:'New',priority:'High',source:'Website — '+label,notes:'From '+market+' page. Moving from: '+(d.where||'n/a')+'. Timeframe: '+(d.timeframe||'n/a')+'. '+(d.notes||'')};
   try{
-    const r=await fetch(SB_URL+'/rest/v1/leads',{method:'POST',headers:{'apikey':SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});
+    const r=await fetch(SB_URL+'/rest/v1/leads',{method:'POST',headers:{'apikey':SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});if(!r.ok)throw new Error('HTTP '+r.status);
     if(typeof gtag==='function')gtag('event','generate_lead',{source:label});
-  }catch(err){}
+  }catch(err){alert("Sorry, we couldn\u2019t send your request. Please call/text (813) 781-8888 or email dd@bridgesglobal.co.");return false;}
   const wrap=f.closest('.leadform');
   wrap.querySelector('.lf-in').style.display='none';
   wrap.querySelector('.ok').style.display='block';
