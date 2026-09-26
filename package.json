@@ -9,6 +9,7 @@
     "dev": "node --watch-path=server server/index.js",
     "start": "node server/index.js",
     "db:migrate": "node server/migrate.js",
+    "db:check": "node server/db-check.js",
     "db:build-sql": "node server/build-sql.js && node server/migrate.js --print",
     "test": "node --test server/test/*.test.js"
   },

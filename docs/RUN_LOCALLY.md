@@ -42,7 +42,9 @@ Try: `/` (hub → *Matcha Pilot* → *Buy now*), `/live-marketplace`, `/matcha`,
    Order: `schema.sql` → `migrations/002_live_commerce.sql` → `seed.sql` (verticals: real-estate,
    matcha, global-trade, nonprofit-housing + the demo live streams).
 2. Put `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` (service_role key) in `.env` and restart.
-   The startup banner shows `database: supabase`.
+   The startup banner shows `database: supabase`. Run `npm run db:check` to confirm the tables
+   and row counts. If Supabase is unreachable or not migrated yet, the server logs why and falls
+   back to the local store so the site keeps working (set `REQUIRE_SUPABASE=true` to fail instead).
 
 The public lead forms on every page post straight to Supabase with the publishable key; the
 migration makes sure the `leads` table has all their columns and an anon **insert** policy.

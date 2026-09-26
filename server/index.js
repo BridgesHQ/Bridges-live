@@ -5,7 +5,7 @@ import path from "node:path";
 import fs from "node:fs";
 import express from "express";
 import { config } from "./config.js";
-import { db } from "./db.js";
+import { db, checkDatabase } from "./db.js";
 import { api } from "./api.js";
 import { attachRealtime } from "./realtime.js";
 
@@ -44,9 +44,10 @@ app.use((req, res) => {
 
 const server = http.createServer(app);
 attachRealtime(server);
+const dbStatus = await checkDatabase();
 server.listen(config.port, () => {
   console.log(`\n  Bridges Live → ${config.appUrl}`);
-  console.log(`  database: ${db.kind}${db.kind === "local" ? " (data/local-db.json — set SUPABASE_URL + SUPABASE_SERVICE_KEY for Supabase)" : ""}`);
+  console.log(`  database: ${dbStatus}${db.kind === "local" && dbStatus === "local" ? " (data/local-db.json — set SUPABASE_URL + SUPABASE_SERVICE_KEY for Supabase)" : ""}`);
   console.log(`  paypal:   ${config.paypal.mode}${config.paypal.mode === "mock" ? " (simulator — set PAYPAL_CLIENT_ID + PAYPAL_SECRET for sandbox)" : ""}`);
   console.log(`  holds:    ${config.holdsEnabled ? "enabled" : "disabled"} · demo mode: ${config.demoMode}\n`);
 });

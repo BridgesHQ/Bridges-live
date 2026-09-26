@@ -93,9 +93,43 @@ class SupabaseStore {
   }
 }
 
-export const db = config.supabase.url && config.supabase.serviceKey
+const localFile = process.env.BL_LOCAL_DB || path.join(config.root, "data", "local-db.json");
+let store = config.supabase.url && config.supabase.serviceKey
   ? new SupabaseStore(config.supabase.url, config.supabase.serviceKey)
-  : new LocalStore(process.env.BL_LOCAL_DB || path.join(config.root, "data", "local-db.json"));
+  : new LocalStore(localFile);
+
+/** Delegating handle so the backing store can be swapped (Supabase → local) at startup. */
+export const db = {
+  get kind() { return store.kind; },
+  select: (...a) => store.select(...a),
+  insert: (...a) => store.insert(...a),
+  update: (...a) => store.update(...a),
+};
+
+/**
+ * Verify Supabase is reachable and migrated. If not, fall back to the local store so the
+ * site keeps working, and explain what to do. Returns a status string for the banner.
+ */
+export async function checkDatabase() {
+  if (store.kind !== "supabase") return "local";
+  try {
+    const rows = await Promise.race([
+      store.select("streams", { status: "live" }, { limit: 1 }),
+      new Promise((_, no) => setTimeout(() => no(new Error("timed out after 8s")), 8000)),
+    ]);
+    if (!rows.length) return "supabase (connected — no live streams yet: run backend/sql/seed.sql)";
+    return "supabase";
+  } catch (e) {
+    const missing = /does not exist|schema cache|relation/i.test(e.message);
+    console.warn(`[db] Supabase check failed: ${e.message}`);
+    console.warn(missing
+      ? "[db] Tables are missing — paste backend/sql/supabase_setup.sql into the Supabase SQL editor (or npm run db:migrate)."
+      : "[db] Could not reach Supabase — check SUPABASE_URL / SUPABASE_SERVICE_KEY and your network.");
+    if (process.env.REQUIRE_SUPABASE === "true") throw e;
+    store = new LocalStore(localFile);
+    return "local (FALLBACK — Supabase not ready, see warning above)";
+  }
+}
 
 // ------------------------------------------------------------- domain queries
 let cache = { at: 0, rows: null };
