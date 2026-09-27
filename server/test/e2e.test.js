@@ -35,7 +35,7 @@ function socket() {
 before(async () => {
   // run from a temp copy root so the test DB never touches data/local-db.json
   proc = spawn(process.execPath, ["server/index.js"], {
-    env: { ...process.env, PORT: String(PORT), ADMIN_TOKEN: "t0ken", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "", PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", BL_LOCAL_DB: path.join(TMP, "db.json") },
+    env: { ...process.env, PORT: String(PORT), ADMIN_TOKEN: "t0ken", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "", PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", AUTO_APPROVE_STREAMS: "false", BL_LOCAL_DB: path.join(TMP, "db.json") },
     stdio: "pipe",
   });
   for (let i = 0; i < 50; i++) {
@@ -123,14 +123,22 @@ test("property: request a showing + reserve hold (authorize) + admin void", asyn
   w.close();
 });
 
-test("lead form endpoint + go-live stream registration", async () => {
+test("lead form endpoint + go-live application → admin approve / take down", async () => {
   assert.equal((await post("/api/leads", { first_name: "Zoe", email: "zoe@example.com", source: "test" })).status, 201);
   const bad = await post("/api/streams", { name: "Host", email: "h@example.com", title: "Tour", playbackUrl: "http://evil" });
   assert.equal(bad.status, 400);
-  const ok = await post("/api/streams", { name: "Host", email: "h@example.com", title: "My Tour", playbackUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" });
+  const ok = await post("/api/streams", { name: "Host", email: "h@example.com", title: "My Tour", license: "SL123", playbackUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" });
   assert.equal(ok.status, 201);
+  assert.equal(ok.body.status, "pending_review");
+  assert.equal((await get(`/api/streams/${ok.body.streamId}`)).status, 404, "hidden until approved");
+  const auth = { Authorization: "Bearer t0ken" };
+  const apps = (await get("/api/admin/streams", auth)).body.streams;
+  assert.equal(apps.find((a) => a.id === ok.body.streamId).license, "SL123");
+  assert.equal((await post(`/api/admin/streams/${ok.body.streamId}/approve`, {}, auth)).status, 200);
   const s = await get(`/api/streams/${ok.body.streamId}`);
   assert.equal(s.body.title, "My Tour");
+  assert.equal((await post(`/api/admin/streams/${ok.body.streamId}/reject`, {}, auth)).status, 200);
+  assert.equal((await get(`/api/streams/${ok.body.streamId}`)).status, 404, "taken down");
 });
 
 test("static site served; private files are not", async () => {

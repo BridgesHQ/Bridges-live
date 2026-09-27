@@ -373,9 +373,10 @@ img{transition:transform .5s ease}
 </div>
 <div id="p-streamers" class="ad-panel">
 <h2 style="font-family:Marcellus,serif;color:#0E1E52;font-size:24px;margin-bottom:20px">Streamer approvals</h2>
-<div class="ad-table"><div class="ad-th" style="grid-template-columns:1.3fr 1fr 1fr 1fr"><div>Applicant</div><div>License</div><div>Status</div><div>Action</div></div>
+<div class="ad-table" id="apprtable"><div class="ad-th" style="grid-template-columns:1.3fr 1fr 1fr 1fr"><div>Applicant</div><div>License</div><div>Status</div><div>Action</div></div>
 <div class="ad-tr" style="grid-template-columns:1.3fr 1fr 1fr 1fr"><div>Triple Creek Homes</div><div>CBC1259XXX (FL)</div><div><span class="pill" style="background:#C9A84C1a;color:#C9A84C">Pending KYC</span></div><div><button style="background:#1A5C3A;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer">Approve</button></div></div>
 <div class="ad-tr" style="grid-template-columns:1.3fr 1fr 1fr 1fr"><div>Emerald Living</div><div>SL3412345 (FL)</div><div><span class="pill" style="background:#1A5C3A1a;color:#1A5C3A">Verified</span></div><div>—</div></div></div>
+<p style="color:#8a93a2;font-size:13px;margin-top:14px">Applications come from the <a href="/become-a-streamer" style="color:#1A5C3A">Go Live</a> page. Verify the license (FL DBPR / TX TREC lookup) and brokerage before approving — approved streams appear in the Bridges Live grid immediately.</p>
 </div>
 <div id="p-showings" class="ad-panel">
 <h2 style="font-family:Marcellus,serif;color:#0E1E52;font-size:24px;margin-bottom:20px">Showing requests</h2>
@@ -403,7 +404,7 @@ var SBU="https://suwphgvhhohvvudkbiii.supabase.co",SBK="sb_publishable_D9YQPfVnB
 var ADM=null; // server admin token (when running the Bridges Live server)
 function esc(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function admApi(path,body){return fetch("/api/admin"+path,{method:body?"POST":"GET",headers:{Authorization:"Bearer "+ADM,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined}).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||r.status);return j;});});}
-function enterApp(){document.getElementById("ad-login").style.display="none";document.getElementById("ad-app").style.display="block";loadLeads();renderPipe();if(ADM){loadOrders();loadCC();loadStreams();}}
+function enterApp(){document.getElementById("ad-login").style.display="none";document.getElementById("ad-app").style.display="block";loadLeads();renderPipe();if(ADM){loadOrders();loadCC();loadStreams();loadApprovals();}}
 async function adminLogin(){var pw=document.getElementById("pw").value,err=document.getElementById("err");err.textContent="";
   var cfg=null;try{var c=await fetch("/api/config");if(c.ok)cfg=await c.json();}catch(e){}
   if(cfg){ // server mode: the password is the server's ADMIN_TOKEN (checked server-side)
@@ -429,6 +430,12 @@ async function loadCC(){try{var q=Object.keys(CCF).map(function(k){return k+"="+
   document.getElementById("ccrows").innerHTML=rows.length?rows.map(function(c){return "<div class=\"ad-tr\" style=\"grid-template-columns:1fr 2.4fr .8fr .8fr 1fr\"><div style=\"font-weight:600;color:#0E1E52\">"+esc(c.author)+"<br><span style=\"font-weight:400;font-size:11px;color:#8a93a2\">"+esc(c.platform)+" · "+fmtWhen(c.created_at)+"</span></div><div style=\"color:#43506e;font-size:13px\">"+esc(c.body)+"</div><div>"+pill(c.intent,ic[c.intent]||"#8a93a2")+"</div><div>"+pill(c.moderation,c.moderation==="visible"?"#1A5C3A":"#D2352A")+"</div><div>"+(c.moderation==="visible"?"<button onclick=\"moderate('"+esc(c.id)+"','hide')\" style=\"background:#fff;border:1px solid #D2352A;color:#D2352A;padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer\">Hide</button>":"<button onclick=\"moderate('"+esc(c.id)+"','approve')\" style=\"background:#1A5C3A;border:none;color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer\">Approve</button>")+"</div></div>";}).join(""):"<div style=\"padding:30px;text-align:center;color:#8a93a2\">No comments yet.</div>";
 }catch(e){console.warn(e)}}
 async function moderate(id,action){try{await admApi("/comments/"+id,{action:action});loadCC();}catch(e){alert(e.message)}}
+async function loadApprovals(){try{var l=(await admApi("/streams")).streams;
+  var col={pending_review:"#C9A84C",live:"#1A5C3A",rejected:"#D2352A",ended:"#8a93a2"},lab={pending_review:"Pending review",live:"Live / approved",rejected:"Rejected",ended:"Ended"};
+  var btn=function(id,a,c,t){return "<button onclick=\"streamAct('"+esc(id)+"','"+a+"')\" style=\"background:"+c+";color:#fff;border:none;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;margin-right:4px\">"+t+"</button>";};
+  document.getElementById("apprtable").innerHTML="<div class=\"ad-th\" style=\"grid-template-columns:1.3fr 1.2fr 1fr 1fr 1.1fr\"><div>Applicant</div><div>Stream</div><div>License</div><div>Status</div><div>Action</div></div>"+(l.length?l.map(function(x){return "<div class=\"ad-tr\" style=\"grid-template-columns:1.3fr 1.2fr 1fr 1fr 1.1fr\"><div style=\"font-weight:600;color:#0E1E52\">"+esc(x.host_name)+"<br><span style=\"font-weight:400;font-size:12px;color:#43506e\">"+esc(x.host_email||"")+" "+esc(x.host_phone||"")+"<br>"+esc(x.brokerage||"")+"</span></div><div style=\"font-size:13px;color:#43506e\">"+esc(x.title||"")+(x.playbackUrl?"<br><a href=\""+esc(x.playbackUrl)+"\" target=\"_blank\" rel=\"noopener\" style=\"color:#1A5C3A\">video link</a>":"<br>no video yet")+"</div><div style=\"font-size:13px\">"+esc(x.license||"—")+"</div><div>"+pill(lab[x.status]||x.status,col[x.status]||"#0E1E52")+"</div><div>"+(x.status!=="live"?btn(x.id,"approve","#1A5C3A","Approve"):"")+(x.status!=="rejected"?btn(x.id,"reject","#D2352A",x.status==="live"?"Take down":"Reject"):"")+"</div></div>";}).join(""):"<div style=\"padding:30px;text-align:center;color:#8a93a2\">No applications yet.</div>");
+}catch(e){console.warn(e)}}
+async function streamAct(id,a){try{if(a==="approve")await admApi("/streams/"+id+"/approve",{});else{if(!confirm("Remove this stream from Bridges Live?"))return;await admApi("/streams/"+id+"/reject",{});}loadApprovals();loadStreams();}catch(e){alert(e.message)}}
 async function loadStreams(){try{var l=(await (await fetch("/api/streams")).json()).streams;
   document.getElementById("st-live").textContent=l.length;document.getElementById("st-view").textContent=l.reduce(function(a,s){return a+s.viewers},0);
   var leads=(await admApi("/leads")).leads,t=new Date().toISOString().slice(0,10);

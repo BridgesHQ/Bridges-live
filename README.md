@@ -11,4 +11,4 @@ npm install && npm run dev   # → http://localhost:3000  (no keys needed to try
 ```
 Live grid + player, WebSocket chat/viewer counts, "just bought" events, PayPal checkout (matcha)
 and the same engine for property showings / reserve holds. See **docs/RUN_LOCALLY.md** for
-Supabase + PayPal sandbox setup.
+Supabase + PayPal sandbox setup, and **docs/DEPLOY.md** to put it live on live.bridgesglobal.co.

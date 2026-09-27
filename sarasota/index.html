@@ -371,7 +371,7 @@ Ask Dorota</div>
 const CHAT_SB_URL="https://suwphgvhhohvvudkbiii.supabase.co",CHAT_SB_KEY="sb_publishable_D9YQPfVnBjRokyHlfNeuBA_TR7npJbb";
 let bgChatOpen=false,bgLead={},bgStage=0;
 function bgChatToggle(){
-  bgChatOpen=!bgChatOpen;
+  bgChatOpen=!bgChatOpen;if(!bgChatOpen)bgFlushNotes();
   document.getElementById('bgchat').style.display=bgChatOpen?'flex':'none';
   document.getElementById('bgchat-btn').style.display=bgChatOpen?'none':'flex';
   if(bgChatOpen&&!document.getElementById('bgchat-feed').children.length){
@@ -402,13 +402,15 @@ async function bgChatSend(){
     bgBot("Perfect — you're all set. Dorota will personally reach out shortly with matched listings and next steps. Meanwhile, want to watch homes live? Tap 'Watch Live' up top. 🏡");
   }else{
     bgBot("Dorota will follow up personally on that. Anything else I can note for her?");
-    if(bgLead.email)bgLead.notes=(bgLead.notes||'')+' | '+v, bgSaveLead(true);
+    if(bgLead.email){bgLead.notes=(bgLead.notes||'')+' | '+v;bgLead.dirty=true;}
   }
 }
+function bgFlushNotes(){if(bgLead.dirty){bgLead.dirty=false;bgSaveLead(true);}}
+window.addEventListener('pagehide',bgFlushNotes);
 async function bgSaveLead(update){
   try{
-    const r=await fetch(CHAT_SB_URL+"/rest/v1/leads",{method:"POST",headers:{apikey:CHAT_SB_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({
-      first_name:bgLead.name||"Chat lead",email:bgLead.email||"noemail@bridgeshq.co",phone:bgLead.phone||"",market:"AI Concierge",stage:"New",priority:"High",source:"Website — AI Concierge Chat",notes:"Interest: "+(bgLead.interest||"")+". "+(bgLead.notes||"")
+    const r=await fetch(CHAT_SB_URL+"/rest/v1/leads",{method:"POST",keepalive:true,headers:{apikey:CHAT_SB_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({
+      first_name:bgLead.name||"Chat lead",email:bgLead.email||"noemail@bridgeshq.co",phone:bgLead.phone||"",market:"AI Concierge",stage:"New",priority:"High",source:update?"Website — AI Concierge Chat (follow-up notes)":"Website — AI Concierge Chat",notes:"Interest: "+(bgLead.interest||"")+". "+(bgLead.notes||"")
     })});
     if(!r.ok)throw new Error("HTTP "+r.status);
     if(typeof gtag==="function")gtag("event","generate_lead",{source:"ai-concierge"});

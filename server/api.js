@@ -126,7 +126,7 @@ api.post("/streams", rateLimit(5), wrap(async (req, res) => {
   const stream = await db.insert("streams", {
     show_id: show.id, provider: provider || "youtube", playback_url: playbackUrl || null, status,
     room_id: `room-${crypto.randomBytes(4).toString("hex")}`, viewer_count: 0,
-    meta: { host_name: name, category, category_label: labels[category], likes: 0, cta: "showing", host_email: email },
+    meta: { host_name: name, category, category_label: labels[category], likes: 0, cta: "showing", host_email: email, host_phone: clean(b.phone, 40), license: clean(b.license, 60), brokerage: clean(b.brokerage, 80), title, applicant: true },
   });
   invalidateStreams();
   await audit("stream.created", "streams", stream.id, { email, status, lead: lead?.id });
@@ -145,6 +145,7 @@ api.post("/admin/streams/:id/approve", requireAdmin, wrap(async (req, res) => {
   const rows = await db.update("streams", { id: req.params.id }, { status: "live" });
   if (!rows.length) return fail(res, 404, "Stream not found");
   invalidateStreams();
+  await audit("stream.approved", "streams", req.params.id);
   res.json({ ok: true });
 }));
 
@@ -324,6 +325,18 @@ admin.get("/summary", wrap(async (req, res) => {
     intents: comments.reduce((m, c) => ((m[c.intent] = (m[c.intent] || 0) + 1), m), {}),
     flagged: comments.filter((c) => c.moderation !== "visible").length,
   });
+}));
+admin.get("/streams", wrap(async (req, res) => {
+  const rows = await db.select("streams", {}, { order: "created_at", limit: 300 });
+  res.json({ streams: rows.filter((r) => r.meta?.applicant).map((r) => ({ id: r.id, status: r.status, playbackUrl: r.playback_url, createdAt: r.created_at, ...r.meta })) });
+}));
+admin.post("/streams/:id/reject", wrap(async (req, res) => {
+  const rows = await db.update("streams", { id: req.params.id }, { status: "rejected" });
+  if (!rows.length) return fail(res, 404, "Stream not found");
+  invalidateStreams();
+  broadcast(req.params.id, { type: "stream_status", status: "ended" });
+  await audit("stream.rejected", "streams", req.params.id);
+  res.json({ ok: true });
 }));
 admin.get("/orders", wrap(async (req, res) => res.json({ orders: await db.select("orders", {}, { order: "created_at", limit: 200 }) })));
 admin.get("/leads", wrap(async (req, res) => res.json({ leads: await db.select("leads", {}, { order: "created_at", limit: 200 }) })));

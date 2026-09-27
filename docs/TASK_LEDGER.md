@@ -38,3 +38,6 @@ Statuses: NOT STARTED · IN PROGRESS · BLOCKED · READY FOR TEST · TESTING · 
 | PayPal checkout: matcha Buy now (CAPTURE) + property hold (AUTHORIZE) | READY FOR TEST | Claude | PayPal sandbox keys | paste PAYPAL_CLIENT_ID/SECRET |
 | Command Center v1 (comment_events, intent, auto-hold spam, admin moderation) | READY FOR TEST | Claude | — | /admin → Command Center |
 | Reserve-hold legal review before PayPal live mode | BLOCKED | Dorota | broker/attorney | set HOLDS_LEGAL_SIGNOFF=true after sign-off |
+| Deploy config: render.yaml (free web service) + docs/DEPLOY.md | READY | Claude | Render account | New → Blueprint |
+| Streamer approvals (admin approve / take down, Go Live applications) | READY FOR TEST | Claude | — | /admin → Streamer approvals |
+| CI: GitHub Actions runs npm test | COMPLETE | Claude | — | — |
