@@ -18,7 +18,12 @@ async function accessToken() {
     body: "grant_type=client_credentials",
   });
   const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(`PayPal auth failed (${r.status}): ${j.error_description || j.error || "unknown"}`);
+  if (!r.ok) {
+    const hint = j.error === "invalid_client"
+      ? ` — these keys don't work in PAYPAL_ENV=${config.paypal.mode}. Sandbox and Live apps have different keys: use the ones from the matching toggle in developer.paypal.com.`
+      : "";
+    throw new Error(`PayPal auth failed (${r.status}): ${j.error_description || j.error || "unknown"}${hint}`);
+  }
   token = { value: j.access_token, exp: Date.now() + j.expires_in * 1000 };
   return token.value;
 }
