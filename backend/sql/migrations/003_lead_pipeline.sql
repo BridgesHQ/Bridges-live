@@ -3,6 +3,8 @@
 -- unsubscribes, and scraped prospects (kept separate from opted-in leads).
 -- Idempotent. Run after 002.
 -- ============================================================
+create extension if not exists "uuid-ossp";
+-- ============================================================
 alter table leads add column if not exists page_url text;
 alter table leads add column if not exists utm jsonb;
 alter table leads add column if not exists sms_consent boolean default false;
