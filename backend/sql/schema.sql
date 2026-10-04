@@ -2,11 +2,14 @@
 -- Bridges Global — Supabase PostgreSQL Schema
 -- Multi-tenant, vertical-agnostic, compliance-aware.
 -- Run in Supabase SQL editor. RLS policies at bottom.
+-- Idempotent: safe to re-run (IF NOT EXISTS / DROP POLICY IF EXISTS).
+-- Run order: schema.sql → migrations/002_live_commerce.sql → seed.sql
+-- (or just `npm run db:migrate` with DATABASE_URL set).
 -- ============================================================
 create extension if not exists "uuid-ossp";
 
 -- ---------- VERTICALS (real-estate, matcha, global-trade, nonprofit-housing) ----------
-create table verticals (
+create table if not exists verticals (
   id uuid primary key default uuid_generate_v4(),
   slug text unique not null,              -- 'real-estate' | 'matcha' | 'global-trade' | 'nonprofit-housing'
   name text not null,
@@ -15,7 +18,7 @@ create table verticals (
 );
 
 -- ---------- ORGANIZATIONS (tenants: brokerage / merchant / external agent) ----------
-create table organizations (
+create table if not exists organizations (
   id uuid primary key default uuid_generate_v4(),
   vertical_id uuid references verticals(id),
   name text not null,
@@ -26,10 +29,12 @@ create table organizations (
 );
 
 -- ---------- USERS / ROLES ----------
-create type user_role as enum
-  ('consumer','selling_agent','listing_broker','external_merchant','platform_admin');
+do $$ begin
+  create type user_role as enum
+    ('consumer','selling_agent','listing_broker','external_merchant','platform_admin');
+exception when duplicate_object then null; end $$;
 
-create table users (
+create table if not exists users (
   id uuid primary key default uuid_generate_v4(),   -- mirrors auth.users.id
   org_id uuid references organizations(id),
   email text unique not null,
@@ -39,7 +44,7 @@ create table users (
   created_at timestamptz default now()
 );
 
-create table licenses (
+create table if not exists licenses (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid references users(id) on delete cascade,
   type text,                              -- 'FL-RE' | 'TX-RE' | 'dealer'
@@ -50,7 +55,7 @@ create table licenses (
 );
 
 -- ---------- LISTINGS (= Item; attributes vary by vertical) ----------
-create table listings (
+create table if not exists listings (
   id uuid primary key default uuid_generate_v4(),
   org_id uuid references organizations(id),
   vertical_id uuid references verticals(id),
@@ -60,7 +65,7 @@ create table listings (
   created_at timestamptz default now()
 );
 
-create table property_authorizations (
+create table if not exists property_authorizations (
   id uuid primary key default uuid_generate_v4(),
   listing_id uuid references listings(id) on delete cascade,
   user_id uuid references users(id),
@@ -70,7 +75,7 @@ create table property_authorizations (
 );
 
 -- ---------- LIVE STREAMS ----------
-create table shows (
+create table if not exists shows (
   id uuid primary key default uuid_generate_v4(),
   host_id uuid references users(id),
   org_id uuid references organizations(id),
@@ -82,13 +87,13 @@ create table shows (
   created_at timestamptz default now()
 );
 
-create table show_listings (
+create table if not exists show_listings (
   show_id uuid references shows(id) on delete cascade,
   listing_id uuid references listings(id) on delete cascade,
   primary key (show_id, listing_id)
 );
 
-create table streams (
+create table if not exists streams (
   id uuid primary key default uuid_generate_v4(),
   show_id uuid unique references shows(id) on delete cascade,
   provider text default 'cloudflare',      -- cloudflare | ivs | livekit
@@ -100,7 +105,7 @@ create table streams (
   created_at timestamptz default now()
 );
 
-create table stream_destinations (        -- social multicast targets
+create table if not exists stream_destinations (        -- social multicast targets
   id uuid primary key default uuid_generate_v4(),
   stream_id uuid references streams(id) on delete cascade,
   platform text,                           -- youtube | tiktok | instagram | facebook
@@ -108,7 +113,7 @@ create table stream_destinations (        -- social multicast targets
   status text default 'pending'
 );
 
-create table chat_messages (              -- live chat (also cached in Redis)
+create table if not exists chat_messages (              -- live chat (also cached in Redis)
   id uuid primary key default uuid_generate_v4(),
   stream_id uuid references streams(id) on delete cascade,
   user_id uuid references users(id),
@@ -118,7 +123,7 @@ create table chat_messages (              -- live chat (also cached in Redis)
 );
 
 -- ---------- ENGAGEMENT → LEADS → APPOINTMENTS ----------
-create table engagements (
+create table if not exists engagements (
   id uuid primary key default uuid_generate_v4(),
   show_id uuid references shows(id) on delete cascade,
   viewer_id uuid references users(id),
@@ -126,7 +131,7 @@ create table engagements (
   created_at timestamptz default now()
 );
 
-create table leads (
+create table if not exists leads (
   id uuid primary key default uuid_generate_v4(),
   engagement_id uuid references engagements(id),
   listing_id uuid references listings(id),
@@ -140,16 +145,37 @@ create table leads (
   priority text default 'High',
   created_at timestamptz default now()
 );
+-- The production `leads` table pre-dates this schema (site forms write
+-- first_name/email/phone/market/stage/priority/source/notes). Make sure every
+-- column exists on an older table before policies reference them.
+alter table leads add column if not exists engagement_id uuid references engagements(id);
+alter table leads add column if not exists listing_id uuid references listings(id);
+alter table leads add column if not exists host_id uuid references users(id);
+alter table leads add column if not exists org_id uuid references organizations(id);
+alter table leads add column if not exists first_name text;
+alter table leads add column if not exists email text;
+alter table leads add column if not exists phone text;
+alter table leads add column if not exists source text;
+alter table leads add column if not exists stage text default 'New';
+alter table leads add column if not exists priority text default 'High';
+alter table leads add column if not exists market text;
+alter table leads add column if not exists notes text;
+alter table leads add column if not exists created_at timestamptz default now();
 
-create table appointments (
-  id uuid primary key default uuid_generate_v4(),
-  lead_id uuid references leads(id) on delete cascade,
-  scheduled_at timestamptz,
-  status text default 'requested'
-);
+-- lead_id matches whatever type leads.id already has (older tables may use bigint).
+do $$ declare t text; begin
+  select format_type(a.atttypid, a.atttypmod) into t from pg_attribute a
+   where a.attrelid = 'public.leads'::regclass and a.attname = 'id';
+  execute format('create table if not exists appointments (
+    id uuid primary key default uuid_generate_v4(),
+    lead_id %s references leads(id) on delete cascade,
+    scheduled_at timestamptz,
+    status text default ''requested''
+  )', t);
+end $$;
 
 -- ---------- E-COMMERCE (Matcha / Global Trade) ----------
-create table orders (
+create table if not exists orders (
   id uuid primary key default uuid_generate_v4(),
   org_id uuid references organizations(id),
   buyer_email text,
@@ -161,7 +187,7 @@ create table orders (
   created_at timestamptz default now()
 );
 
-create table subscriptions (
+create table if not exists subscriptions (
   id uuid primary key default uuid_generate_v4(),
   org_id uuid references organizations(id),
   plan text,
@@ -171,7 +197,7 @@ create table subscriptions (
 );
 
 -- ---------- TRANSACTIONS / REVENUE (commission via brokerage, not SaaS) ----------
-create table transactions (
+create table if not exists transactions (
   id uuid primary key default uuid_generate_v4(),
   appointment_id uuid references appointments(id),
   amount numeric(14,2),
@@ -181,7 +207,7 @@ create table transactions (
   created_at timestamptz default now()
 );
 
-create table revenue_events (
+create table if not exists revenue_events (
   id uuid primary key default uuid_generate_v4(),
   transaction_id uuid references transactions(id),
   type text,                               -- commission | referral | subscription | lead_fee | ad
@@ -192,7 +218,7 @@ create table revenue_events (
 );
 
 -- ---------- ESCROW EVENT LOGS (software NEVER holds funds) ----------
-create table escrow_events (
+create table if not exists escrow_events (
   id uuid primary key default uuid_generate_v4(),
   transaction_id uuid references transactions(id),
   processor text,                          -- earnnest | payload
@@ -208,7 +234,7 @@ create table escrow_events (
 );
 
 -- ---------- 501(c)(3) NONPROFIT (isolated) ----------
-create table housing_resources (
+create table if not exists housing_resources (
   id uuid primary key default uuid_generate_v4(),
   type text,                               -- workshop | guide | grant-program
   title text,
@@ -217,7 +243,7 @@ create table housing_resources (
   created_at timestamptz default now()
 );
 
-create table attendees (                   -- workshop / event attendees (nonprofit)
+create table if not exists attendees (                   -- workshop / event attendees (nonprofit)
   id uuid primary key default uuid_generate_v4(),
   resource_id uuid references housing_resources(id) on delete cascade,
   name text,
@@ -225,7 +251,7 @@ create table attendees (                   -- workshop / event attendees (nonpro
   registered_at timestamptz default now()
 );
 
-create table donations (                   -- nonprofit only; never commingled
+create table if not exists donations (                   -- nonprofit only; never commingled
   id uuid primary key default uuid_generate_v4(),
   donor_name text,
   amount numeric(14,2),
@@ -235,7 +261,7 @@ create table donations (                   -- nonprofit only; never commingled
 );
 
 -- ---------- AUDIT LOGS ----------
-create table audit_logs (
+create table if not exists audit_logs (
   id uuid primary key default uuid_generate_v4(),
   org_id uuid,
   actor_id uuid,
@@ -266,27 +292,35 @@ create or replace function current_role_val() returns user_role language sql sta
 $$;
 
 -- leads: host sees own org's leads; platform_admin sees all
+drop policy if exists leads_tenant on leads;
 create policy leads_tenant on leads for select using (
   org_id = current_org() or current_role_val() = 'platform_admin'
 );
+drop policy if exists leads_insert on leads;
 create policy leads_insert on leads for insert with check ( true );  -- public forms insert
 
 -- listings: org members manage own; public can read active
+drop policy if exists listings_read on listings;
 create policy listings_read on listings for select using ( status='active' or org_id=current_org() );
+drop policy if exists listings_write on listings;
 create policy listings_write on listings for all using ( org_id=current_org() );
 
 -- orders: buyer/org scoped
+drop policy if exists orders_tenant on orders;
 create policy orders_tenant on orders for select using ( org_id=current_org() or current_role_val()='platform_admin' );
 
 -- escrow: brokerage + admin only, NEVER consumers
+drop policy if exists escrow_read on escrow_events;
 create policy escrow_read on escrow_events for select using (
   current_role_val() in ('listing_broker','platform_admin')
 );
 
 -- nonprofit isolation: commercial roles cannot read donations
+drop policy if exists donations_isolated on donations;
 create policy donations_isolated on donations for select using (
   current_role_val() = 'platform_admin'
 );
+drop policy if exists housing_public on housing_resources;
 create policy housing_public on housing_resources for select using ( is_nonprofit = true );
 
 -- MLS sync support: add listing_id + unique constraint for upsert onConflict

@@ -1,0 +1,43 @@
+# Render Blueprint — one free web service runs the whole site + API + WebSockets.
+# Render dashboard → New → Blueprint → pick this repo. Fill the "sync: false" values when asked.
+services:
+  - type: web
+    name: bridges-live
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: APP_URL
+        value: https://live.bridgesglobal.co
+      - key: SUPABASE_URL
+        value: https://suwphgvhhohvvudkbiii.supabase.co
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      # production must use Supabase (the local file store is wiped on every deploy)
+      - key: REQUIRE_SUPABASE
+        value: "true"
+      - key: PAYPAL_ENV
+        value: sandbox
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: DEMO_MODE
+        value: "false"
+      - key: AUTO_APPROVE_STREAMS
+        value: "false"
+      - key: ENABLE_PROPERTY_HOLDS
+        value: "true"
+      - key: HOLDS_LEGAL_SIGNOFF
+        value: "false"

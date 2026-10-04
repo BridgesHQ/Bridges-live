@@ -32,3 +32,12 @@ Statuses: NOT STARTED · IN PROGRESS · BLOCKED · READY FOR TEST · TESTING · 
 | Homepage: 3-panel hub at top (hero removed) | COMPLETE | Claude | — | — |
 | Pilot toggle (Real Estate <-> Matcha) on action drawer | COMPLETE | Claude | — | wire real Stripe in Claude Code |
 | DESIGN DONE → shift to Claude Code for backend/data | READY | Dorota/Dev | needs repo | open in Claude Code, hand /backend + /docs |
+| Node server: static site + /api + /ws (WebSocket) | READY FOR TEST | Claude | — | `npm run dev`, see docs/RUN_LOCALLY.md |
+| Supabase migrations (idempotent schema + 002 + seed verticals/streams) | READY FOR TEST | Claude | Supabase service key / DB URL | run backend/sql/supabase_setup.sql |
+| Live grid + player + realtime chat/viewers + just-bought events | READY FOR TEST | Claude | — | test with 2 browser windows |
+| PayPal checkout: matcha Buy now (CAPTURE) + property hold (AUTHORIZE) | READY FOR TEST | Claude | PayPal sandbox keys | paste PAYPAL_CLIENT_ID/SECRET |
+| Command Center v1 (comment_events, intent, auto-hold spam, admin moderation) | READY FOR TEST | Claude | — | /admin → Command Center |
+| Reserve-hold legal review before PayPal live mode | BLOCKED | Dorota | broker/attorney | set HOLDS_LEGAL_SIGNOFF=true after sign-off |
+| Deploy config: render.yaml (free web service) + docs/DEPLOY.md | READY | Claude | Render account | New → Blueprint |
+| Streamer approvals (admin approve / take down, Go Live applications) | READY FOR TEST | Claude | — | /admin → Streamer approvals |
+| CI: GitHub Actions runs npm test | COMPLETE | Claude | — | — |

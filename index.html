@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bridges Global — Watch Real Estate Live | Bridges Live Marketplace</title>
-<meta name="description" content="Bridges Global is the umbrella brand behind Bridges Live — a live-commerce marketplace where verified agents stream real estate live. Discover homes, meet agents, request a showing. Real estate first; more verticals coming. Tampa Bay, Austin & beyond.">>
+<meta name="description" content="Bridges Global is the umbrella brand behind Bridges Live — a live-commerce marketplace where verified agents stream real estate live. Discover homes, meet agents, request a showing. Real estate first; more verticals coming. Tampa Bay, Austin & beyond.">
 <meta name="keywords" content="Tampa real estate, Sarasota condos, apartment locator Tampa, new construction Parrish, relocation Florida, bilingual realtor, Polish speaking realtor, live home tours">
 <link rel="canonical" href="https://live.bridgesglobal.co/">
 <meta property="og:title" content="Bridges Global — Real Estate, Relocation & Live Home Tours">
@@ -368,7 +368,7 @@ html,body{background:var(--bg)!important;color:var(--text)!important;transition:
   <a class="bglogo" href="/" style="display:flex;align-items:center;text-decoration:none;flex-shrink:0"><img src="/assets/logo-nav.svg" alt="Bridges Global" style="height:40px;width:auto;object-fit:contain;display:block"></a>
   <button class="bgburger" aria-label="Menu" onclick="document.getElementById('bgmenu').classList.toggle('open')"><span></span><span></span><span></span></button>
   <div class="bgmenu" id="bgmenu">
-    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/brandon">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
+    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/riverview">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
     <a href="/apartment-locating">Apartments</a>
     <a href="/live-marketplace" class="nav-live"><span class="nav-dot"></span>Bridges Live</a>
     <a href="/relocation">Relocation</a>
@@ -383,12 +383,13 @@ html,body{background:var(--bg)!important;color:var(--text)!important;transition:
   <!-- COL 1: VIDEO ONLY -->
   <div style="position:relative;width:100%;height:100%;min-height:420px;border-radius:16px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow)">
     <img id="hpImg" src="/assets/hero-luxury.jpg" alt="Live tour" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
+    <div id="hpVideo" style="position:absolute;inset:0;overflow:hidden"></div>
     <span style="position:absolute;top:14px;left:14px;background:var(--live);color:#fff;font-size:12px;font-weight:800;padding:5px 12px;border-radius:6px;display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;background:#fff;border-radius:50%;animation:LVdot 1.4s infinite"></span>LIVE</span>
-    <span style="position:absolute;top:14px;right:14px;background:rgba(8,16,40,.65);backdrop-filter:blur(6px);color:#fff;font-size:12px;padding:5px 12px;border-radius:6px">👁 186 watching</span>
+    <span style="position:absolute;top:14px;right:14px;background:rgba(8,16,40,.65);backdrop-filter:blur(6px);color:#fff;font-size:12px;padding:5px 12px;border-radius:6px">👁 <span id="hpViewers">186</span> watching</span>
     <div style="position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.9));padding:20px">
-      <div style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.1em;text-transform:uppercase">New Construction</div>
-      <div style="font-family:Marcellus,serif;font-size:clamp(20px,2.4vw,26px);color:#fff">Triple Creek — Model B</div>
-      <div style="font-size:14px;color:rgba(255,255,255,.85)">Riverview, FL · <span style="color:var(--accent);font-weight:600">From the $340s</span></div>
+      <div id="hpCat" style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.1em;text-transform:uppercase">New Construction</div>
+      <div id="hpTitle" style="font-family:Marcellus,serif;font-size:clamp(20px,2.4vw,26px);color:#fff">Triple Creek — Model B</div>
+      <div id="hpMeta" style="font-size:14px;color:rgba(255,255,255,.85)">Riverview, FL · <span style="color:var(--accent);font-weight:600">From the $340s</span></div>
     </div>
   </div>
   <!-- COL 2: CHAT -->
@@ -399,7 +400,7 @@ html,body{background:var(--bg)!important;color:var(--text)!important;transition:
       <div><b style="color:var(--muted)">Marta</b> <span style="color:var(--text)">Show the primary bath next?</span></div>
     </div>
     <div style="padding:12px;border-top:1px solid var(--line);display:flex;gap:8px">
-      <input id="wninput" placeholder="Message…" style="flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:10px 12px;font-size:13.5px">
+      <input id="wninput" maxlength="280" onkeydown="if(event.key==='Enter')wnSend()" placeholder="Message…" style="flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:10px 12px;font-size:13.5px">
       <button onclick="wnSend()" style="background:var(--accent);color:#0a0e17;font-weight:700;border:none;border-radius:9px;padding:0 16px;cursor:pointer">Send</button>
     </div>
   </div>
@@ -413,17 +414,17 @@ html,body{background:var(--bg)!important;color:var(--text)!important;transition:
       <div id="pmLabel" style="font-size:11px;color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Active hold</div>
       <div id="pmTitle" style="font-family:Marcellus,serif;font-size:17px;color:var(--text)">Triple Creek — Model B</div>
       <div id="pmMeta" style="font-size:13px;color:var(--muted);margin-bottom:12px">Riverview, FL · <span style="color:var(--accent)">$500 refundable hold</span></div>
-      <a id="pmCta1" href="/live-show" style="display:block;text-align:center;background:var(--cta);color:#fff;font-weight:700;padding:12px;border-radius:9px;text-decoration:none;margin-bottom:8px">Request a showing</a>
-      <a id="pmCta2" href="/live-show" style="display:block;text-align:center;background:var(--panel2);color:var(--text);font-weight:600;padding:11px;border-radius:9px;text-decoration:none;border:1px solid var(--line)">Reserve hold ($500)</a>
+      <a id="pmCta1" href="/live-show" onclick="return hubCta(event,1)" style="display:block;text-align:center;background:var(--cta);color:#fff;font-weight:700;padding:12px;border-radius:9px;text-decoration:none;margin-bottom:8px">Request a showing</a>
+      <a id="pmCta2" href="/live-show" onclick="return hubCta(event,2)" style="display:block;text-align:center;background:var(--panel2);color:var(--text);font-weight:600;padding:11px;border-radius:9px;text-decoration:none;border:1px solid var(--line)">Reserve hold ($500)</a>
       <div id="pmDisc" style="font-size:11px;color:var(--muted);margin-top:8px">Dorota Maslowska · LPT Realty (FL BK3519799)</div>
     </div>
     <div style="background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;flex:1">
       <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Command Center · Moderation</div>
       <div style="font-size:13px;color:var(--text);display:flex;flex-direction:column;gap:8px">
-        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Live viewers</span><b>186</b></div>
-        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Questions</span><b>7</b></div>
-        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Showings requested</span><b style="color:var(--accent)">3</b></div>
-        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Flagged / spam</span><b>0</b></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Live viewers</span><b id="hmViewers">186</b></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Questions</span><b id="hmQuestions">7</b></div>
+        <div style="display:flex;justify-content:space-between"><span id="hmShowL" style="color:var(--muted)">Showings requested</span><b id="hmShowings" style="color:var(--accent)">3</b></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Flagged / spam</span><b id="hmFlagged">0</b></div>
       </div>
     </div>
   </div>
@@ -486,7 +487,9 @@ function setHero(i){
   document.getElementById("hpTitle").textContent=x.p;
   document.getElementById("hpMeta").innerHTML=x.meta+' · <span style="color:#D8BC6A;font-weight:600">'+x.pr+'</span>';
   var img=document.getElementById("hpImg");if(img){img.src=x.img;img.style.display="block";}
+  if(window.hubFromCard)hubFromCard(x);
   var cta=document.getElementById("hpCta");
+  if(!cta){window.scrollTo({top:0,behavior:"smooth"});return;}
   if(x.type==="commerce"){cta.textContent="Buy now";cta.href="/matcha";cta.style.background="#C9A84C";cta.style.color="#0a0e17";}
   else if(x.cat==="relocation"){cta.textContent="Book consultation";cta.href="/relocation";cta.style.background="#0E4FA3";cta.style.color="#fff";}
   else{cta.textContent="Request a showing";cta.href="/live-show";cta.style.background="#1A5C3A";cta.style.color="#fff";}
@@ -597,7 +600,7 @@ Ask Dorota</div>
 const CHAT_SB_URL="https://suwphgvhhohvvudkbiii.supabase.co",CHAT_SB_KEY="sb_publishable_D9YQPfVnBjRokyHlfNeuBA_TR7npJbb";
 let bgChatOpen=false,bgLead={},bgStage=0;
 function bgChatToggle(){
-  bgChatOpen=!bgChatOpen;
+  bgChatOpen=!bgChatOpen;if(!bgChatOpen)bgFlushNotes();
   document.getElementById('bgchat').style.display=bgChatOpen?'flex':'none';
   document.getElementById('bgchat-btn').style.display=bgChatOpen?'none':'flex';
   if(bgChatOpen&&!document.getElementById('bgchat-feed').children.length){
@@ -624,20 +627,24 @@ async function bgChatSend(){
     bgLead.email=v;bgStage=3;bgBot("And a phone or WhatsApp? (optional — type 'skip')");
   }else if(bgStage===3){
     bgLead.phone=(low==='skip')?'':v;bgStage=4;
-    await bgSaveLead();
+    if(!(await bgSaveLead())){bgBot("Sorry, I couldn\u2019t save your details just now. Please call/text (813) 781-8888 or email dd@bridgesglobal.co and Dorota will take it from there.");return;}
     bgBot("Perfect — you're all set. Dorota will personally reach out shortly with matched listings and next steps. Meanwhile, want to watch homes live? Tap 'Watch Live' up top. 🏡");
   }else{
     bgBot("Dorota will follow up personally on that. Anything else I can note for her?");
-    if(bgLead.email)bgLead.notes=(bgLead.notes||'')+' | '+v, bgSaveLead(true);
+    if(bgLead.email){bgLead.notes=(bgLead.notes||'')+' | '+v;bgLead.dirty=true;}
   }
 }
+function bgFlushNotes(){if(bgLead.dirty){bgLead.dirty=false;bgSaveLead(true);}}
+window.addEventListener('pagehide',bgFlushNotes);
 async function bgSaveLead(update){
   try{
-    await fetch(CHAT_SB_URL+"/rest/v1/leads",{method:"POST",headers:{apikey:CHAT_SB_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({
-      first_name:bgLead.name||"Chat lead",email:bgLead.email||"noemail@bridgeshq.co",phone:bgLead.phone||"",market:"AI Concierge",stage:"New",priority:"High",source:"Website — AI Concierge Chat",notes:"Interest: "+(bgLead.interest||"")+". "+(bgLead.notes||"")
+    const r=await fetch(CHAT_SB_URL+"/rest/v1/leads",{method:"POST",keepalive:true,headers:{apikey:CHAT_SB_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({
+      first_name:bgLead.name||"Chat lead",email:bgLead.email||"noemail@bridgeshq.co",phone:bgLead.phone||"",market:"AI Concierge",stage:"New",priority:"High",source:update?"Website — AI Concierge Chat (follow-up notes)":"Website — AI Concierge Chat",notes:"Interest: "+(bgLead.interest||"")+". "+(bgLead.notes||"")
     })});
+    if(!r.ok)throw new Error("HTTP "+r.status);
     if(typeof gtag==="function")gtag("event","generate_lead",{source:"ai-concierge"});
-  }catch(e){}
+    return true;
+  }catch(e){return false;}
 }
 </script>
 
@@ -645,7 +652,7 @@ async function bgSaveLead(update){
 function navFilter(cat,ev){
   if(ev)ev.preventDefault();
   var pill=[...document.querySelectorAll('.catpill')].find(function(p){return p.dataset.cat===cat});
-  if(pill){pill.click();document.getElementById('catbar').scrollIntoView({behavior:'smooth',block:'center'});}
+  if(pill){pill.click();var bar=document.getElementById('catbar')||document.getElementById('home-live');if(bar)bar.scrollIntoView({behavior:'smooth',block:'center'});}
   return false;
 }
 document.addEventListener('DOMContentLoaded',function(){
@@ -674,8 +681,54 @@ function setPilot(mode){
     document.getElementById('pmMeta').innerHTML='Uji, Kyoto · <span style="color:var(--accent)">$30 · instant checkout</span>';
     document.getElementById('pmCta1').textContent='Buy now ($30)';document.getElementById('pmCta1').href='/matcha';
     document.getElementById('pmCta2').style.display='none';
-    document.getElementById('pmDisc').textContent='Instant Stripe checkout · proof-of-concept test';
+    document.getElementById('pmDisc').textContent='Instant PayPal checkout · proof-of-concept test';
   }
+  if(window.hubSwitch)hubSwitch(re?null:'buy');
 }
-</script></body>
+</script>
+<script src="/assets/js/bridges-live.js"></script>
+<script>
+// Homepage hub: live player + WebSocket chat + action drawer on the real engine.
+// Without the API (plain static hosting) everything keeps its original static behaviour.
+var HUB={live:false,streams:[],cur:null,prop:null,q:0,sh:0,fl:0};
+function hubEl(id){return document.getElementById(id);}
+function wnLine(name,body,sys){var c=hubEl('wnchat');if(!c)return;var d=document.createElement('div');var b=document.createElement('b');b.style.color=sys?'var(--accent)':'var(--muted)';b.textContent=name;var t=document.createElement('span');t.style.color='var(--text)';t.textContent=' '+body;d.appendChild(b);d.appendChild(t);if(sys){d.style.borderLeft='2px solid var(--accent)';d.style.paddingLeft='8px';}c.appendChild(d);while(c.children.length>60)c.removeChild(c.firstChild);c.scrollTop=c.scrollHeight;}
+function wnSend(){var i=hubEl('wninput'),v=i.value.trim();if(!v)return;i.value='';
+  if(!HUB.live||!HUB.cur){wnLine('You',v);return;}
+  if(!BL.name()){var n=prompt('Your first name for the chat?','');if(n)BL.setName(n.trim().slice(0,40));}
+  BL.chat(v);}
+function hubStats(){hubEl('hmQuestions').textContent=HUB.q;hubEl('hmShowings').textContent=HUB.sh;hubEl('hmFlagged').textContent=HUB.fl;
+  hubEl('hmShowL').textContent=HUB.cur&&HUB.cur.cta==='buy'?'Orders this stream':'Showings & holds';}
+function hubEvt(m){
+  if(m.type==='chat_message'){wnLine(m.name,m.body+(m.held?' (held for review)':''));if(m.held)HUB.fl++;if(m.intent==='question'||m.intent==='price')HUB.q++;}
+  else{var d=BL.describe(m);if(!d)return;wnLine('★',d,true);if(m.type==='item_purchased'||m.type==='hold_reserved'||m.type==='showing_requested')HUB.sh++;}
+  hubStats();}
+function hubShow(s){
+  if(!s)return;HUB.cur=s;HUB.q=HUB.sh=HUB.fl=0;
+  hubEl('hpCat').textContent=s.categoryLabel;hubEl('hpTitle').textContent=s.title;
+  hubEl('hpMeta').innerHTML=BL.esc(s.location)+' · <span style="color:var(--accent);font-weight:600">'+BL.esc(s.priceLabel)+'</span>';
+  hubEl('hpViewers').textContent=s.viewers;hubEl('hmViewers').textContent=s.viewers;
+  BL.mountPlayer(hubEl('hpVideo'),s);
+  hubEl('wnchat').innerHTML='';
+  BL.join(s.id);
+  if(s.cta!=='buy'){HUB.prop=s;hubEl('pmTitle').textContent=s.title;hubEl('pmMeta').innerHTML=BL.esc(s.location)+' · <span style="color:var(--accent)">$500 refundable hold</span>';}
+  BL.config().then(function(c){if(s.cta!=='buy')hubEl('pmCta2').style.display=c&&c.holds.enabled?'block':'none';});
+  hubStats();
+}
+function hubSwitch(kind){if(!HUB.live)return;hubShow(kind==='buy'?HUB.streams.find(function(s){return s.cta==='buy'}):(HUB.prop||HUB.streams.find(function(s){return s.cta!=='buy'})));}
+function hubFromCard(x){if(!HUB.live)return;var s=HUB.streams.find(function(t){return t.title===x.p})||HUB.streams.find(function(t){return x.type==='commerce'?t.cta==='buy':t.title.indexOf(x.p.split(' — ')[0])===0});if(!s)return;
+  if(s.cta==='buy'){setPilot('matcha');}else{HUB.prop=s;setPilot('re');}}
+function hubCta(e,n){if(!HUB.live||!HUB.cur)return true;e.preventDefault();
+  if(HUB.cur.cta==='buy')BL.buy(HUB.cur);else if(n===2)BL.reserveHold(HUB.cur);else BL.requestShowing(HUB.cur);return false;}
+BL.on('history',function(m){if(HUB.cur&&m.streamId===HUB.cur.id)m.events.forEach(hubEvt);});
+['chat_message','item_purchased','hold_reserved','showing_requested'].forEach(function(t){BL.on(t,function(m){if(HUB.cur&&m.streamId===HUB.cur.id){hubEvt(m);if(t!=='chat_message')BL.toast(BL.describe(m));}});});
+BL.on('viewer_count',function(m){if(HUB.cur&&m.streamId===HUB.cur.id){hubEl('hpViewers').textContent=m.count;hubEl('hmViewers').textContent=m.count;}});
+BL.on('error',function(m){wnLine('Bridges',m.error,true);});
+BL.available.then(function(ok){if(!ok)return;BL.streams().then(function(list){
+  HUB.live=true;HUB.streams=list;
+  HUB.prop=list.find(function(s){return s.title==='Triple Creek — Model B'})||list.find(function(s){return s.cta!=='buy'});
+  hubShow(HUB.prop);
+});});
+</script>
+</body>
 </html>

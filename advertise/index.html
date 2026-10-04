@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Advertise With Bridges Global | Reach Tampa Bay Movers & Buyers</title>
-<meta name="description" content="Advertise your business to Tampa Bay movers, buyers, and renters — movers, lenders, insurers, stagers and more. High-intent local audience.">>>
+<meta name="description" content="Advertise your business to Tampa Bay movers, buyers, and renters — movers, lenders, insurers, stagers and more. High-intent local audience.">
 <meta name="keywords" content="sell my home Tampa, list my house Austin, live streamed open house, sell to international buyers">
-<link rel="canonical" href="https://live.bridgesglobal.co/advertise">>>
+<link rel="canonical" href="https://live.bridgesglobal.co/advertise">
 <meta property="og:title" content="Sell Your Home with Live-Streamed Showings | Bridges Global">
 <meta property="og:description" content="Sell your Tampa Bay or Austin home with live-streamed open houses that reach relocation and international buyers. Multilingual marketing.">
 <meta property="og:type" content="website">
@@ -286,7 +286,7 @@ img{transition:transform .5s ease}
   <a class="bglogo" href="/" style="display:flex;align-items:center;text-decoration:none;flex-shrink:0"><img src="/assets/logo-nav.svg" alt="Bridges Global" style="height:40px;width:auto;object-fit:contain;display:block"></a>
   <button class="bgburger" aria-label="Menu" onclick="document.getElementById('bgmenu').classList.toggle('open')"><span></span><span></span><span></span></button>
   <div class="bgmenu" id="bgmenu">
-    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/brandon">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
+    <div class="bgdrop"><a href="/new-construction">New Construction</a><div class="bgpanel"><div class="lbl">By area</div><a href="/tampa">Tampa</a><a href="/sarasota">Sarasota</a><a href="/parrish">Parrish</a><a href="/riverview">Riverview</a><a href="/clearwater">Clearwater</a><a href="/st-petersburg">St. Petersburg</a><a href="/riverview">Brandon</a><a href="/lakewood-ranch">Lakewood Ranch</a></div></div>
     <a href="/apartment-locating">Apartments</a>
     <a href="/live-marketplace" class="nav-live"><span class="nav-dot"></span>Bridges Live</a>
     <a href="/relocation">Relocation</a>
@@ -330,7 +330,7 @@ img{transition:transform .5s ease}
 async function submitAd(e){
   e.preventDefault();var f=e.target,d=Object.fromEntries(new FormData(f).entries());
   var payload={first_name:d.name,email:d.email,phone:d.phone||"",market:d.company,stage:"New",priority:"High",source:"Website - Advertiser Inquiry",notes:"ADVERTISER. Company: "+d.company+". Type: "+(d.type||"")+". "+(d.notes||"")};
-  try{await fetch("https://suwphgvhhohvvudkbiii.supabase.co/rest/v1/leads",{method:"POST",headers:{apikey:"sb_publishable_D9YQPfVnBjRokyHlfNeuBA_TR7npJbb","Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(payload)});if(typeof gtag==="function")gtag("event","generate_lead",{source:"advertiser"});}catch(err){}
+  try{const r=await fetch("https://suwphgvhhohvvudkbiii.supabase.co/rest/v1/leads",{method:"POST",headers:{apikey:"sb_publishable_D9YQPfVnBjRokyHlfNeuBA_TR7npJbb","Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(payload)});if(!r.ok)throw new Error('HTTP '+r.status);if(typeof gtag==="function")gtag("event","generate_lead",{source:"advertiser"});}catch(err){alert("Sorry, we couldn\u2019t send your request. Please call/text (813) 781-8888 or email dd@bridgesglobal.co.");return false;}
   f.closest(".leadform").querySelector(".lf-in").style.display="none";
   f.closest(".leadform").querySelector(".ok").style.display="block";return false;
 }
