@@ -116,6 +116,9 @@ test("property: request a showing + reserve hold (authorize) + admin void", asyn
   const h = orders.find((o) => o.kind === "hold");
   assert.equal(h.status, "authorized");
   assert.equal((await post(`/api/admin/holds/${h.id}/void`, {}, auth)).body.status, "voided");
+  const lr = (await get("/api/admin/listingreel", auth)).body;
+  assert.equal(lr.connected, false, "local DB has no ListingReel tables → explains instead of crashing");
+  assert.match(lr.reason, /local test database/);
   const sum = (await get("/api/admin/summary", auth)).body;
   assert.equal(sum.purchases, 1);
   assert.ok(sum.leads >= 2);
@@ -143,7 +146,7 @@ test("lead form endpoint + go-live application → admin approve / take down", a
 
 test("static site served; private files are not", async () => {
   assert.equal((await fetch(BASE + "/live-marketplace/")).status, 200);
-  for (const p of ["/server/api.js", "/.env", "/data/local-db.json", "/backend/sql/schema.sql", "/package.json", "/docs/TECHNICAL_SPEC.md"]) {
+  for (const p of ["/listingreel/.env.example", "/listingreel/lib/env.ts", "/server/api.js", "/.env", "/data/local-db.json", "/backend/sql/schema.sql", "/package.json", "/docs/TECHNICAL_SPEC.md"]) {
     assert.equal((await fetch(BASE + p)).status, 404, p);
   }
 });

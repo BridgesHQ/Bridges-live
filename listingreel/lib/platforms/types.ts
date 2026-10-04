@@ -1,0 +1,2 @@
+export type Platform='tiktok'|'instagram'|'youtube'|'facebook'; export type ConnectedAccount={platform:Platform;accessToken:string;refreshToken?:string;expiresAt?:string;accountId?:string};
+export interface Publisher{refresh(account:ConnectedAccount):Promise<ConnectedAccount>;publish(account:ConnectedAccount,videoUrl:string,caption:string):Promise<{postId:string;url?:string}>;analytics(account:ConnectedAccount,postId:string):Promise<Record<string,number>>}

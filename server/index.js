@@ -31,7 +31,7 @@ app.use("/api", (req, res, next) => {
 app.use("/api", api);
 
 // Never serve server code, secrets, data, or repo internals as static files.
-const PRIVATE = /^\/(server|backend|data|node_modules|functions|docs)(\/|$)|^\/\.|\/\.|\.(txt|md|json|sql|ts|tsx|lock)$/i;
+const PRIVATE = /^\/(server|backend|data|node_modules|functions|docs|listingreel)(\/|$)|^\/\.|\/\.|\.(txt|md|json|sql|ts|tsx|lock)$/i;
 const PUBLIC_FILES = new Set(["/robots.txt", "/llms.txt", "/sitemap.xml"]);
 app.use((req, res, next) => (PRIVATE.test(req.path) && !PUBLIC_FILES.has(req.path) ? res.status(404).end() : next()));
 

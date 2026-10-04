@@ -338,6 +338,29 @@ admin.post("/streams/:id/reject", wrap(async (req, res) => {
   await audit("stream.rejected", "streams", req.params.id);
   res.json({ ok: true });
 }));
+// ListingReel (separate Next.js app, same Supabase project, lr_* tables) — summary for the Bridges admin.
+admin.get("/listingreel", wrap(async (req, res) => {
+  if (db.kind !== "supabase") return res.json({ connected: false, reason: "Bridges is using the local test database — connect Supabase to see ListingReel." });
+  const safe = (t, opts) => db.select(t, {}, opts).catch(() => null);
+  const [users, listings, videos, subs, clicks] = await Promise.all([
+    safe("lr_users", { order: "created_at", limit: 500 }), safe("lr_listings", { order: "created_at", limit: 500 }),
+    safe("lr_videos", { limit: 1000 }), safe("lr_subscriptions", { limit: 500 }), safe("lr_click_events", { limit: 5000 }),
+  ]);
+  if (users === null) return res.json({ connected: false, reason: "ListingReel tables not found — run listingreel/supabase/migrations/001_init.sql in the Supabase SQL Editor." });
+  const byUser = Object.fromEntries((users || []).map((u) => [u.id, u]));
+  res.json({
+    connected: true,
+    agents: users.length,
+    paying: (subs || []).filter((s) => s.status === "active").length,
+    trialing: (subs || []).filter((s) => s.status === "trialing").length,
+    listings: (listings || []).length,
+    videosReady: (videos || []).filter((v) => v.render_status === "ready").length,
+    videosRendering: (videos || []).filter((v) => v.render_status === "rendering").length,
+    ctaClicks: (clicks || []).length,
+    recentAgents: users.slice(0, 20).map((u) => ({ email: u.email, name: u.full_name, joined: u.created_at, listings: (listings || []).filter((l) => l.user_id === u.id).length })),
+    recentListings: (listings || []).slice(0, 20).map((l) => ({ address: l.address, status: l.status, agent: byUser[l.user_id]?.email || "", created: l.created_at })),
+  });
+}));
 admin.get("/orders", wrap(async (req, res) => res.json({ orders: await db.select("orders", {}, { order: "created_at", limit: 200 }) })));
 admin.get("/leads", wrap(async (req, res) => res.json({ leads: await db.select("leads", {}, { order: "created_at", limit: 200 }) })));
 admin.get("/comments", wrap(async (req, res) => {
