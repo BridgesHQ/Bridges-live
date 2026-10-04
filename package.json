@@ -2,16 +2,19 @@
   "name": "bridges-live",
   "version": "0.1.0",
   "private": true,
-  "description": "Bridges Live — live-commerce platform (static site + API + WebSocket + PayPal checkout)",
+  "description": "Bridges Live \u2014 live-commerce platform (static site + API + WebSocket + PayPal checkout)",
   "type": "module",
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev": "node --watch-path=server server/index.js",
     "start": "node server/index.js",
     "db:migrate": "node server/migrate.js",
     "db:check": "node server/db-check.js",
     "db:build-sql": "node server/build-sql.js && node server/migrate.js --print",
-    "test": "node --test server/test/*.test.js"
+    "test": "node --test server/test/*.test.js",
+    "prospects:reddit": "node server/prospects/reddit.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

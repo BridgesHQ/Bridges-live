@@ -3,10 +3,20 @@
 import express from "express";
 import crypto from "node:crypto";
 import { config } from "./config.js";
-import { db, listStreams, getStream, insertLead, audit, invalidateStreams } from "./db.js";
+import { db, listStreams, getStream, audit, invalidateStreams } from "./db.js";
 import * as paypal from "./paypal.js";
 import { broadcast, broadcastCommerce, roomSize } from "./realtime.js";
 import { HOLD_TERMS } from "./seed-data.js";
+import { routeLead, isEmail as validEmail } from "./leads/router.js";
+import { runDueFollowups, unsubscribeToken } from "./leads/sequence.js";
+import { integrations } from "./leads/providers.js";
+import { scanReddit } from "./prospects/reddit.js";
+
+/** Every captured lead goes through the same pipeline (save → alert → CRM → follow-up). */
+async function captureLead(l) {
+  const r = await routeLead(l);
+  return { id: r.lead_id, report: r };
+}
 
 export const api = express.Router();
 api.use(express.json({ limit: "32kb" }));
@@ -60,6 +70,7 @@ api.get("/config", (req, res) => {
     holds: { enabled: config.holdsEnabled, ...HOLD_TERMS },
     demoMode: config.demoMode,
     database: db.kind,
+    bookingUrl: config.leads.bookingUrl || null,
   });
 });
 
@@ -111,7 +122,7 @@ api.post("/streams", rateLimit(5), wrap(async (req, res) => {
   const verticals = await db.select("verticals", { slug: "real-estate" });
   const verticalId = verticals[0]?.id || null;
 
-  const lead = await insertLead({
+  const lead = await captureLead({
     first_name: name, email, phone: clean(b.phone, 40), market: title, source: "Website — Go Live (streamer application)",
     notes: `License: ${clean(b.license, 60) || "n/a"} · Brokerage: ${clean(b.brokerage, 80) || "n/a"} · Stream: ${playbackUrl || "not yet"}`,
   });
@@ -154,12 +165,57 @@ api.post("/leads", rateLimit(10), wrap(async (req, res) => {
   const b = req.body || {};
   const email = clean(b.email, 120).toLowerCase();
   if (!clean(b.first_name || b.name) || !isEmail(email)) return fail(res, 400, "Name and a valid email are required.");
-  const lead = await insertLead({
+  const lead = await captureLead({
     first_name: clean(b.first_name || b.name, 80), email, phone: clean(b.phone, 40), market: clean(b.market, 120),
     source: clean(b.source, 120) || "Website", notes: clean(b.notes, 2000), stage: "New", priority: "High",
     stream_id: clean(b.streamId, 64) || null,
   });
-  res.status(201).json({ ok: true, id: lead?.id ?? null });
+  res.status(201).json({ ok: true, id: lead?.id ?? null, delivery: lead.report });
+}));
+
+// ---------------------------------------------------------------- lead router (all site forms)
+// Public endpoint every lead form posts to. Honeypot + rate limit keep bots from texting your phone.
+api.post("/lead-router", rateLimit(8, 10 * 60_000), wrap(async (req, res) => {
+  const b = req.body || {};
+  if (b.company_website) return res.status(201).json({ ok: true }); // honeypot field filled → bot; pretend success
+  const email = clean(b.email, 120).toLowerCase();
+  if (!clean(b.first_name || b.name) || !(validEmail(email) || /\d{7,}/.test(String(b.phone || "").replace(/\D/g, "")))) {
+    return fail(res, 400, "Please add your name and an email or phone number.");
+  }
+  const r = await routeLead({
+    first_name: b.first_name || b.name, email, phone: b.phone, market: b.market, source: b.source, notes: b.notes,
+    page_url: b.page_url, utm: b.utm, sms_consent: b.sms_consent === true, stream_id: clean(b.streamId, 64) || null,
+  });
+  res.status(201).json({ ok: true, id: r.lead_id, booking_url: config.leads.bookingUrl || null, delivery: r });
+}));
+
+api.get("/unsubscribe", wrap(async (req, res) => {
+  let email = "";
+  try { email = Buffer.from(String(req.query.e || ""), "base64url").toString("utf8").toLowerCase(); } catch {}
+  const ok = validEmail(email) && String(req.query.t || "") === unsubscribeToken(email);
+  if (ok) {
+    if (!(await db.select("lead_unsubscribes", { email })).length) await db.insert("lead_unsubscribes", { email });
+    await db.update("lead_followups", { email, status: "pending" }, { status: "cancelled", detail: "unsubscribed" });
+  }
+  res.type("html").send(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>Unsubscribe</title><body style="font-family:Arial,sans-serif;max-width:520px;margin:60px auto;padding:0 16px;color:#1A1A1A"><h2 style="color:#0E1E52">${ok ? "You're unsubscribed" : "Link not valid"}</h2><p>${ok ? "You won't receive any more automatic emails from Bridges Global." : "This unsubscribe link is invalid or expired. Reply to any email and we'll remove you."}</p><p><a href="/">Back to Bridges Global</a></p></body>`);
+}));
+api.post("/unsubscribe", wrap(async (req, res) => { // RFC 8058 one-click (List-Unsubscribe-Post)
+  let email = "";
+  try { email = Buffer.from(String(req.query.e || ""), "base64url").toString("utf8").toLowerCase(); } catch {}
+  if (validEmail(email) && String(req.query.t || "") === unsubscribeToken(email)) {
+    if (!(await db.select("lead_unsubscribes", { email })).length) await db.insert("lead_unsubscribes", { email });
+    await db.update("lead_followups", { email, status: "pending" }, { status: "cancelled", detail: "unsubscribed" });
+  }
+  res.status(200).end();
+}));
+
+// External free cron (cron-job.org) pings this every 15 min: sends due follow-ups and keeps a
+// free Render instance awake. Authorization: Bearer $CRON_SECRET
+api.post("/cron/followups", wrap(async (req, res) => {
+  const tok = (req.get("authorization") || "").replace(/^Bearer\s+/i, "");
+  const a = Buffer.from(tok), b2 = Buffer.from(config.cronSecret || "");
+  if (!config.cronSecret || a.length !== b2.length || !crypto.timingSafeEqual(a, b2)) return fail(res, 401, "Unauthorized");
+  res.json(await runDueFollowups());
 }));
 
 api.post("/showings", rateLimit(8), wrap(async (req, res) => {
@@ -169,7 +225,7 @@ api.post("/showings", rateLimit(8), wrap(async (req, res) => {
   const s = await getStream(clean(b.streamId, 64));
   if (!s) return fail(res, 404, "Stream not found");
   const eng = await db.insert("engagements", { show_id: s.showId, type: "showing_request" });
-  const lead = await insertLead({
+  const lead = await captureLead({
     first_name: name, email, phone: clean(b.phone, 40), market: s.title, source: "Bridges Live — Request a showing",
     notes: `Live stream: ${s.title} (${s.host}). Preferred time: ${clean(b.when, 80) || "flexible"}. ${clean(b.message, 800)}`,
     listing_id: s.listingId, org_id: s.orgId, host_id: s.hostId, stream_id: s.id, engagement_id: eng.id,
@@ -249,7 +305,7 @@ api.post("/holds", rateLimit(6), wrap(async (req, res) => {
   if (b.agree !== true) return fail(res, 400, "Please confirm the hold terms.");
   const s = await getStream(clean(b.streamId, 64));
   if (!s || s.cta === "buy") return fail(res, 400, "This stream has no property to hold.");
-  const lead = await insertLead({
+  const lead = await captureLead({
     first_name: name, email, phone: clean(b.phone, 40), market: s.title, source: "Bridges Live — Reserve hold",
     notes: `Requested ${HOLD_TERMS.label} on ${s.title} (${s.host}) during live stream.`,
     listing_id: s.listingId, org_id: s.orgId, host_id: s.hostId, stream_id: s.id,
@@ -360,6 +416,30 @@ admin.get("/listingreel", wrap(async (req, res) => {
     recentAgents: users.slice(0, 20).map((u) => ({ email: u.email, name: u.full_name, joined: u.created_at, listings: (listings || []).filter((l) => l.user_id === u.id).length })),
     recentListings: (listings || []).slice(0, 20).map((l) => ({ address: l.address, status: l.status, agent: byUser[l.user_id]?.email || "", created: l.created_at })),
   });
+}));
+admin.get("/pipeline", wrap(async (req, res) => {
+  const [events, followups, unsubs] = await Promise.all([
+    db.select("lead_events", {}, { order: "created_at", limit: 300 }).catch(() => []),
+    db.select("lead_followups", {}, { order: "send_at", desc: false, limit: 1000 }).catch(() => []),
+    db.select("lead_unsubscribes", {}, { limit: 1000 }).catch(() => []),
+  ]);
+  const count = (arr, k) => arr.reduce((m, x) => ((m[x[k]] = (m[x[k]] || 0) + 1), m), {});
+  res.json({ integrations: integrations(), events: events.slice(0, 100), followups: count(followups, "status"),
+    upcoming: followups.filter((f) => f.status === "pending").slice(0, 50), unsubscribed: unsubs.length });
+}));
+admin.post("/followups/stop", wrap(async (req, res) => {
+  const email = clean(req.body?.email, 120).toLowerCase();
+  if (!validEmail(email)) return fail(res, 400, "email required");
+  const rows = await db.update("lead_followups", { email, status: "pending" }, { status: "cancelled", detail: "stopped by admin" });
+  res.json({ ok: true, cancelled: rows.length });
+}));
+admin.get("/prospects", wrap(async (req, res) => res.json({ prospects: await db.select("prospects", {}, { order: "created_at", limit: 300 }).catch(() => []) })));
+admin.post("/prospects/scan", wrap(async (req, res) => res.json(await scanReddit())));
+admin.post("/prospects/:id", wrap(async (req, res) => {
+  const status = ["new", "contacted", "ignored"].includes(req.body?.status) ? req.body.status : null;
+  if (!status) return fail(res, 400, "status must be new | contacted | ignored");
+  const rows = await db.update("prospects", { id: req.params.id }, { status });
+  res.json({ ok: !!rows.length });
 }));
 admin.get("/orders", wrap(async (req, res) => res.json({ orders: await db.select("orders", {}, { order: "created_at", limit: 200 }) })));
 admin.get("/leads", wrap(async (req, res) => res.json({ leads: await db.select("leads", {}, { order: "created_at", limit: 200 }) })));

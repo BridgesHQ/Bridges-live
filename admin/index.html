@@ -281,6 +281,8 @@ img{transition:transform .5s ease}
 <meta property="og:image" content="https://live.bridgesglobal.co/assets/hero-luxury.jpg">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
+<script src="/assets/js/site-config.js"></script>
+<script src="/assets/js/lead-pipeline.js" defer></script>
 </head>
 <body>
 <nav class="bgnav"><div class="bgwrap">
@@ -347,6 +349,8 @@ img{transition:transform .5s ease}
 <div class="ad-tab" onclick="tab(&#39;orders&#39;,this)">🛒 Orders (matcha)</div>
 <div class="ad-tab" onclick="tab(&#39;cc&#39;,this)">🛡 Command Center</div>
 <div class="ad-tab" onclick="tab(&#39;lr&#39;,this)">🎬 ListingReel</div>
+<div class="ad-tab" onclick="tab(&#39;pl&#39;,this)">📣 Lead pipeline</div>
+<div class="ad-tab" onclick="tab(&#39;pr&#39;,this)">🔎 Prospects</div>
 </div>
 <div class="ad-main">
 <div id="p-leads" class="ad-panel on">
@@ -392,6 +396,17 @@ img{transition:transform .5s ease}
 <div class="ad-stats"><div class="ad-stat"><div class="l">Paid orders</div><div class="v" style="color:#1A5C3A" id="o-n">—</div></div><div class="ad-stat"><div class="l">Revenue</div><div class="v" style="color:#C9A84C" id="o-rev">—</div></div><div class="ad-stat"><div class="l">PayPal</div><div class="v" style="color:#0E1E52;font-size:18px" id="o-mode">—</div></div></div>
 <div class="ad-table"><div class="ad-th" style="grid-template-columns:1.2fr 1.6fr .8fr .9fr 1fr"><div>Buyer</div><div>Items</div><div>Amount</div><div>Status</div><div>When</div></div><div id="orderrows"><div style="padding:30px;text-align:center;color:#8a93a2">Log in with the server admin token to see live orders.</div></div></div>
 </div>
+<div id="p-pl" class="ad-panel">
+<h2 style="font-family:Marcellus,serif;color:#0E1E52;font-size:24px;margin-bottom:8px">Lead pipeline</h2>
+<p style="color:#8a93a2;font-size:13px;margin-bottom:18px">Every lead: saved → SMS + email alert to you → CRM → 5-touch follow-up. Each delivery attempt is logged here.</p>
+<div id="plbody"><div style="padding:30px;text-align:center;color:#8a93a2">Log in with the server admin token.</div></div>
+</div>
+<div id="p-pr" class="ad-panel">
+<h2 style="font-family:Marcellus,serif;color:#0E1E52;font-size:24px;margin-bottom:8px">Prospects</h2>
+<p style="color:#8a93a2;font-size:13px;margin-bottom:12px">Public Reddit posts from people planning a move to Tampa Bay. They haven't contacted you — nothing is sent automatically. Open the post and reply personally; mark it when done.</p>
+<button onclick="scanProspects(this)" style="background:#0E1E52;color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:14px">Scan Reddit now</button>
+<div id="prbody"></div>
+</div>
 <div id="p-lr" class="ad-panel">
 <h2 style="font-family:Marcellus,serif;color:#0E1E52;font-size:24px;margin-bottom:8px">ListingReel</h2>
 <p style="color:#8a93a2;font-size:13px;margin-bottom:18px">AI listing videos for agents — same Supabase project. Every ListingReel sign-up also appears in Leads (source "ListingReel — agent sign-up").</p>
@@ -410,7 +425,7 @@ var SBU="https://suwphgvhhohvvudkbiii.supabase.co",SBK="sb_publishable_D9YQPfVnB
 var ADM=null; // server admin token (when running the Bridges Live server)
 function esc(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function admApi(path,body){return fetch("/api/admin"+path,{method:body?"POST":"GET",headers:{Authorization:"Bearer "+ADM,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined}).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||r.status);return j;});});}
-function enterApp(){document.getElementById("ad-login").style.display="none";document.getElementById("ad-app").style.display="block";loadLeads();renderPipe();if(ADM){loadOrders();loadCC();loadStreams();loadApprovals();loadLR();}}
+function enterApp(){document.getElementById("ad-login").style.display="none";document.getElementById("ad-app").style.display="block";loadLeads();renderPipe();if(ADM){loadOrders();loadCC();loadStreams();loadApprovals();loadLR();loadPipeline();loadProspects();}}
 async function adminLogin(){var pw=document.getElementById("pw").value,err=document.getElementById("err");err.textContent="";
   var cfg=null;try{var c=await fetch("/api/config");if(c.ok)cfg=await c.json();}catch(e){}
   if(cfg){ // server mode: the password is the server's ADMIN_TOKEN (checked server-side)
@@ -450,6 +465,22 @@ async function loadLR(){try{var d=await admApi("/listingreel"),b=document.getEle
    +"<h3 style=\"font-family:Marcellus,serif;color:#0E1E52;margin:18px 0 10px\">Newest agents</h3><div class=\"ad-table\"><div class=\"ad-th\" style=\"grid-template-columns:1.6fr 1fr .6fr 1fr\"><div>Email</div><div>Name</div><div>Listings</div><div>Joined</div></div>"+(d.recentAgents.map(function(a){return row([esc(a.email),esc(a.name||"—"),a.listings,fmtWhen(a.joined)],"1.6fr 1fr .6fr 1fr")}).join("")||"<div style=\"padding:20px;color:#8a93a2\">No agents yet.</div>")+"</div>"
    +"<h3 style=\"font-family:Marcellus,serif;color:#0E1E52;margin:18px 0 10px\">Newest listings</h3><div class=\"ad-table\"><div class=\"ad-th\" style=\"grid-template-columns:1.6fr 1fr 1.2fr 1fr\"><div>Address</div><div>Status</div><div>Agent</div><div>Created</div></div>"+(d.recentListings.map(function(l){return row([esc(l.address),pill(l.status,"#0E1E52"),esc(l.agent),fmtWhen(l.created)],"1.6fr 1fr 1.2fr 1fr")}).join("")||"<div style=\"padding:20px;color:#8a93a2\">No listings yet.</div>")+"</div>";
 }catch(e){console.warn(e)}}
+async function loadPipeline(){try{var d=await admApi("/pipeline"),i=d.integrations,b=document.getElementById("plbody");
+  var chip=function(l,on,extra){return "<span class=\"pill\" style=\"background:"+(on?"#1A5C3A1a":"#D2352A1a")+";color:"+(on?"#1A5C3A":"#D2352A")+";margin:0 6px 6px 0;display:inline-block\">"+(on?"✓ ":"✗ ")+esc(l)+(extra?" · "+esc(extra):"")+"</span>";};
+  var col={sent:"#1A5C3A",scheduled:"#1A5C3A",new:"#0E1E52",update:"#C9A84C",skipped:"#8a93a2",failed:"#D2352A",pending:"#C9A84C",cancelled:"#8a93a2"};
+  b.innerHTML="<div style=\"margin-bottom:14px\">"+chip("SMS alerts (Twilio)",i.sms&&i.alertsTo.phone)+chip("Email (Resend)",i.email&&i.alertsTo.email)+chip("CRM",i.crm.length,i.crm.join(", "))+chip("Booking link",i.booking)+chip("Texts to leads",i.smsToLeads,i.smsToLeads?"":"needs A2P 10DLC")+"</div>"
+   +"<div class=\"ad-stats\">"+Object.keys(d.followups).map(function(k){return "<div class=\"ad-stat\"><div class=\"l\">Follow-ups "+esc(k)+"</div><div class=\"v\" style=\"color:"+(col[k]||"#0E1E52")+"\">"+d.followups[k]+"</div></div>"}).join("")+"<div class=\"ad-stat\"><div class=\"l\">Unsubscribed</div><div class=\"v\">"+d.unsubscribed+"</div></div></div>"
+   +"<h3 style=\"font-family:Marcellus,serif;color:#0E1E52;margin:18px 0 10px\">Recent deliveries</h3><div class=\"ad-table\"><div class=\"ad-th\" style=\"grid-template-columns:1.4fr .9fr .8fr 2fr 1fr\"><div>Lead</div><div>Step</div><div>Result</div><div>Detail</div><div>When</div></div>"
+   +(d.events.map(function(e){return "<div class=\"ad-tr\" style=\"grid-template-columns:1.4fr .9fr .8fr 2fr 1fr\"><div style=\"font-size:13px\">"+esc(e.email||e.lead_ref||"—")+"</div><div style=\"font-size:13px\">"+esc(e.type)+"</div><div>"+pill(e.status,col[e.status]||"#0E1E52")+"</div><div style=\"font-size:12px;color:#43506e\">"+esc(e.detail||"")+"</div><div style=\"font-size:12px\">"+fmtWhen(e.created_at)+"</div></div>"}).join("")||"<div style=\"padding:20px;color:#8a93a2\">No leads routed yet.</div>")+"</div>"
+   +"<h3 style=\"font-family:Marcellus,serif;color:#0E1E52;margin:18px 0 10px\">Upcoming follow-ups</h3><div class=\"ad-table\"><div class=\"ad-th\" style=\"grid-template-columns:1.6fr .5fr .8fr 1fr .8fr\"><div>Lead</div><div>Touch</div><div>Channel</div><div>Sends</div><div></div></div>"
+   +(d.upcoming.map(function(f){return "<div class=\"ad-tr\" style=\"grid-template-columns:1.6fr .5fr .8fr 1fr .8fr\"><div style=\"font-size:13px\">"+esc(f.first_name||"")+" "+esc(f.email)+"</div><div>"+f.step+"/5</div><div style=\"font-size:13px\">"+esc(f.channel)+"</div><div style=\"font-size:12px\">"+fmtWhen(f.send_at)+"</div><div><button onclick=\"stopSeq('"+esc(f.email)+"')\" style=\"background:#fff;border:1px solid #D2352A;color:#D2352A;padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer\">Stop</button></div></div>"}).join("")||"<div style=\"padding:20px;color:#8a93a2\">Nothing scheduled.</div>")+"</div>";
+}catch(e){console.warn(e)}}
+async function stopSeq(email){if(!confirm("Stop all automatic follow-ups to "+email+"?"))return;try{await admApi("/followups/stop",{email:email});loadPipeline();}catch(e){alert(e.message)}}
+async function loadProspects(){try{var l=(await admApi("/prospects")).prospects,b=document.getElementById("prbody");
+  b.innerHTML="<div class=\"ad-table\"><div class=\"ad-th\" style=\"grid-template-columns:2.4fr .9fr .8fr 1.1fr\"><div>Post</div><div>Where</div><div>Status</div><div>Action</div></div>"+(l.map(function(p){return "<div class=\"ad-tr\" style=\"grid-template-columns:2.4fr .9fr .8fr 1.1fr\"><div><a href=\""+esc(p.url)+"\" target=\"_blank\" rel=\"noopener\" style=\"color:#0E1E52;font-weight:600\">"+esc(p.title)+"</a><div style=\"font-size:12px;color:#43506e;margin-top:3px\">"+esc((p.body||"").slice(0,180))+"</div></div><div style=\"font-size:12px\">"+esc(p.community)+"<br>u/"+esc(p.author)+"<br>"+fmtWhen(p.posted_at)+"</div><div>"+pill(p.status,p.status==="new"?"#C9A84C":p.status==="contacted"?"#1A5C3A":"#8a93a2")+"</div><div><button onclick=\"prospectSet('"+esc(p.id)+"','contacted')\" style=\"background:#1A5C3A;color:#fff;border:none;padding:5px 9px;border-radius:6px;font-size:12px;cursor:pointer;margin:0 4px 4px 0\">Contacted</button><button onclick=\"prospectSet('"+esc(p.id)+"','ignored')\" style=\"background:#fff;border:1px solid #8a93a2;color:#43506e;padding:5px 9px;border-radius:6px;font-size:12px;cursor:pointer\">Ignore</button></div></div>"}).join("")||"<div style=\"padding:20px;color:#8a93a2\">No prospects yet — click Scan Reddit now.</div>")+"</div>";
+}catch(e){console.warn(e)}}
+async function prospectSet(id,st){try{await admApi("/prospects/"+id,{status:st});loadProspects();}catch(e){alert(e.message)}}
+async function scanProspects(btn){btn.disabled=true;btn.textContent="Scanning… (~20 s)";try{var r=await admApi("/prospects/scan",{});btn.textContent="Found "+r.found+", new "+r.added+(r.errors.length?" ("+r.errors.length+" errors)":"");loadProspects();}catch(e){btn.textContent="Scan failed: "+e.message}btn.disabled=false;}
 async function loadStreams(){try{var l=(await (await fetch("/api/streams")).json()).streams;
   document.getElementById("st-live").textContent=l.length;document.getElementById("st-view").textContent=l.reduce(function(a,s){return a+s.viewers},0);
   var leads=(await admApi("/leads")).leads,t=new Date().toISOString().slice(0,10);

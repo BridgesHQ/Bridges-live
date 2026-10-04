@@ -183,7 +183,8 @@ export async function insertLead(lead) {
     market: lead.market || "", stage: lead.stage || "New", priority: lead.priority || "High",
     source: lead.source || "Website", notes: lead.notes || "",
   };
-  const extended = { ...base, listing_id: lead.listing_id || null, org_id: lead.org_id || null, host_id: lead.host_id || null, stream_id: lead.stream_id || null, engagement_id: lead.engagement_id || null };
+  const extended = { ...base, listing_id: lead.listing_id || null, org_id: lead.org_id || null, host_id: lead.host_id || null, stream_id: lead.stream_id || null, engagement_id: lead.engagement_id || null,
+    page_url: lead.page_url || null, utm: lead.utm && Object.keys(lead.utm).length ? lead.utm : null, sms_consent: !!lead.sms_consent };
   try { return await db.insert("leads", extended); }
   catch (e) {
     if (db.kind !== "supabase") throw e;

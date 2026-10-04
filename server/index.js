@@ -8,6 +8,8 @@ import { config } from "./config.js";
 import { db, checkDatabase } from "./db.js";
 import { api } from "./api.js";
 import { attachRealtime } from "./realtime.js";
+import { startFollowupScheduler } from "./leads/sequence.js";
+import { integrations } from "./leads/providers.js";
 
 const app = express();
 app.disable("x-powered-by");
@@ -45,9 +47,12 @@ app.use((req, res) => {
 const server = http.createServer(app);
 attachRealtime(server);
 const dbStatus = await checkDatabase();
+if (process.env.NODE_ENV !== "test") startFollowupScheduler();
 server.listen(config.port, () => {
   console.log(`\n  Bridges Live → ${config.appUrl}`);
   console.log(`  database: ${dbStatus}${db.kind === "local" && dbStatus === "local" ? " (data/local-db.json — set SUPABASE_URL + SUPABASE_SERVICE_KEY for Supabase)" : ""}`);
   console.log(`  paypal:   ${config.paypal.mode}${config.paypal.mode === "mock" ? " (simulator — set PAYPAL_CLIENT_ID + PAYPAL_SECRET for sandbox)" : ""}`);
-  console.log(`  holds:    ${config.holdsEnabled ? "enabled" : "disabled"} · demo mode: ${config.demoMode}\n`);
+  console.log(`  holds:    ${config.holdsEnabled ? "enabled" : "disabled"} · demo mode: ${config.demoMode}`);
+  const i = integrations();
+  console.log(`  leads:    sms alerts ${i.sms && i.alertsTo.phone ? "on" : "off"} · email ${i.email ? "on" : "off"} · crm ${i.crm.join("+") || "off"} · booking ${i.booking ? "on" : "off"} · texts to leads ${i.smsToLeads ? "on" : "off"}\n`);
 });

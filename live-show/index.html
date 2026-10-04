@@ -280,6 +280,8 @@ img{transition:transform .5s ease}
 <meta property="og:image" content="https://live.bridgesglobal.co/assets/hero-luxury.jpg">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
+<script src="/assets/js/site-config.js"></script>
+<script src="/assets/js/lead-pipeline.js" defer></script>
 </head>
 <body>
 <nav class="bgnav"><div class="bgwrap">
@@ -336,7 +338,12 @@ img{transition:transform .5s ease}
 <button type="submit" style="width:100%;background:#1A5C3A;color:#fff;border:none;padding:12px;border-radius:9px;font-weight:700;cursor:pointer">Request a tour</button>
 </form>
 </div>
-<div class="ok" id="ok-live" style="display:none;text-align:center;padding:16px 0"><div style="font-family:Marcellus,serif;font-size:18px;color:#D8BC6A">You're on the list.</div><div style="color:#8fa0c0;font-size:13px;margin-top:6px">Dorota will follow up shortly.</div></div>
+<div class="ok" id="ok-live" style="display:none;text-align:center;padding:16px 0"><div style="font-family:Marcellus,serif;font-size:18px;color:#D8BC6A">You're on the list.</div><div style="color:#8fa0c0;font-size:13px;margin-top:6px">Dorota will follow up shortly.</div><a class="ls-book" href="/thank-you/" style="display:none;margin-top:14px;background:#D8BC6A;color:#0a0e17;font-weight:700;padding:11px 18px;border-radius:9px;text-decoration:none">Book a 15-min call now</a></div>
+</div>
+<div class="ls-book-card" style="display:none;background:#131a2b;border:1px solid #1e2740;border-radius:14px;padding:18px 20px;margin-top:14px">
+<div style="font-family:Marcellus,serif;font-size:17px;margin-bottom:4px">Prefer to talk it through?</div>
+<div style="color:#8fa0c0;font-size:13px;margin-bottom:12px">Pick a time for a 15-minute call with Dorota — video or phone.</div>
+<a class="ls-book" target="_blank" rel="noopener" href="/thank-you/" style="display:block;text-align:center;background:#D8BC6A;color:#0a0e17;font-weight:700;padding:11px;border-radius:9px;text-decoration:none">Book a call</a>
 </div>
 </div>
 </div>
@@ -371,6 +378,9 @@ async function submitLive(e){
   document.getElementById("lf-live").style.display="none";
   document.getElementById("ok-live").style.display="block";return false;
 }
+// booking link (Calendly / GHL) from site-config.js or the server's BOOKING_URL
+(function(){function show(u){if(!u)return;document.querySelectorAll('.ls-book').forEach(function(a){a.href=u;a.target='_blank';a.rel='noopener';a.style.display=a.style.display==='none'?'inline-block':a.style.display;});document.querySelectorAll('.ls-book-card').forEach(function(c){c.style.display='block';});}
+  var u=(window.BRIDGES_CONFIG||{}).bookingUrl;if(u)show(u);else if(window.BL)BL.config().then(function(c){show(c&&c.bookingUrl);});})();
 // ?stream=<id> → load that live stream (player + title) from the Bridges Live API
 (function(){var id=new URLSearchParams(location.search).get('stream');if(!id||!window.BL)return;
   BL.api('/streams/'+encodeURIComponent(id)).then(function(st){LS_STREAM=st;
