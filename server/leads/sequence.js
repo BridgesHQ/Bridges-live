@@ -16,9 +16,6 @@ export function unsubscribeUrl(email) {
   return `${config.appUrl}/api/unsubscribe?e=${encodeURIComponent(Buffer.from(String(email).toLowerCase()).toString("base64url"))}&t=${unsubscribeToken(email)}`;
 }
 
-function bookingLine(l) {
-  return config.leads.bookingUrl ? `Pick a time that suits you: ${config.leads.bookingUrl}` : `Reply to this email or call/text (813) 781-8888.`;
-}
 
 function layout(l, paragraphs, cta) {
   const site = config.appUrl;
@@ -35,7 +32,6 @@ Real estate services provided by LPT Realty · FL BK3519799 · TX 829789-SA · E
   return { html, text };
 }
 
-const booking = () => (config.leads.bookingUrl ? { label: "Book a 15-minute call", href: config.leads.bookingUrl } : null);
 
 /** The five touches. `channel: "sms"` steps fall back to email when texting leads isn't enabled. */
 export const STEPS = [
@@ -44,10 +40,10 @@ export const STEPS = [
     body: (l) => [
       `Hi ${esc(first(l))},`,
       `Thanks for reaching out${l.market ? ` about <b>${esc(l.market)}</b>` : ""}. I personally read every request and I'll be in touch shortly.`,
-      `The fastest way to get answers is a quick call — ${config.leads.bookingUrl ? "grab any open slot below." : "reply with a good time, or call/text (813) 781-8888."}`,
+      `Just reply to this email (or text me back) with any questions — what you're looking for, your timeline, and your budget range help me send the right options.`,
     ],
-    cta: booking,
-    sms: (l) => `Hi ${first(l)}, it's Dorota at Bridges Global — got your request${l.market ? ` about ${l.market}` : ""}. ${bookingLine(l)} Reply STOP to opt out.` },
+    cta: null,
+    sms: (l) => `Hi ${first(l)}, it's Dorota at Bridges Global — got your request${l.market ? ` about ${l.market}` : ""}. I'll follow up by text and email. Questions? Just reply here. Reply STOP to opt out.` },
   { step: 2, delay: 1 * DAY, channel: "email",
     subject: () => `See homes live before you visit`,
     body: (l) => [`Hi ${esc(first(l))},`, `On Bridges Live you can watch real homes and new-construction models on camera, ask questions in the chat, and request a private showing in one tap — from anywhere.`, `Tell me what you'd like to see and I'll schedule a live walkthrough for you.`],
@@ -55,7 +51,7 @@ export const STEPS = [
   { step: 3, delay: 3 * DAY, channel: "sms",
     subject: () => `Quick question about your timeline`,
     body: (l) => [`Hi ${esc(first(l))},`, `Quick question so I can send you the right options: what's your ideal move-in timeframe, and is there a budget range you'd like me to stay within?`, `Just hit reply — a one-line answer is perfect.`],
-    cta: booking,
+    cta: null,
     sms: (l) => `Hi ${first(l)}, Dorota here (Bridges Global). What's your ideal move-in timeframe? Happy to send matching homes. Reply STOP to opt out.` },
   { step: 4, delay: 7 * DAY, channel: "email",
     subject: () => `Your free Tampa Bay relocation guide`,
@@ -64,7 +60,7 @@ export const STEPS = [
   { step: 5, delay: 14 * DAY, channel: "email",
     subject: (l) => `Should I keep your file open, ${first(l)}?`,
     body: (l) => [`Hi ${esc(first(l))},`, `I haven't heard back, so I don't want to crowd your inbox. If you're still looking, reply "yes" and I'll keep sending options. If your plans changed, no problem at all — this is my last automatic note.`],
-    cta: booking },
+    cta: null },
 ];
 
 export async function isUnsubscribed(email) {

@@ -27,7 +27,6 @@ export const config = {
   leads: {
     ownerPhone: env.LEAD_ALERT_PHONE || "",          // your mobile, E.164 (+18135551234)
     ownerEmail: env.LEAD_ALERT_EMAIL || "",          // where new-lead emails go
-    bookingUrl: env.BOOKING_URL || "",               // Calendly / GHL calendar link
     fromName: env.LEAD_FROM_NAME || "Dorota Maslowska · Bridges Global",
     businessAddress: env.BUSINESS_ADDRESS || "",     // required in marketing emails (CAN-SPAM)
     // automatic texts TO LEADS need Twilio A2P 10DLC registration — off until you turn it on

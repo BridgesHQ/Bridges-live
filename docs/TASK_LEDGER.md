@@ -41,7 +41,7 @@ Statuses: NOT STARTED · IN PROGRESS · BLOCKED · READY FOR TEST · TESTING · 
 | Deploy config: render.yaml (free web service) + docs/DEPLOY.md | READY | Claude | Render account | New → Blueprint |
 | Streamer approvals (admin approve / take down, Go Live applications) | READY FOR TEST | Claude | — | /admin → Streamer approvals |
 | CI: GitHub Actions runs npm test | COMPLETE | Claude | — | — |
-| Lead pipeline: Pixel/GA4/RB2B on every page, /api/lead-router, SMS+email alerts, CRM, 5-touch follow-up, booking | READY FOR TEST | Claude | Pixel ID, RB2B key, Twilio, Resend, HubSpot/GHL, Calendly | paste keys — docs/LEAD_PIPELINE.md |
+| Lead pipeline: Pixel/GA4/RB2B on every page, /api/lead-router, SMS+email alerts, CRM, 5-touch follow-up (text + email, no call booking) | READY FOR TEST | Claude | Pixel ID, RB2B key, Twilio, Resend domain, HubSpot/GHL | paste keys — docs/LEAD_PIPELINE.md |
 | Texting leads (A2P 10DLC registration) | BLOCKED | Dorota | Twilio A2P approval (paid) | register brand + campaign, then LEAD_SMS_TO_LEADS=true |
 | Privacy policy page (Pixel / GA4 / RB2B disclosure) | NOT STARTED | Dorota | legal text | add /privacy |
 | Reddit prospects finder | READY FOR TEST | Claude | — | /admin → Prospects → Scan |

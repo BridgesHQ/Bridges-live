@@ -5,7 +5,7 @@
  *    submissions through /api/lead-router instead (save → SMS + email alert → CRM → 5-touch
  *    follow-up), adding page URL, UTM campaign data, SMS consent and a bot honeypot.
  *    If the router can't be reached, the original Supabase request goes through, so no lead is lost.
- * 3. After a lead: Meta "Lead" event + a "book a call" prompt (Calendly / GHL).
+ * 3. After a lead: Meta "Lead" event + a short "request received" confirmation.
  */
 (function () {
   "use strict";
@@ -65,21 +65,20 @@
   }
 
   // ------------------------------------------------------------------ after a lead
-  var prompted = false;
-  function afterLead(source, bookingUrl) {
+  var confirmed = false;
+  function afterLead(source) {
     try { if (window.fbq) window.fbq("track", "Lead", { content_name: source || "Website" }); } catch (e) {}
-    var url = bookingUrl || C.bookingUrl;
-    if (!url || prompted || /follow-up notes/i.test(source || "")) return;
-    prompted = true;
+    if (confirmed || /follow-up notes/i.test(source || "")) return;
+    confirmed = true;
     setTimeout(function () {
       var d = document.createElement("div");
-      d.setAttribute("role", "dialog");
-      d.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:6000;max-width:340px;background:#0E1E52;color:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 18px 50px rgba(0,0,0,.35);font:14px/1.45 'DM Sans',system-ui,sans-serif";
-      d.innerHTML = '<button aria-label="Close" style="float:right;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1">×</button><b style="font-size:15px">Thanks — you\'re all set.</b><div style="margin:6px 0 12px;opacity:.85">Want to skip the back-and-forth? Pick a time for a quick call with Dorota.</div><a target="_blank" rel="noopener" style="display:inline-block;background:#D8BC6A;color:#0a0e1a;font-weight:700;padding:10px 16px;border-radius:9px;text-decoration:none">Book a 15-min call</a>';
-      d.querySelector("a").href = url;
+      d.setAttribute("role", "status");
+      d.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:6000;max-width:340px;background:#0E1E52;color:#fff;border-radius:14px;padding:14px 18px;box-shadow:0 18px 50px rgba(0,0,0,.35);font:14px/1.45 'DM Sans',system-ui,sans-serif";
+      d.innerHTML = '<button aria-label="Close" style="float:right;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;margin-left:8px">×</button><b style="font-size:15px">✓ Request received</b><div style="margin-top:4px;opacity:.85">Dorota will follow up by text and email shortly.</div>';
       d.querySelector("button").onclick = function () { d.remove(); };
       document.body.appendChild(d);
-    }, 600);
+      setTimeout(function () { if (d.parentNode) d.remove(); }, 9000);
+    }, 400);
   }
 
   // ------------------------------------------------------------------ routing
@@ -97,7 +96,7 @@
     };
     return nativeFetch(API + "/api/lead-router", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), keepalive: true })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw Object.assign(new Error(j.error || "router " + r.status), { status: r.status }); return j; }); })
-      .then(function (j) { afterLead(body.source, j.booking_url); return j; });
+      .then(function (j) { afterLead(body.source); return j; });
   }
   window.BridgesLead = { submit: submit };
 

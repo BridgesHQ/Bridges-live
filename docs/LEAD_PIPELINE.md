@@ -1,5 +1,7 @@
 # Lead pipeline — visitors and stream viewers → tracked, alerted, followed-up leads
 
+No call booking: after a lead submits they see a confirmation, and all follow-up is by **text and email**.
+
 ```
 every page ── Meta Pixel (PageView) · GA4 G-NN5K59SYSJ · RB2B visitor ID
    │
@@ -10,7 +12,7 @@ POST /api/lead-router  ──►  Supabase `leads` row (always first — a lead 
                        ├──►  SMS to you (Twilio)          "🔔 New lead: Ana · 813… · Website — Tampa"
                        ├──►  email to you (Resend)        full details + call/text/email buttons
                        ├──►  CRM (HubSpot upsert and/or GoHighLevel / any webhook)
-                       ├──►  Meta Pixel "Lead" + "Book a 15-min call" prompt (Calendly / GHL)
+                       ├──►  Meta Pixel "Lead" + a short "request received — follow-up by text and email" confirmation
                        └──►  5-touch follow-up: now · +1 day · +3 days · +7 days · +14 days
 ```
 
@@ -23,7 +25,7 @@ and emailed to you as an **update**, without another text or a second sequence.
 ## The 5 touches
 | # | When | Channel | Content |
 |---|------|---------|---------|
-| 1 | immediately | email (+ text*) | Thanks, personal reply coming, **book a call** link |
+| 1 | immediately | email (+ text*) | Thanks, personal reply coming, reply with timeline/budget |
 | 2 | +1 day | email | Watch homes live on Bridges Live |
 | 3 | +3 days | text* (email if texting is off) | Timeline / budget question |
 | 4 | +7 days | email | Free Tampa Bay relocation guide |
@@ -42,7 +44,6 @@ remaining touches. Stop anyone's sequence from **/admin → 📣 Lead pipeline**
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` | console.twilio.com | trial credit; texts to **your verified phone** work on trial |
 | `RESEND_API_KEY`, `RESEND_FROM` | resend.com → API Keys; **Domains → add bridgesglobal.co** (add the DNS records in Cloudflare) | ✅ 3,000/mo |
 | `HUBSPOT_TOKEN` **or** `GHL_WEBHOOK_URL` | HubSpot → Settings → Integrations → Private Apps (contacts read/write) · GHL → Automation → Workflow → trigger "Inbound Webhook" | HubSpot ✅ / GHL paid |
-| `BOOKING_URL` | Calendly → your event link (or GHL calendar link) | ✅ |
 | `BUSINESS_ADDRESS` | mailing address for email footers (required by CAN-SPAM) | — |
 | `CRON_SECRET` | auto-generated on Render | ✅ |
 

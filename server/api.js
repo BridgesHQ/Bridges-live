@@ -70,7 +70,6 @@ api.get("/config", (req, res) => {
     holds: { enabled: config.holdsEnabled, ...HOLD_TERMS },
     demoMode: config.demoMode,
     database: db.kind,
-    bookingUrl: config.leads.bookingUrl || null,
   });
 });
 
@@ -186,7 +185,7 @@ api.post("/lead-router", rateLimit(8, 10 * 60_000), wrap(async (req, res) => {
     first_name: b.first_name || b.name, email, phone: b.phone, market: b.market, source: b.source, notes: b.notes,
     page_url: b.page_url, utm: b.utm, sms_consent: b.sms_consent === true, stream_id: clean(b.streamId, 64) || null,
   });
-  res.status(201).json({ ok: true, id: r.lead_id, booking_url: config.leads.bookingUrl || null, delivery: r });
+  res.status(201).json({ ok: true, id: r.lead_id, delivery: r });
 }));
 
 api.get("/unsubscribe", wrap(async (req, res) => {

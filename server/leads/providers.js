@@ -83,6 +83,5 @@ export const integrations = () => ({
   email: !!(config.resend.key && config.resend.from),
   crm: [config.crm.hubspotToken && "hubspot", config.crm.ghlWebhook && "gohighlevel", config.crm.webhook && "webhook"].filter(Boolean),
   alertsTo: { phone: !!config.leads.ownerPhone, email: !!config.leads.ownerEmail },
-  booking: !!config.leads.bookingUrl,
   smsToLeads: config.leads.smsToLeads,
 });

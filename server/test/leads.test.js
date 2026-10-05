@@ -38,7 +38,7 @@ before(async () => {
   proc = spawn(process.execPath, ["server/index.js"], {
     env: { ...process.env, PORT: String(PORT), NODE_ENV: "test", ADMIN_TOKEN: "t0ken", CRON_SECRET: "cron-secret-123456", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "",
       PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", BL_LOCAL_DB: path.join(TMP, "db.json"), APP_URL: BASE,
-      LEAD_ALERT_PHONE: "+18135550100", LEAD_ALERT_EMAIL: "owner@example.com", BOOKING_URL: "https://calendly.com/dorota/15min",
+      LEAD_ALERT_PHONE: "+18135550100", LEAD_ALERT_EMAIL: "owner@example.com",
       TWILIO_ACCOUNT_SID: "AC123", TWILIO_AUTH_TOKEN: "tok", TWILIO_FROM: "+18135550199", TWILIO_API_BASE: f,
       RESEND_API_KEY: "re_123", RESEND_FROM: "Dorota <dd@bridgesglobal.co>", RESEND_API_BASE: f,
       HUBSPOT_TOKEN: "pat-123", HUBSPOT_API_BASE: f, GHL_WEBHOOK_URL: `${f}/ghl`, LEAD_SMS_TO_LEADS: "true" },
@@ -56,7 +56,7 @@ test("site form → saved, agent alerted (SMS + email), CRM synced, sequence sta
   const r = await post("/api/lead-router", { first_name: "Ana Lee", email: "Ana@Example.com", phone: "(813) 555-1234", market: "Tampa Bay", source: "Website — Tampa",
     notes: "Moving from Chicago in June", page_url: "https://live.bridgesglobal.co/tampa", utm: { utm_source: "facebook", utm_campaign: "relo", evil: "x" }, sms_consent: true });
   assert.equal(r.status, 201);
-  assert.equal(r.body.booking_url, "https://calendly.com/dorota/15min");
+  assert.equal(r.body.booking_url, undefined, "no call booking");
   const d = r.body.delivery;
   assert.deepEqual([d.alert_sms, d.alert_email, d.crm, d.sequence], ["sent", "sent", "sent", "scheduled"]);
   await wait(400); // touch 1 goes out right away
@@ -68,7 +68,8 @@ test("site form → saved, agent alerted (SMS + email), CRM synced, sequence sta
   assert.equal(alert.auth, "Basic " + Buffer.from("AC123:tok").toString("base64"));
   const welcomeSms = sms.find((c) => c.body.To === "+18135551234");
   assert.ok(welcomeSms, "touch 1 text to the lead (consent + A2P flag on)");
-  assert.match(welcomeSms.body.Body, /calendly\.com\/dorota\/15min.*Reply STOP/);
+  assert.match(welcomeSms.body.Body, /follow up by text and email.*Reply STOP/);
+  assert.doesNotMatch(welcomeSms.body.Body, /calendly|book/i);
 
   const emails = of("resend");
   const ownerMail = emails.find((c) => c.body.to[0] === "owner@example.com");
@@ -77,7 +78,8 @@ test("site form → saved, agent alerted (SMS + email), CRM synced, sequence sta
   assert.doesNotMatch(ownerMail.body.html, /evil/, "only utm/click-id keys are kept");
   const welcome = emails.find((c) => c.body.to[0] === "ana@example.com");
   assert.match(welcome.body.subject, /Got it, Ana/);
-  assert.match(welcome.body.html, /calendly\.com\/dorota\/15min/);
+  assert.doesNotMatch(welcome.body.html, /calendly|Book a/i);
+  assert.match(welcome.body.html, /reply to this email/i);
   assert.match(welcome.body.html, /\/api\/unsubscribe\?e=/);
   assert.ok(welcome.body.headers["List-Unsubscribe"]);
 
