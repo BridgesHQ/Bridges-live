@@ -144,3 +144,15 @@ test("unsubscribe cancels the remaining touches; cron endpoint is protected", as
   assert.equal((await post("/api/cron/followups", {})).status, 401);
   assert.equal((await post("/api/cron/followups", {}, { Authorization: "Bearer cron-secret-123456" })).status, 200);
 });
+
+test("Resend test sender (onboarding@resend.dev) only emails the owner; leads are skipped with a reason", async () => {
+  const { sendEmail } = await import("../leads/providers.js");
+  const { config } = await import("../config.js");
+  const saved = { ...config.resend }, owner = config.leads.ownerEmail;
+  Object.assign(config.resend, { key: "re_x", from: "Bridges Global Leads <onboarding@resend.dev>", base: "http://127.0.0.1:9" });
+  config.leads.ownerEmail = "owner@example.com";
+  const r = await sendEmail({ to: "lead@example.com", subject: "x", html: "x", text: "x" });
+  assert.equal(r.status, "skipped");
+  assert.match(r.detail, /verify bridgesglobal\.co/);
+  Object.assign(config.resend, saved); config.leads.ownerEmail = owner;
+});

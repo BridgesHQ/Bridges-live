@@ -28,6 +28,10 @@ export async function sendEmail({ to, subject, html, text, replyTo, headers }) {
   const r = config.resend;
   if (!r.key || !r.from) return skipped("Resend not configured");
   if (!to) return skipped("no email");
+  // Resend's shared test sender (onboarding@resend.dev) only delivers to the account owner.
+  if (/@resend\.dev>?\s*$/i.test(r.from) && to.toLowerCase() !== (config.leads.ownerEmail || "").toLowerCase()) {
+    return skipped("verify bridgesglobal.co in Resend to email leads");
+  }
   const body = await http(`${r.base}/emails`, {
     method: "POST",
     headers: { Authorization: `Bearer ${r.key}`, "Content-Type": "application/json" },
