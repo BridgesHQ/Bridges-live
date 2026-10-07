@@ -158,3 +158,26 @@ test("Resend test sender (onboarding@resend.dev) only emails the owner; leads ar
   assert.match(r.detail, /verify bridgesglobal\.co/);
   Object.assign(config.resend, saved); config.leads.ownerEmail = owner;
 });
+
+test("HubSpot: existing contact further along than 'lead' is still updated (retry without stage)", async () => {
+  const hs = http.createServer((req, res) => {
+    let raw = ""; req.on("data", (d) => (raw += d)); req.on("end", () => {
+      const props = JSON.parse(raw).inputs[0].properties;
+      hs.seen.push(props);
+      if (props.lifecyclestage) { res.statusCode = 400; return res.end(JSON.stringify({ message: "Property values were not valid: lifecyclestage cannot be set backwards" })); }
+      res.end(JSON.stringify({ results: [{ id: "77" }] }));
+    });
+  });
+  hs.seen = [];
+  await new Promise((r) => hs.listen(0, r));
+  const { syncCrm } = await import("../leads/providers.js");
+  const { config } = await import("../config.js");
+  const saved = { ...config.crm };
+  Object.assign(config.crm, { hubspotToken: "pat-x", hubspotBase: `http://127.0.0.1:${hs.address().port}`, ghlWebhook: "", webhook: "" });
+  const [r] = await syncCrm({ email: "old.client@example.com", first_name: "Old Client", source: "Website" });
+  Object.assign(config.crm, saved); hs.close();
+  assert.equal(r.status, "sent");
+  assert.equal(hs.seen.length, 2);
+  assert.equal(hs.seen[1].lifecyclestage, undefined);
+  assert.equal(hs.seen[1].firstname, "Old");
+});

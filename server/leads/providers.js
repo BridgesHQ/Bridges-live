@@ -44,15 +44,24 @@ export async function sendEmail({ to, subject, html, text, replyTo, headers }) {
 async function hubspot(lead) {
   const c = config.crm;
   const [firstname, ...rest] = String(lead.first_name || "").trim().split(/\s+/);
-  const body = await http(`${c.hubspotBase}/crm/v3/objects/contacts/batch/upsert`, {
+  const props = {
+    email: lead.email, firstname: firstname || "", lastname: rest.join(" "), phone: lead.phone || "",
+    lifecyclestage: "lead", hs_lead_status: "NEW",
+    message: `${lead.source || "Website"} — ${lead.market || ""}\n${lead.notes || ""}`.slice(0, 5000),
+  };
+  const send = (properties) => http(`${c.hubspotBase}/crm/v3/objects/contacts/batch/upsert`, {
     method: "POST",
     headers: { Authorization: `Bearer ${c.hubspotToken}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ inputs: [{ idProperty: "email", id: lead.email, properties: {
-      email: lead.email, firstname: firstname || "", lastname: rest.join(" "), phone: lead.phone || "",
-      lifecyclestage: "lead", hs_lead_status: "NEW",
-      message: `${lead.source || "Website"} — ${lead.market || ""}\n${lead.notes || ""}`.slice(0, 5000),
-    } }] }),
+    body: JSON.stringify({ inputs: [{ idProperty: "email", id: lead.email, properties }] }),
   });
+  let body;
+  try { body = await send(props); }
+  catch (e) {
+    // existing contacts further along (e.g. "customer") can't be moved back to "lead" — update the rest
+    if (!/ 400: /.test(e.message) || !/lifecycle|lead_status|hs_lead_status/i.test(e.message)) throw e;
+    const { lifecyclestage, hs_lead_status, ...restProps } = props;
+    body = await send(restProps);
+  }
   return { status: "sent", detail: `hubspot ${body.results?.[0]?.id || "ok"}` };
 }
 
