@@ -10,7 +10,7 @@ every page ── Meta Pixel (PageView) · GA4 G-NN5K59SYSJ · RB2B visitor ID
    │                  (one alert per visitor per 30 min; every tap is still logged)
    │
 any lead form / chat assistant / /live-show / showing + hold modals / Go Live
-   │  assets/js/lead-pipeline.js  (adds page URL, UTM/fbclid/gclid, SMS consent, bot honeypot)
+   │  assets/js/lead-pipeline.js  (adds page URL, UTM/fbclid/gclid, contact consent, bot honeypot)
    ▼
 POST /api/lead-router  ──►  Supabase `leads` row (always first — a lead is never lost)
                        ├──►  email to you (Resend)        full details + call / WhatsApp / email buttons
