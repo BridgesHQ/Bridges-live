@@ -3,7 +3,7 @@
 import express from "express";
 import crypto from "node:crypto";
 import { config } from "./config.js";
-import { db, listStreams, getStream, audit, invalidateStreams } from "./db.js";
+import { db, dbDiagnostics, listStreams, getStream, audit, invalidateStreams } from "./db.js";
 import * as paypal from "./paypal.js";
 import { broadcast, broadcastCommerce, roomSize } from "./realtime.js";
 import { HOLD_TERMS } from "./seed-data.js";
@@ -73,7 +73,12 @@ api.get("/config", (req, res) => {
   });
 });
 
-api.get("/health", (req, res) => res.json({ ok: true, database: db.kind, paypal: config.paypal.mode }));
+api.get("/health", (req, res) => res.json({
+  ok: true, database: db.kind, paypal: config.paypal.mode,
+  database_detail: dbDiagnostics.reason,
+  supabase_project: config.supabase.url ? new URL(config.supabase.url).hostname.split(".")[0] : null,
+  supabase_key_type: !config.supabase.serviceKey ? null : config.supabase.serviceKey.startsWith("sb_secret_") ? "secret" : config.supabase.serviceKey.startsWith("sb_publishable_") ? "publishable (WRONG — use the secret key)" : config.supabase.serviceKey.startsWith("eyJ") ? "legacy JWT" : "unknown",
+}));
 
 // ------------------------------------------------------------------ streams
 api.get("/streams", wrap(async (req, res) => {

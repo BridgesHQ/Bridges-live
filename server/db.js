@@ -110,17 +110,34 @@ export const db = {
  * Verify Supabase is reachable and migrated. If not, fall back to the local store so the
  * site keeps working, and explain what to do. Returns a status string for the banner.
  */
+/** Why the server is (or isn't) on Supabase — shown on /api/health, never includes secrets. */
+export const dbDiagnostics = { status: "not checked", reason: "" };
+
 export async function checkDatabase() {
-  if (store.kind !== "supabase") return "local";
+  const r = await checkDatabaseInner();
+  dbDiagnostics.status = r;
+  return r;
+}
+async function checkDatabaseInner() {
+  if (store.kind !== "supabase") {
+    const missing = [!config.supabase.url && "SUPABASE_URL", !config.supabase.serviceKey && "SUPABASE_SERVICE_KEY"].filter(Boolean);
+    dbDiagnostics.reason = `Not configured — missing ${missing.join(" and ")}`;
+    return "local";
+  }
   try {
     const rows = await Promise.race([
       store.select("streams", { status: "live" }, { limit: 1 }),
       new Promise((_, no) => setTimeout(() => no(new Error("timed out after 8s")), 8000)),
     ]);
-    if (!rows.length) return "supabase (connected — no live streams yet: run backend/sql/seed.sql)";
+    if (!rows.length) { dbDiagnostics.reason = "Connected, but no live streams — run backend/sql/seed.sql"; return "supabase (connected — no live streams yet: run backend/sql/seed.sql)"; }
+    dbDiagnostics.reason = "Connected";
     return "supabase";
   } catch (e) {
     const missing = /does not exist|schema cache|relation/i.test(e.message);
+    const badKey = /invalid api key|jwt|unauthorized|401|403|apikey/i.test(e.message);
+    dbDiagnostics.reason = missing ? `Connected, but the tables are missing — run backend/sql/supabase_setup.sql in the Supabase SQL Editor (${e.message.slice(0, 120)})`
+      : badKey ? `Supabase rejected the key — use the project's secret / service_role key (${e.message.slice(0, 120)})`
+      : `Could not reach Supabase at ${config.supabase.url} — check SUPABASE_URL (${e.message.slice(0, 120)})`;
     console.warn(`[db] Supabase check failed: ${e.message}`);
     console.warn(missing
       ? "[db] Tables are missing — paste backend/sql/supabase_setup.sql into the Supabase SQL editor (or npm run db:migrate)."

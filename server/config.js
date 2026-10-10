@@ -11,8 +11,9 @@ export const config = {
   port: Number(env.PORT || 3000),
   appUrl: env.APP_URL || `http://localhost:${env.PORT || 3000}`,
   supabase: {
-    url: env.SUPABASE_URL || "",
-    serviceKey: env.SUPABASE_SERVICE_KEY || env.SUPABASE_SERVICE_ROLE_KEY || "",
+    // tolerate common paste mistakes: spaces/quotes, trailing slash, "/rest/v1" suffix
+    url: (env.SUPABASE_URL || "").trim().replace(/^["']|["']$/g, "").replace(/\/(rest\/v1\/?)?$/, "").replace(/\/+$/, ""),
+    serviceKey: (env.SUPABASE_SERVICE_KEY || env.SUPABASE_SERVICE_ROLE_KEY || "").trim().replace(/^["']|["']$/g, ""),
     databaseUrl: env.DATABASE_URL || "",
   },
   paypal: {
