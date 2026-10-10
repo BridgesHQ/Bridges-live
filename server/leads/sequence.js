@@ -1,9 +1,8 @@
-// 5-touch follow-up sequence. Emails go through Resend; texts to leads only when
-// LEAD_SMS_TO_LEADS=true (Twilio A2P 10DLC registered) and the lead gave a phone + consent.
+// 5-touch follow-up sequence, sent by email through Resend.
 import crypto from "node:crypto";
 import { config } from "../config.js";
 import { db } from "../db.js";
-import { sendEmail, sendSms } from "./providers.js";
+import { sendEmail } from "./providers.js";
 
 const DAY = 86_400_000;
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -33,26 +32,26 @@ Real estate services provided by LPT Realty · FL BK3519799 · TX 829789-SA · E
 }
 
 
-/** The five touches. `channel: "sms"` steps fall back to email when texting leads isn't enabled. */
+const whatsapp = () => (config.leads.whatsappNumber ? { label: "Message me on WhatsApp", href: `https://wa.me/${config.leads.whatsappNumber}` } : null);
+
+/** The five touches (all email). */
 export const STEPS = [
-  { step: 1, delay: 0, channel: "email+sms",
+  { step: 1, delay: 0, channel: "email",
     subject: (l) => `Got it, ${first(l)} — next steps from Bridges Global`,
     body: (l) => [
       `Hi ${esc(first(l))},`,
       `Thanks for reaching out${l.market ? ` about <b>${esc(l.market)}</b>` : ""}. I personally read every request and I'll be in touch shortly.`,
-      `Just reply to this email (or text me back) with any questions — what you're looking for, your timeline, and your budget range help me send the right options.`,
+      `Just reply to this email${config.leads.whatsappNumber ? " or message me on WhatsApp" : ""} with any questions — what you're looking for, your timeline, and your budget range help me send the right options.`,
     ],
-    cta: null,
-    sms: (l) => `Hi ${first(l)}, it's Dorota at Bridges Global — got your request${l.market ? ` about ${l.market}` : ""}. I'll follow up by text and email. Questions? Just reply here. Reply STOP to opt out.` },
+    cta: whatsapp },
   { step: 2, delay: 1 * DAY, channel: "email",
     subject: () => `See homes live before you visit`,
     body: (l) => [`Hi ${esc(first(l))},`, `On Bridges Live you can watch real homes and new-construction models on camera, ask questions in the chat, and request a private showing in one tap — from anywhere.`, `Tell me what you'd like to see and I'll schedule a live walkthrough for you.`],
     cta: () => ({ label: "Watch homes live", href: `${config.appUrl}/live-marketplace` }) },
-  { step: 3, delay: 3 * DAY, channel: "sms",
+  { step: 3, delay: 3 * DAY, channel: "email",
     subject: () => `Quick question about your timeline`,
     body: (l) => [`Hi ${esc(first(l))},`, `Quick question so I can send you the right options: what's your ideal move-in timeframe, and is there a budget range you'd like me to stay within?`, `Just hit reply — a one-line answer is perfect.`],
-    cta: null,
-    sms: (l) => `Hi ${first(l)}, Dorota here (Bridges Global). What's your ideal move-in timeframe? Happy to send matching homes. Reply STOP to opt out.` },
+    cta: whatsapp },
   { step: 4, delay: 7 * DAY, channel: "email",
     subject: () => `Your free Tampa Bay relocation guide`,
     body: (l) => [`Hi ${esc(first(l))},`, `I put together a free guide to Tampa Bay neighborhoods, new-construction incentives, and what to expect when you move here.`, `If anything in it sparks a question, reply and I'll answer personally.`],
@@ -85,17 +84,10 @@ export async function enqueueSequence(lead) {
 async function deliver(row) {
   const s = STEPS.find((x) => x.step === row.step);
   const l = { first_name: row.first_name, email: row.email, market: row.market, source: row.source, phone: row.phone };
-  const results = [];
-  const smsAllowed = config.leads.smsToLeads && row.sms_consent && row.phone;
-  if (s.channel.includes("sms") && smsAllowed) results.push(await sendSms(row.phone, s.sms(l)).catch((e) => ({ status: "failed", detail: e.message })));
-  // email always for email steps; for sms-only steps, email is the fallback when texting isn't allowed
-  if (s.channel.includes("email") || !smsAllowed) {
-    const { html, text } = layout(l, s.body(l), s.cta && s.cta(l));
-    results.push(await sendEmail({ to: row.email, subject: s.subject(l), html, text,
-      headers: { "List-Unsubscribe": `<${unsubscribeUrl(row.email)}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } })
-      .catch((e) => ({ status: "failed", detail: e.message })));
-  }
-  return results;
+  const { html, text } = layout(l, s.body(l), s.cta && s.cta(l));
+  return [await sendEmail({ to: row.email, subject: s.subject(l), html, text,
+    headers: { "List-Unsubscribe": `<${unsubscribeUrl(row.email)}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } })
+    .catch((e) => ({ status: "failed", detail: e.message }))];
 }
 
 /** Sends every due follow-up. Runs every minute in-process and via /api/cron/followups. */

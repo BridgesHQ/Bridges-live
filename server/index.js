@@ -54,5 +54,5 @@ server.listen(config.port, () => {
   console.log(`  paypal:   ${config.paypal.mode}${config.paypal.mode === "mock" ? " (simulator — set PAYPAL_CLIENT_ID + PAYPAL_SECRET for sandbox)" : ""}`);
   console.log(`  holds:    ${config.holdsEnabled ? "enabled" : "disabled"} · demo mode: ${config.demoMode}`);
   const i = integrations();
-  console.log(`  leads:    sms alerts ${i.sms && i.alertsTo.phone ? "on" : "off"} · email ${i.email ? "on" : "off"} · crm ${i.crm.join("+") || "off"} · texts to leads ${i.smsToLeads ? "on" : "off"}\n`);
+  console.log(`  leads:    email alerts ${i.email && i.alertsTo.email ? "on" : "off"} · crm ${i.crm.join("+") || "off"} · whatsapp ${i.whatsapp ? "on" : "off (set whatsappNumber in assets/js/site-config.js)"}\n`);
 });

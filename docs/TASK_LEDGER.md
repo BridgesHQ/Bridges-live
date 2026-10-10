@@ -16,7 +16,7 @@ Statuses: NOT STARTED · IN PROGRESS · BLOCKED · READY FOR TEST · TESTING · 
 | Stripe Connect | BLOCKED | Dorota | Stripe key | paste key |
 | CRM (HubSpot) | NOT STARTED | Dorota+Dev | HubSpot acct | connect |
 | Email (Resend) | BLOCKED | Dorota | provider key | paste key |
-| SMS (Twilio) | BLOCKED | Dorota | Twilio key | paste key |
+| SMS (Twilio) | DROPPED | Dorota | — | replaced by WhatsApp button |
 | Vertical-agnostic data model (Phase 10) | COMPLETE | Claude | — | developer builds generic schema |
 | Security audit doc (Phase 9) | COMPLETE | Claude | — | developer enables RLS + auth |
 | Compliance: purge ALL reserve/deposit/60-reserved language | COMPLETE | Claude | — | broker/attorney defines real deposit flow |
@@ -41,7 +41,7 @@ Statuses: NOT STARTED · IN PROGRESS · BLOCKED · READY FOR TEST · TESTING · 
 | Deploy config: render.yaml (free web service) + docs/DEPLOY.md | READY | Claude | Render account | New → Blueprint |
 | Streamer approvals (admin approve / take down, Go Live applications) | READY FOR TEST | Claude | — | /admin → Streamer approvals |
 | CI: GitHub Actions runs npm test | COMPLETE | Claude | — | — |
-| Lead pipeline: Pixel/GA4/RB2B on every page, /api/lead-router, SMS+email alerts, CRM, 5-touch follow-up (text + email, no call booking) | READY FOR TEST | Claude | Pixel ID, RB2B key, Twilio, Resend domain, HubSpot/GHL | paste keys — docs/LEAD_PIPELINE.md |
-| Texting leads (A2P 10DLC registration) | BLOCKED | Dorota | Twilio A2P approval (paid) | register brand + campaign, then LEAD_SMS_TO_LEADS=true |
+| Lead pipeline: Pixel/GA4/RB2B on every page, /api/lead-router, email alerts, CRM, 5-touch follow-up (email, no call booking, no Twilio) | READY FOR TEST | Claude | Pixel ID, RB2B key, Resend domain | paste keys — docs/LEAD_PIPELINE.md |
+| WhatsApp "Message us" button (site-wide + /live-show), taps logged as leads | READY FOR TEST | Claude | — | number set: +1 301-379-6785 |
 | Privacy policy page (Pixel / GA4 / RB2B disclosure) | NOT STARTED | Dorota | legal text | add /privacy |
 | Reddit prospects finder | READY FOR TEST | Claude | — | /admin → Prospects → Scan |

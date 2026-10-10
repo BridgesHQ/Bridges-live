@@ -7,7 +7,7 @@ import { db, listStreams, getStream, audit, invalidateStreams } from "./db.js";
 import * as paypal from "./paypal.js";
 import { broadcast, broadcastCommerce, roomSize } from "./realtime.js";
 import { HOLD_TERMS } from "./seed-data.js";
-import { routeLead, isEmail as validEmail } from "./leads/router.js";
+import { routeLead, logWhatsAppClick, isEmail as validEmail } from "./leads/router.js";
 import { runDueFollowups, unsubscribeToken } from "./leads/sequence.js";
 import { integrations } from "./leads/providers.js";
 import { scanReddit } from "./prospects/reddit.js";
@@ -186,6 +186,15 @@ api.post("/lead-router", rateLimit(8, 10 * 60_000), wrap(async (req, res) => {
     page_url: b.page_url, utm: b.utm, sms_consent: b.sms_consent === true, stream_id: clean(b.streamId, 64) || null,
   });
   res.status(201).json({ ok: true, id: r.lead_id, delivery: r });
+}));
+
+// "Message us on WhatsApp" taps → anonymous lead + email alert (sent with navigator.sendBeacon)
+api.post("/whatsapp-click", express.text({ type: "*/*", limit: "8kb" }), rateLimit(20, 10 * 60_000), wrap(async (req, res) => {
+  let b = req.body;
+  if (typeof b === "string") { try { b = JSON.parse(b); } catch { b = {}; } }
+  if (!b || typeof b !== "object" || b.company_website) return res.status(204).end();
+  const r = await logWhatsAppClick({ page_url: b.page_url, label: b.label, stream_title: b.stream_title, utm: b.utm, visitor: b.visitor || req.ip });
+  res.status(201).json({ ok: true, ...r });
 }));
 
 api.get("/unsubscribe", wrap(async (req, res) => {

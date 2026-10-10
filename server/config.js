@@ -1,5 +1,6 @@
 import "dotenv/config";
 import path from "node:path";
+import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const env = process.env;
@@ -25,18 +26,12 @@ export const config = {
   cronSecret: env.CRON_SECRET || "",
   // ---- lead pipeline (each integration switches on when its keys are present) ----
   leads: {
-    ownerPhone: env.LEAD_ALERT_PHONE || "",          // your mobile, E.164 (+18135551234)
     ownerEmail: env.LEAD_ALERT_EMAIL || "",          // where new-lead emails go
     fromName: env.LEAD_FROM_NAME || "Dorota Maslowska · Bridges Global",
     businessAddress: env.BUSINESS_ADDRESS || "",     // required in marketing emails (CAN-SPAM)
-    // automatic texts TO LEADS need Twilio A2P 10DLC registration — off until you turn it on
-    smsToLeads: bool(env.LEAD_SMS_TO_LEADS, false),
     sequence: bool(env.LEAD_SEQUENCE_ENABLED, true),
     unsubscribeSecret: env.UNSUBSCRIBE_SECRET || env.ADMIN_TOKEN || "dev-only-secret",
-  },
-  twilio: {
-    sid: env.TWILIO_ACCOUNT_SID || "", token: env.TWILIO_AUTH_TOKEN || "", from: env.TWILIO_FROM || "",
-    base: env.TWILIO_API_BASE || "https://api.twilio.com",
+    whatsappNumber: "",                              // filled below from WHATSAPP_NUMBER or site-config.js
   },
   resend: {
     key: env.RESEND_API_KEY || "", from: env.RESEND_FROM || "",          // e.g. "Dorota <dd@bridgesglobal.co>" (verified domain)
@@ -53,6 +48,16 @@ export const config = {
   // Property reserve holds (PayPal authorization). Needs broker/attorney sign-off before live mode.
   holdsEnabled: bool(env.ENABLE_PROPERTY_HOLDS, true),
 };
+
+// WhatsApp number: one place to set it — assets/js/site-config.js (whatsappNumber) — or WHATSAPP_NUMBER.
+{
+  let n = env.WHATSAPP_NUMBER || "";
+  if (!n) {
+    try { n = (fs.readFileSync(path.join(config.root, "assets/js/site-config.js"), "utf8").match(/whatsappNumber:\s*"([^"]*)"/) || [])[1] || ""; } catch {}
+  }
+  const digits = n.replace(/\D/g, "");
+  config.leads.whatsappNumber = digits.length === 10 ? `1${digits}` : digits.length >= 11 && digits.length <= 15 ? digits : "";
+}
 
 config.paypal.mode = config.paypal.clientId && config.paypal.secret ? config.paypal.env : "mock";
 if (config.paypal.mode === "live" && config.holdsEnabled && !bool(env.HOLDS_LEGAL_SIGNOFF, false)) {

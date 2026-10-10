@@ -1,6 +1,7 @@
-// Lead pipeline end-to-end: real server + fake Twilio / Resend / HubSpot / GoHighLevel APIs.
-// Verifies: lead saved, SMS + email alert to the agent, CRM upsert + webhook, 5-touch sequence
-// scheduled with touch 1 sent immediately, dedupe, honeypot, unsubscribe, live-show/showing path.
+// Lead pipeline end-to-end: real server + fake Resend / HubSpot / GoHighLevel APIs.
+// Verifies: lead saved, email alert to the agent, CRM upsert + webhook, 5-touch email sequence
+// scheduled with touch 1 sent immediately, dedupe, honeypot, unsubscribe, live-show/showing path,
+// WhatsApp button taps logged as leads.
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
@@ -38,10 +39,9 @@ before(async () => {
   proc = spawn(process.execPath, ["server/index.js"], {
     env: { ...process.env, PORT: String(PORT), NODE_ENV: "test", ADMIN_TOKEN: "t0ken", CRON_SECRET: "cron-secret-123456", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "",
       PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", BL_LOCAL_DB: path.join(TMP, "db.json"), APP_URL: BASE,
-      LEAD_ALERT_PHONE: "+18135550100", LEAD_ALERT_EMAIL: "owner@example.com",
-      TWILIO_ACCOUNT_SID: "AC123", TWILIO_AUTH_TOKEN: "tok", TWILIO_FROM: "+18135550199", TWILIO_API_BASE: f,
+      LEAD_ALERT_EMAIL: "owner@example.com", WHATSAPP_NUMBER: "301-379-6785",
       RESEND_API_KEY: "re_123", RESEND_FROM: "Dorota <dd@bridgesglobal.co>", RESEND_API_BASE: f,
-      HUBSPOT_TOKEN: "pat-123", HUBSPOT_API_BASE: f, GHL_WEBHOOK_URL: `${f}/ghl`, LEAD_SMS_TO_LEADS: "true" },
+      HUBSPOT_TOKEN: "pat-123", HUBSPOT_API_BASE: f, GHL_WEBHOOK_URL: `${f}/ghl` },
     stdio: "pipe",
   });
   for (let i = 0; i < 50; i++) {
@@ -52,34 +52,27 @@ before(async () => {
 });
 after(() => { proc?.kill(); fake?.close(); });
 
-test("site form → saved, agent alerted (SMS + email), CRM synced, sequence started", async () => {
+test("site form → saved, agent emailed, CRM synced, email sequence started", async () => {
   const r = await post("/api/lead-router", { first_name: "Ana Lee", email: "Ana@Example.com", phone: "(813) 555-1234", market: "Tampa Bay", source: "Website — Tampa",
     notes: "Moving from Chicago in June", page_url: "https://live.bridgesglobal.co/tampa", utm: { utm_source: "facebook", utm_campaign: "relo", evil: "x" }, sms_consent: true });
   assert.equal(r.status, 201);
   assert.equal(r.body.booking_url, undefined, "no call booking");
   const d = r.body.delivery;
-  assert.deepEqual([d.alert_sms, d.alert_email, d.crm, d.sequence], ["sent", "sent", "sent", "scheduled"]);
+  assert.deepEqual([d.alert_sms, d.alert_email, d.crm, d.sequence], [undefined, "sent", "sent", "scheduled"]);
   await wait(400); // touch 1 goes out right away
-
-  const sms = of("twilio");
-  const alert = sms.find((c) => c.body.To === "+18135550100");
-  assert.ok(alert, "agent SMS alert");
-  assert.match(alert.body.Body, /New lead: Ana Lee · \(813\) 555-1234 · ana@example\.com/);
-  assert.equal(alert.auth, "Basic " + Buffer.from("AC123:tok").toString("base64"));
-  const welcomeSms = sms.find((c) => c.body.To === "+18135551234");
-  assert.ok(welcomeSms, "touch 1 text to the lead (consent + A2P flag on)");
-  assert.match(welcomeSms.body.Body, /follow up by text and email.*Reply STOP/);
-  assert.doesNotMatch(welcomeSms.body.Body, /calendly|book/i);
+  assert.equal(of("other").length, 0, "no SMS provider is ever called");
 
   const emails = of("resend");
   const ownerMail = emails.find((c) => c.body.to[0] === "owner@example.com");
   assert.match(ownerMail.body.subject, /New lead: Ana Lee/);
+  assert.match(ownerMail.body.html, /wa\.me\/18135551234/, "WhatsApp quick-reply link to the lead");
   assert.match(ownerMail.body.html, /utm_source=facebook/);
   assert.doesNotMatch(ownerMail.body.html, /evil/, "only utm/click-id keys are kept");
   const welcome = emails.find((c) => c.body.to[0] === "ana@example.com");
   assert.match(welcome.body.subject, /Got it, Ana/);
   assert.doesNotMatch(welcome.body.html, /calendly|Book a/i);
-  assert.match(welcome.body.html, /reply to this email/i);
+  assert.match(welcome.body.html, /reply to this email or message me on WhatsApp/i);
+  assert.match(welcome.body.html, /href="https:\/\/wa\.me\/13013796785"/);
   assert.match(welcome.body.html, /\/api\/unsubscribe\?e=/);
   assert.ok(welcome.body.headers["List-Unsubscribe"]);
 
@@ -100,7 +93,7 @@ test("site form → saved, agent alerted (SMS + email), CRM synced, sequence sta
   assert.deepEqual(pipe.upcoming.map((f) => f.step), [2, 3, 4, 5]);
 });
 
-test("same person again within 12h → saved + emailed as update, no SMS, no second sequence", async () => {
+test("same person again within 12h → saved + emailed as update, no second sequence", async () => {
   const before = calls.length;
   const r = await post("/api/lead-router", { first_name: "Ana", email: "ana@example.com", source: "Website — AI Concierge Chat (follow-up notes)", notes: "prefers pool" });
   assert.equal(r.body.delivery.update, true);
@@ -108,7 +101,6 @@ test("same person again within 12h → saved + emailed as update, no SMS, no sec
   assert.equal(r.body.delivery.sequence, undefined);
   await wait(200);
   const fresh = calls.slice(before);
-  assert.equal(fresh.filter((c) => c.kind === "twilio").length, 0);
   assert.match(fresh.find((c) => c.kind === "resend").body.subject, /Lead update/);
 });
 
@@ -127,7 +119,7 @@ test("live stream viewer (Request a showing) goes through the same pipeline", as
   assert.equal(r.status, 201);
   await wait(400);
   const fresh = calls.slice(before);
-  assert.ok(fresh.some((c) => c.kind === "twilio" && /Kai Viewer/.test(c.body.Body) && /Request a showing/.test(c.body.Body)));
+  assert.ok(fresh.some((c) => c.kind === "resend" && c.body.to[0] === "owner@example.com" && /Kai Viewer/.test(c.body.subject) && /Request a showing/.test(c.body.subject)));
   assert.ok(fresh.some((c) => c.kind === "resend" && c.body.to[0] === "kai@example.com"), "viewer gets touch 1");
   assert.ok(fresh.some((c) => c.kind === "hubspot" && c.body.inputs[0].id === "kai@example.com"));
 });
@@ -180,4 +172,29 @@ test("HubSpot: existing contact further along than 'lead' is still updated (retr
   assert.equal(hs.seen.length, 2);
   assert.equal(hs.seen[1].lifecyclestage, undefined);
   assert.equal(hs.seen[1].firstname, "Old");
+});
+
+test("WhatsApp button tap → anonymous lead in Supabase + one email alert per visitor", async () => {
+  const before = calls.length;
+  const tap = (body) => fetch(BASE + "/api/whatsapp-click", { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) }).then(async (r) => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  const r = await tap({ page_url: "https://live.bridgesglobal.co/live-show/?stream=x", label: "Live Show", stream_title: "Triple Creek — Model B", utm: { utm_source: "instagram" }, visitor: "v-123" });
+  assert.equal(r.status, 201);
+  assert.equal(r.body.alert_email, "sent");
+  await wait(150);
+  const mail = calls.slice(before).find((c) => c.kind === "resend");
+  assert.equal(mail.body.to[0], "owner@example.com");
+  assert.match(mail.body.subject, /WhatsApp chat started — Triple Creek/);
+  assert.match(mail.body.html, /utm_source=instagram/);
+  // same visitor taps again within 30 min → logged, but no second email
+  const again = await tap({ page_url: "https://live.bridgesglobal.co/tampa/", label: "Tampa", visitor: "v-123" });
+  assert.equal(again.body.alert_email, "skipped");
+  await wait(100);
+  assert.equal(calls.slice(before).filter((c) => c.kind === "resend").length, 1);
+  const leads = (await get("/api/admin/leads", { Authorization: "Bearer t0ken" })).body.leads.filter((l) => /^WhatsApp click/.test(l.source));
+  assert.equal(leads.length, 2);
+  assert.match(leads.find((l) => /Triple Creek/.test(l.source)).notes, /Opened a WhatsApp chat/);
+  assert.equal((await tap({ company_website: "spam" })).status, 204, "honeypot");
+  const health = (await get("/api/admin/pipeline", { Authorization: "Bearer t0ken" })).body.integrations;
+  assert.equal(health.whatsapp, true);
+  assert.equal(health.sms, undefined);
 });

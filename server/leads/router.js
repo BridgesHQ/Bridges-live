@@ -1,8 +1,8 @@
 // One pipeline for every lead — site forms, live-show viewers, showing/hold modals, Go Live:
-// save to Supabase → instant SMS + email to the agent → CRM → 5-touch follow-up.
+// save to Supabase → instant email alert to the agent → CRM → 5-touch email follow-up.
 import { config } from "../config.js";
 import { db, insertLead } from "../db.js";
-import { sendEmail, sendSms, syncCrm } from "./providers.js";
+import { sendEmail, syncCrm } from "./providers.js";
 import { enqueueSequence, isUnsubscribed } from "./sequence.js";
 
 const clean = (s, n = 200) => String(s ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, n);
@@ -59,11 +59,11 @@ function alertText(l, isUpdate) {
 function alertEmail(l, isUpdate) {
   const rows = [["Name", l.first_name], ["Email", l.email && `<a href="mailto:${esc(l.email)}">${esc(l.email)}</a>`], ["Phone", l.phone && `<a href="tel:${esc(l.phone_e164 || l.phone)}">${esc(l.phone)}</a>`],
     ["Source", esc(l.source)], ["Interest", esc(l.market)], ["Notes", esc(l.notes).replace(/\n/g, "<br>")], ["Page", l.page_url && `<a href="${esc(l.page_url)}">${esc(l.page_url)}</a>`],
-    ["Campaign", esc(Object.entries(l.utm || {}).map(([k, v]) => `${k}=${v}`).join(" "))], ["Texts OK", l.sms_consent ? "yes" : "no"]]
+    ["Campaign", esc(Object.entries(l.utm || {}).map(([k, v]) => `${k}=${v}`).join(" "))]]
     .filter(([, v]) => v);
   const html = `<div style="font-family:Arial,sans-serif;font-size:14px"><h2 style="color:#0E1E52;margin:0 0 12px">${isUpdate ? "Lead update" : "New lead"} — ${esc(l.first_name || l.email || "website visitor")}</h2>
 <table cellpadding="6" style="border-collapse:collapse">${rows.map(([k, v]) => `<tr><td style="color:#777;vertical-align:top">${k}</td><td>${typeof v === "string" && v.startsWith("<") ? v : esc(v)}</td></tr>`).join("")}</table>
-<p>${l.phone_e164 ? `<a href="tel:${esc(l.phone_e164)}">Call</a> · <a href="sms:${esc(l.phone_e164)}">Text</a> · ` : ""}${l.email ? `<a href="mailto:${esc(l.email)}">Email</a> · ` : ""}<a href="${esc(config.appUrl)}/admin">Open admin</a></p></div>`;
+<p>${l.phone_e164 ? `<a href="tel:${esc(l.phone_e164)}">Call</a> · <a href="https://wa.me/${esc(l.phone_e164.slice(1))}">WhatsApp</a> · ` : ""}${l.email ? `<a href="mailto:${esc(l.email)}">Email</a> · ` : ""}<a href="${esc(config.appUrl)}/admin">Open admin</a></p></div>`;
   return { subject: `${isUpdate ? "Lead update" : "🔔 New lead"}: ${l.first_name || l.email} — ${l.source}`, html, text: alertText(l, isUpdate) };
 }
 
@@ -90,8 +90,6 @@ export async function routeLead(input, { alert = true } = {}) {
   if (alert) {
     const a = alertEmail(lead, isUpdate);
     tasks.push(["alert_email", () => sendEmail({ to: config.leads.ownerEmail, subject: a.subject, html: a.html, text: a.text, replyTo: lead.email || undefined })]);
-    // no SMS for updates — avoid buzzing your phone twice for the same person
-    if (!isUpdate) tasks.push(["alert_sms", () => sendSms(config.leads.ownerPhone, alertText(lead, false))]);
   }
   tasks.push(["crm", async () => {
     const r = await syncCrm(lead);
@@ -109,4 +107,39 @@ export async function routeLead(input, { alert = true } = {}) {
   // the first follow-up (welcome email) is due now — send it right away instead of waiting a minute
   if (report.sequence === "scheduled") import("./sequence.js").then((m) => m.runDueFollowups()).catch(() => {});
   return report;
+}
+
+/**
+ * A visitor tapped "Message us on WhatsApp". We don't know who they are yet (the chat happens
+ * in WhatsApp), so log an anonymous lead with where they came from and email the agent.
+ * One alert per visitor per 30 minutes.
+ */
+const recentClicks = new Map();
+export async function logWhatsAppClick({ page_url, label, stream_title, utm, visitor }) {
+  const key = clean(visitor, 64) || "anon";
+  const last = recentClicks.get(key) || 0;
+  const repeat = Date.now() - last < 30 * 60_000;
+  recentClicks.set(key, Date.now());
+  if (recentClicks.size > 5000) recentClicks.clear();
+  const where = clean(stream_title, 160) || clean(label, 160) || "website";
+  const lead = normalizeLead({
+    first_name: "WhatsApp visitor", source: `WhatsApp click — ${where}`.slice(0, 160), market: where,
+    notes: `Opened a WhatsApp chat from ${clean(page_url, 300) || "the website"}. Their message arrives in WhatsApp Business.`,
+    page_url, utm, priority: "Medium",
+  });
+  const saved = await insertLead(lead);
+  const row = { ...lead, id: saved?.id ?? null };
+  await log(row, "whatsapp_click", { status: repeat ? "repeat" : "new", detail: where });
+  if (repeat) return { lead_id: row.id, alert_email: "skipped" };
+  const camp = Object.entries(lead.utm || {}).map(([k, v]) => `${k}=${v}`).join(" ");
+  const r = await sendEmail({
+    to: config.leads.ownerEmail,
+    subject: `💬 WhatsApp chat started — ${where}`,
+    html: `<div style="font-family:Arial,sans-serif;font-size:14px"><h2 style="color:#0E1E52;margin:0 0 10px">Someone tapped "Message us on WhatsApp"</h2>
+<p>From: ${lead.page_url ? `<a href="${esc(lead.page_url)}">${esc(lead.page_url)}</a>` : "website"}${camp ? `<br>Campaign: ${esc(camp)}` : ""}</p>
+<p>Their message should arrive in <b>WhatsApp Business</b> now — reply there. Logged as a lead in Supabase (source "WhatsApp click").</p></div>`,
+    text: `Someone tapped "Message us on WhatsApp" on ${lead.page_url || "the website"}. Reply in WhatsApp Business.`,
+  }).catch((e) => ({ status: "failed", detail: e.message }));
+  await log(row, "alert_email", r);
+  return { lead_id: row.id, alert_email: r.status };
 }

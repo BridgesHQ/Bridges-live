@@ -12,18 +12,6 @@ async function http(url, opts) {
 }
 const skipped = (why) => ({ status: "skipped", detail: why });
 
-export async function sendSms(to, text) {
-  const t = config.twilio;
-  if (!t.sid || !t.token || !t.from) return skipped("Twilio not configured");
-  if (!/^\+[1-9]\d{7,14}$/.test(to || "")) return skipped("no valid E.164 phone");
-  const body = await http(`${t.base}/2010-04-01/Accounts/${t.sid}/Messages.json`, {
-    method: "POST",
-    headers: { Authorization: "Basic " + Buffer.from(`${t.sid}:${t.token}`).toString("base64"), "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ To: to, From: t.from, Body: text.slice(0, 1500) }),
-  });
-  return { status: "sent", detail: body.sid };
-}
-
 export async function sendEmail({ to, subject, html, text, replyTo, headers }) {
   const r = config.resend;
   if (!r.key || !r.from) return skipped("Resend not configured");
@@ -88,9 +76,8 @@ export async function syncCrm(lead) {
 }
 
 export const integrations = () => ({
-  sms: !!(config.twilio.sid && config.twilio.token && config.twilio.from),
   email: !!(config.resend.key && config.resend.from),
   crm: [config.crm.hubspotToken && "hubspot", config.crm.ghlWebhook && "gohighlevel", config.crm.webhook && "webhook"].filter(Boolean),
-  alertsTo: { phone: !!config.leads.ownerPhone, email: !!config.leads.ownerEmail },
-  smsToLeads: config.leads.smsToLeads,
+  alertsTo: { email: !!config.leads.ownerEmail },
+  whatsapp: !!config.leads.whatsappNumber,
 });

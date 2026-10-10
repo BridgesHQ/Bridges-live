@@ -338,8 +338,13 @@ img{transition:transform .5s ease}
 <button type="submit" style="width:100%;background:#1A5C3A;color:#fff;border:none;padding:12px;border-radius:9px;font-weight:700;cursor:pointer">Request a tour</button>
 </form>
 </div>
-<div class="ok" id="ok-live" style="display:none;text-align:center;padding:16px 0"><div style="font-family:Marcellus,serif;font-size:18px;color:#D8BC6A">You're on the list.</div><div style="color:#8fa0c0;font-size:13px;margin-top:6px">Dorota will follow up by text and email shortly.</div></div>
+<div class="ok" id="ok-live" style="display:none;text-align:center;padding:16px 0"><div style="font-family:Marcellus,serif;font-size:18px;color:#D8BC6A">You're on the list.</div><div style="color:#8fa0c0;font-size:13px;margin-top:6px">Dorota will follow up by email shortly — or message us on WhatsApp below.</div></div>
 
+</div>
+<div style="background:#131a2b;border:1px solid #1e2740;border-radius:14px;padding:18px 20px;margin-top:14px">
+<div style="font-family:Marcellus,serif;font-size:17px;margin-bottom:4px">Watching now? Message us</div>
+<div style="color:#8fa0c0;font-size:13px;margin-bottom:12px">Ask about this home on WhatsApp — Dorota replies personally.</div>
+<a id="ls-wa" data-whatsapp data-display="flex" data-label="Live Show" data-message="I'm watching the live show and have a question." style="display:none;align-items:center;justify-content:center;gap:8px;background:#25D366;color:#fff;font-weight:700;padding:12px;border-radius:9px;text-decoration:none"><svg viewBox="0 0 32 32" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M16 3C9 3 3.3 8.6 3.3 15.6c0 2.5.7 4.9 2 7L3 29l6.6-2.2c2 1.1 4.2 1.7 6.4 1.7 7 0 12.7-5.6 12.7-12.6S23 3 16 3z"/></svg>Message us on WhatsApp</a>
 </div>
 </div>
 </div>
@@ -374,10 +379,11 @@ async function submitLive(e){
   document.getElementById("lf-live").style.display="none";
   document.getElementById("ok-live").style.display="block";return false;
 }
+(function(){var b=document.getElementById('ls-wa');if(b)b.setAttribute('data-stream-title',document.getElementById('ls-title').textContent.trim());})();
 // ?stream=<id> → load that live stream (player + title) from the Bridges Live API
 (function(){var id=new URLSearchParams(location.search).get('stream');if(!id||!window.BL)return;
   BL.api('/streams/'+encodeURIComponent(id)).then(function(st){LS_STREAM=st;
-    document.getElementById('ls-title').textContent=st.title;
+    document.getElementById('ls-title').textContent=st.title;var wab=document.getElementById('ls-wa');if(wab)wab.setAttribute('data-stream-title',st.title);
     document.getElementById('ls-meta').innerHTML=BL.esc(st.categoryLabel)+' · '+BL.esc(st.location)+' · <span style="color:#D8BC6A;font-weight:600">'+BL.esc(st.priceLabel)+'</span>';
     if(st.playbackUrl)BL.mountPlayer(document.getElementById('player'),st,{controls:true});
   }).catch(function(){});})();
