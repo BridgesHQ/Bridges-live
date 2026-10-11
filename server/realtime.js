@@ -42,6 +42,12 @@ export function broadcast(streamId, payload, { remember: keep = true } = {}) {
 }
 
 /** Commerce events also go to the lobby so the grid can show a "just bought" ticker. */
+/** Status changes (e.g. an agent's camera went live) go to that stream's viewers and the grid. */
+export function broadcastAll(payload) {
+  const targets = new Set([...(rooms.get(payload.streamId) || []), ...lobby]);
+  for (const ws of targets) send(ws, payload);
+}
+
 export function broadcastCommerce(streamId, payload) {
   remember(streamId, payload);
   const targets = new Set([...(rooms.get(streamId) || []), ...lobby]); // a viewer may be in both

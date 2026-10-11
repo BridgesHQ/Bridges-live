@@ -327,7 +327,7 @@ img{transition:transform .5s ease}
 <input name="title" placeholder="Stream title (e.g. Triple Creek — Model B)" required maxlength="120" style="width:100%;box-sizing:border-box;padding:11px;border-radius:8px;border:1px solid #2a3550;background:#0f1626;color:#fff;margin-bottom:10px;font-size:14px;font-family:inherit">
 <div style="display:flex;gap:8px"><input name="location" placeholder="City, ST" maxlength="80" style="width:100%;box-sizing:border-box;padding:11px;border-radius:8px;border:1px solid #2a3550;background:#0f1626;color:#fff;margin-bottom:10px;font-size:14px;font-family:inherit"><input name="priceLabel" placeholder="Price (e.g. From the $340s)" maxlength="40" style="width:100%;box-sizing:border-box;padding:11px;border-radius:8px;border:1px solid #2a3550;background:#0f1626;color:#fff;margin-bottom:10px;font-size:14px;font-family:inherit"></div>
 <select name="category" style="width:100%;box-sizing:border-box;padding:11px;border-radius:8px;border:1px solid #2a3550;background:#0f1626;color:#fff;margin-bottom:10px;font-size:14px;font-family:inherit"><option value="new">New Construction</option><option value="apt">Apartments</option><option value="lux">Luxury</option><option value="reloc">Relocation</option><option value="tx">Texas</option></select>
-<input name="playbackUrl" type="url" placeholder="YouTube Live or .m3u8 URL (optional)" maxlength="500" style="width:100%;box-sizing:border-box;padding:11px;border-radius:8px;border:1px solid #2a3550;background:#0f1626;color:#fff;margin-bottom:10px;font-size:14px;font-family:inherit">
+<input name="playbackUrl" type="url" placeholder="YouTube Live link (optional — leave empty to stream with Bridges Live)" maxlength="500" style="width:100%;box-sizing:border-box;padding:11px;border-radius:8px;border:1px solid #2a3550;background:#0f1626;color:#fff;margin-bottom:10px;font-size:14px;font-family:inherit">
 <div id="gl-err" style="color:#ff8b80;font-size:13px;min-height:1em;margin-bottom:6px"></div>
 <button type="submit" style="width:100%;background:#D2352A;color:#fff;border:none;padding:12px;border-radius:9px;font-weight:700;cursor:pointer;font-size:15px">Go Live</button>
 </form></div>
@@ -352,7 +352,8 @@ async function submitGoLive(e){
     }
     if(typeof gtag==="function")gtag("event","generate_lead",{source:"go-live"});
     document.getElementById('gl-form').style.display='none';document.getElementById('gl-ok').style.display='block';
-    if(res.status==='live'){document.getElementById('gl-ok-d').textContent='Your stream is in the Bridges Live grid now.';document.getElementById('gl-watch').href=res.watchUrl;}
+    if(res.status==='live'&&res.hostUrl){document.getElementById('gl-ok-d').textContent='Your stream is set up. Open your private Go-Live page for your stream key and phone/OBS setup — bookmark it and keep it private (we also emailed it to you).';var w=document.getElementById('gl-watch');w.href=res.hostUrl;w.textContent='Open my Go-Live page';}
+    else if(res.status==='live'){document.getElementById('gl-ok-d').textContent='Your stream is in the Bridges Live grid now.';document.getElementById('gl-watch').href=res.watchUrl;}
     else{document.getElementById('gl-ok-t').textContent='Application received.';document.getElementById('gl-ok-d').textContent='We verify your license and brokerage, then your stream goes live in the grid.';document.getElementById('gl-watch').style.display='none';}
   }catch(x){err.textContent=x.message||'Could not submit — please call/text (813) 781-8888.';btn.disabled=false;btn.textContent='Go Live';}
   return false;

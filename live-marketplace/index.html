@@ -283,6 +283,7 @@ img{transition:transform .5s ease}
 .sg-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .sg-live{position:absolute;top:10px;left:10px;background:#D2352A;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:5px;display:flex;align-items:center;gap:5px;z-index:2}
 .sg-live .d{width:5px;height:5px;background:#fff;border-radius:50%}
+.sg-live.sg-off{background:rgba(20,26,43,.85);color:#c8d0e0;padding-left:10px}.sg-card .sg-live.sg-off::before{display:none}
 .sg-body{padding:14px 15px 16px}
 .sg-body h4{font-family:Marcellus,serif;font-weight:400;color:#fff;font-size:16px;margin:0 0 4px}
 .sg-meta{color:#8a97b5;font-size:12.5px;margin-bottom:10px}
@@ -458,7 +459,7 @@ function renderStreams(cat){
   document.getElementById('streamgrid').innerHTML=rows.length?rows.map(function(s){
     var idx=STREAMS.indexOf(s);
     return '<div class="sg-card" onclick="openStream('+idx+')">'
-      +'<div class="sg-thumb"><span class="sg-live"><span class="d"></span>LIVE · <span class="sg-w" data-id="'+esc(s.id||'')+'">'+s.w+'</span></span><img src="'+esc(s.img)+'" onerror="this.style.display=\'none\'"></div>'
+      +'<div class="sg-thumb">'+(s.live===false?'<span class="sg-live sg-off">OFFLINE · starts soon</span>':'<span class="sg-live"><span class="d"></span>LIVE · <span class="sg-w" data-id="'+esc(s.id||'')+'">'+s.w+'</span></span>')+'<img src="'+esc(s.img)+'" onerror="this.style.display=\'none\'"></div>'
       +'<div class="sg-body">'
       +'<h4>'+esc(s.p)+'</h4>'
       +'<div class="sg-meta">'+esc(s.catlabel||s.cat||'')+' · <span class="pr">'+esc(s.pr)+'</span></div>'
@@ -471,7 +472,23 @@ function lvFilter(el,cat){document.querySelectorAll('.lvchip').forEach(function(
 renderStreams('all');
 
 // Live data: pull real streams from the API; keep the static list if the API is offline.
-function fromApi(x){return{id:x.id,n:x.host,p:x.title,pr:x.priceLabel,w:x.viewers,l:x.likes,b:0,img:x.image,cat:x.category,catlabel:x.categoryLabel,cta:x.cta,api:x};}
+function fromApi(x){return{id:x.id,n:x.host,p:x.title,pr:x.priceLabel,w:x.viewers,l:x.likes,b:0,img:x.image,cat:x.category,catlabel:x.categoryLabel,cta:x.cta,live:x.liveNow!==false,api:x};}
+// an agent's Cloudflare camera went live / stopped → update the grid (live first) and the open player
+BL.on('stream_status',function(m){
+  if(typeof m.live!=='boolean')return;
+  var s=STREAMS.find(function(x){return x.id===m.streamId});if(!s)return;
+  s.live=m.live;if(s.api)s.api.liveNow=m.live;
+  STREAMS.sort(function(a,b){return (b.live===true)-(a.live===true)});
+  renderStreams(lvCat);
+  if(curStream&&curStream.id===m.streamId){mountCur();if(m.live)BL.toast('● '+s.n+' is live now');}
+  else if(m.live)BL.toast('● '+s.n+' just went live: '+s.p);
+});
+function mountCur(){
+  if(!curStream)return;
+  var off=curStream.provider==='cloudflare'&&curStream.liveNow===false;
+  BL.mountPlayer(document.getElementById('videoslot'),off?{image:curStream.image}:curStream);
+  if(off){var w=document.querySelector('#videoslot .bl-wait');if(w)w.textContent='◉ '+(curStream.host||'The agent')+' is getting ready — the stream starts soon';}
+}
 BL.available.then(function(ok){
   if(!ok)return;
   BL.streams().then(function(list){
@@ -519,7 +536,7 @@ function openStream(i){
   if(liveMode&&curStream){
     bookedN=0;document.getElementById('fs-booked').textContent='0';
     BL.config().then(function(c){document.getElementById('fs-hold').style.display=(!buy&&c&&c.holds.enabled)?'block':'none';});
-    BL.mountPlayer(document.getElementById('videoslot'),curStream);
+    mountCur();
     BL.join(curStream.id);
     history.replaceState(null,'','?stream='+curStream.id);
     return;

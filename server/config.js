@@ -43,6 +43,16 @@ export const config = {
     ghlWebhook: env.GHL_WEBHOOK_URL || "",            // GoHighLevel inbound-webhook workflow trigger
     webhook: env.CRM_WEBHOOK_URL || "",               // any other CRM / Zapier / Make
   },
+  // Cloudflare Stream: one live input per approved agent (RTMPS/SRT ingest → HLS playback).
+  cloudflare: {
+    accountId: (env.CF_ACCOUNT_ID || "").trim(),
+    token: (env.CF_STREAM_TOKEN || "").trim(),                // API token with "Stream: Edit"
+    customerCode: (env.CF_SUBDOMAIN || env.CF_STREAM_CUSTOMER_CODE || "").trim().replace(/^https?:\/\//, "").replace(/^customer-/, "").replace(/\.cloudflarestream\.com.*$/, ""),
+    apiBase: env.CF_API_BASE || "https://api.cloudflare.com/client/v4",
+    deliveryBase: env.CF_DELIVERY_BASE || "",                  // tests only; default https://customer-<code>.cloudflarestream.com
+    pollMs: Number(env.CF_POLL_MS || 20_000),
+  },
+  showSeedStreams: bool(env.SHOW_SEED_STREAMS, true),
   // Demo mode: grid shows the seeded audience size on top of real sockets.
   demoMode: bool(env.DEMO_MODE, true),
   autoApproveStreams: bool(env.AUTO_APPROVE_STREAMS, true),

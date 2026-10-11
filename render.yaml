@@ -47,6 +47,14 @@ services:
         sync: false
       - key: GHL_WEBHOOK_URL
         sync: false
+      - key: CF_ACCOUNT_ID
+        sync: false
+      - key: CF_STREAM_TOKEN
+        sync: false
+      - key: CF_SUBDOMAIN
+        sync: false
+      - key: SHOW_SEED_STREAMS
+        value: "true"
       - key: DEMO_MODE
         value: "false"
       - key: AUTO_APPROVE_STREAMS

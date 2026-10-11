@@ -11,6 +11,9 @@ import { routeLead, logWhatsAppClick, isEmail as validEmail } from "./leads/rout
 import { runDueFollowups, unsubscribeToken } from "./leads/sequence.js";
 import { integrations } from "./leads/providers.js";
 import { scanReddit } from "./prospects/reddit.js";
+import { cloudflareEnabled, createLiveInput, getLiveInput, deleteLiveInput } from "./stream/cloudflare.js";
+import { liveNow } from "./stream/monitor.js";
+import { sendEmail } from "./leads/providers.js";
 
 /** Every captured lead goes through the same pipeline (save → alert → CRM → follow-up). */
 async function captureLead(l) {
@@ -61,7 +64,52 @@ function paymentsAvailable(res) {
   return true;
 }
 
-const withViewers = (s) => ({ ...s, viewers: roomSize(s.id) + (config.demoMode ? s.baselineViewers : 0) });
+const withViewers = (s) => ({ ...s, viewers: roomSize(s.id) + (config.demoMode ? s.baselineViewers : 0), liveNow: liveNow(s) });
+
+// ---------------------------------------------------------------- Cloudflare Stream hosts
+// Each agent gets a private host link (/go-live/#t=<token>) showing their stream key. Only a
+// SHA-256 hash of the token is stored; the stream key itself stays at Cloudflare.
+const sha256 = (t) => crypto.createHash("sha256").update(String(t)).digest("hex");
+const hostLink = (token) => `${config.appUrl}/go-live/#t=${token}`;
+
+async function issueHostToken(stream) {
+  const token = crypto.randomBytes(24).toString("base64url");
+  await db.update("streams", { id: stream.id }, { meta: { ...(stream.meta || {}), host_token_hash: sha256(token) } });
+  return token;
+}
+
+/** Gives an approved agent their own Cloudflare live input and emails them the host link. */
+async function provisionCloudflare(stream) {
+  if (!cloudflareEnabled() || stream.meta?.cf_input_uid || stream.playback_url) return null;
+  const input = await createLiveInput({ name: `${stream.meta?.host_name || "Agent"} — ${stream.meta?.title || ""}`, streamId: stream.id });
+  const meta = { ...(stream.meta || {}), cf_input_uid: input.uid };
+  await db.update("streams", { id: stream.id }, { provider: "cloudflare", playback_url: input.hls, meta });
+  const token = await issueHostToken({ ...stream, meta });
+  invalidateStreams();
+  const link = hostLink(token);
+  if (stream.meta?.host_email) {
+    const first = String(stream.meta.host_name || "").split(/\s+/)[0] || "there";
+    await sendEmail({
+      to: stream.meta.host_email,
+      subject: "You're approved to go live on Bridges Live",
+      html: `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.55;max-width:560px"><p>Hi ${first.replace(/[<>&"]/g, "")},</p>
+<p>Your stream <b>${String(stream.meta.title || "").replace(/[<>&"]/g, "")}</b> is ready. Open your private Go-Live page for your stream key and step-by-step setup (phone or OBS):</p>
+<p><a href="${link}" style="display:inline-block;background:#1A5C3A;color:#fff;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:bold">Open my Go-Live page</a></p>
+<p style="font-size:13px;color:#555">Keep this link private — anyone with it can see your stream key.</p><p>— Bridges Live</p></div>`,
+      text: `Your Bridges Live stream is ready. Open your private Go-Live page (keep it private): ${link}`,
+    }).catch((e) => console.warn("[host email]", e.message));
+  }
+  await audit("stream.cloudflare_provisioned", "streams", stream.id, { uid: input.uid });
+  return link;
+}
+
+async function streamByHostToken(req) {
+  const tok = String(req.get("x-host-token") || "").trim();
+  if (tok.length < 20) return null;
+  const h = sha256(tok);
+  const rows = await db.select("streams", { provider: "cloudflare" }).catch(() => []);
+  return rows.find((s) => s.meta?.host_token_hash && s.meta.host_token_hash.length === h.length && crypto.timingSafeEqual(Buffer.from(s.meta.host_token_hash), Buffer.from(h))) || null;
+}
 
 // ------------------------------------------------------------------ config
 api.get("/config", (req, res) => {
@@ -75,6 +123,7 @@ api.get("/config", (req, res) => {
 
 api.get("/health", (req, res) => res.json({
   ok: true, database: db.kind, paypal: config.paypal.mode,
+  video: cloudflareEnabled() ? "cloudflare" : `off — missing ${[!config.cloudflare.accountId && "CF_ACCOUNT_ID", !config.cloudflare.token && "CF_STREAM_TOKEN", !config.cloudflare.customerCode && "CF_SUBDOMAIN"].filter(Boolean).join(", ")}`,
   database_detail: dbDiagnostics.reason,
   supabase_project: config.supabase.url ? new URL(config.supabase.url).hostname.split(".")[0] : null,
   supabase_key_type: !config.supabase.serviceKey ? null : config.supabase.serviceKey.startsWith("sb_secret_") ? "secret" : config.supabase.serviceKey.startsWith("sb_publishable_") ? "publishable (WRONG — use the secret key)" : config.supabase.serviceKey.startsWith("eyJ") ? "legacy JWT" : "unknown",
@@ -83,8 +132,13 @@ api.get("/health", (req, res) => res.json({
 // ------------------------------------------------------------------ streams
 api.get("/streams", wrap(async (req, res) => {
   const cat = clean(req.query.category, 20);
-  const rows = (await listStreams()).filter((s) => !cat || cat === "all" || s.category === cat);
-  res.json({ streams: rows.map(withViewers) });
+  const rows = (await listStreams())
+    .filter((s) => !cat || cat === "all" || s.category === cat)
+    .filter((s) => config.showSeedStreams || s.applicant || s.cta === "buy")
+    .map(withViewers);
+  // agents broadcasting right now first (stable otherwise)
+  rows.sort((a, b) => (b.liveNow === true) - (a.liveNow === true));
+  res.json({ streams: rows });
 }));
 
 api.get("/streams/:id", wrap(async (req, res) => {
@@ -145,7 +199,9 @@ api.post("/streams", rateLimit(5), wrap(async (req, res) => {
   });
   invalidateStreams();
   await audit("stream.created", "streams", stream.id, { email, status, lead: lead?.id });
-  res.status(201).json({ streamId: stream.id, status, watchUrl: `/live-marketplace?stream=${stream.id}` });
+  let hostUrl = null;
+  if (status === "live") hostUrl = await provisionCloudflare(stream).catch((e) => { console.warn("[cloudflare]", e.message); return null; });
+  res.status(201).json({ streamId: stream.id, status, watchUrl: `/live-marketplace?stream=${stream.id}`, hostUrl });
 }));
 
 api.post("/streams/:id/stop", requireAdmin, wrap(async (req, res) => {
@@ -160,8 +216,10 @@ api.post("/admin/streams/:id/approve", requireAdmin, wrap(async (req, res) => {
   const rows = await db.update("streams", { id: req.params.id }, { status: "live" });
   if (!rows.length) return fail(res, 404, "Stream not found");
   invalidateStreams();
+  let hostUrl = null;
+  try { hostUrl = await provisionCloudflare(rows[0]); } catch (e) { return fail(res, 502, `Approved, but Cloudflare Stream setup failed: ${e.message}`); }
   await audit("stream.approved", "streams", req.params.id);
-  res.json({ ok: true });
+  res.json({ ok: true, hostUrl });
 }));
 
 // ------------------------------------------------------------------ leads + showings
@@ -200,6 +258,21 @@ api.post("/whatsapp-click", express.text({ type: "*/*", limit: "8kb" }), rateLim
   if (!b || typeof b !== "object" || b.company_website) return res.status(204).end();
   const r = await logWhatsAppClick({ page_url: b.page_url, label: b.label, stream_title: b.stream_title, utm: b.utm, visitor: b.visitor || req.ip });
   res.status(201).json({ ok: true, ...r });
+}));
+
+// ---------------------------------------------------------------- agent Go-Live page API
+api.get("/host/stream", rateLimit(30), wrap(async (req, res) => {
+  const s0 = await streamByHostToken(req);
+  if (!s0) return fail(res, 401, "This Go-Live link is invalid or was replaced. Ask Bridges for a new one.");
+  let input = null, error = null;
+  try { input = await getLiveInput(s0.meta.cf_input_uid); } catch (e) { error = e.message; }
+  const pub = await getStream(s0.id);
+  res.json({
+    streamId: s0.id, title: s0.meta?.title || pub?.title, host: s0.meta?.host_name, status: s0.status,
+    liveNow: pub ? liveNow(pub) : false, watchUrl: `${config.appUrl}/live-marketplace?stream=${s0.id}`,
+    ingest: input && { rtmpsUrl: input.rtmpsUrl, streamKey: input.streamKey, srtUrl: input.srtUrl, srtStreamId: input.srtStreamId, srtPassphrase: input.srtPassphrase, state: input.state },
+    error,
+  });
 }));
 
 api.get("/unsubscribe", wrap(async (req, res) => {
@@ -397,11 +470,15 @@ admin.get("/summary", wrap(async (req, res) => {
 }));
 admin.get("/streams", wrap(async (req, res) => {
   const rows = await db.select("streams", {}, { order: "created_at", limit: 300 });
-  res.json({ streams: rows.filter((r) => r.meta?.applicant).map((r) => ({ id: r.id, status: r.status, playbackUrl: r.playback_url, createdAt: r.created_at, ...r.meta })) });
+  res.json({ streams: rows.filter((r) => r.meta?.applicant).map((r) => {
+    const { host_token_hash, ...meta } = r.meta || {};
+    return { id: r.id, status: r.status, provider: r.provider, playbackUrl: r.playback_url, createdAt: r.created_at, ...meta, hasHostLink: !!host_token_hash, liveNow: r.provider === "cloudflare" ? liveNow(r) : null, cloudflare: cloudflareEnabled() };
+  }) });
 }));
 admin.post("/streams/:id/reject", wrap(async (req, res) => {
   const rows = await db.update("streams", { id: req.params.id }, { status: "rejected" });
   if (!rows.length) return fail(res, 404, "Stream not found");
+  if (rows[0].meta?.cf_input_uid && cloudflareEnabled()) await deleteLiveInput(rows[0].meta.cf_input_uid).catch((e) => console.warn("[cloudflare delete]", e.message));
   invalidateStreams();
   broadcast(req.params.id, { type: "stream_status", status: "ended" });
   await audit("stream.rejected", "streams", req.params.id);
@@ -453,6 +530,17 @@ admin.post("/prospects/:id", wrap(async (req, res) => {
   if (!status) return fail(res, 400, "status must be new | contacted | ignored");
   const rows = await db.update("prospects", { id: req.params.id }, { status });
   res.json({ ok: !!rows.length });
+}));
+admin.post("/streams/:id/host-link", wrap(async (req, res) => {
+  const s0 = (await db.select("streams", { id: req.params.id }))[0];
+  if (!s0) return fail(res, 404, "Stream not found");
+  if (s0.provider !== "cloudflare") {
+    if (!cloudflareEnabled()) return fail(res, 409, "Cloudflare Stream is not configured (CF_ACCOUNT_ID, CF_STREAM_TOKEN, CF_SUBDOMAIN).");
+    if (s0.status !== "live") return fail(res, 409, "Approve the stream first.");
+    if (s0.playback_url) return fail(res, 409, "This stream uses its own video link (e.g. YouTube) — no Cloudflare input needed.");
+    return res.json({ hostUrl: await provisionCloudflare(s0) });
+  }
+  res.json({ hostUrl: hostLink(await issueHostToken(s0)) }); // new link; the old one stops working
 }));
 admin.get("/orders", wrap(async (req, res) => res.json({ orders: await db.select("orders", {}, { order: "created_at", limit: 200 }) })));
 admin.get("/leads", wrap(async (req, res) => res.json({ leads: await db.select("leads", {}, { order: "created_at", limit: 200 }) })));

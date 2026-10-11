@@ -181,6 +181,7 @@ export async function listStreams() {
       baselineViewers: st.viewer_count || 0, likes: meta.likes || 0,
       cta: meta.cta || (attrs.kind === "product" ? "buy" : "showing"),
       product: attrs.product || null, hold: attrs.hold || null,
+      applicant: !!meta.applicant,
     };
   });
   // matcha pilot first, then by audience
