@@ -58,3 +58,25 @@ export async function isLive(uid) {
   const j = await r.json().catch(() => ({}));
   return j.live === true;
 }
+
+// ---------------------------------------------------------------- recordings
+/** Recorded videos of a live input (Cloudflare records every broadcast automatically). */
+export async function listRecordings(uid) {
+  const rows = (await api("GET", `/live_inputs/${encodeURIComponent(uid)}/videos`)) || [];
+  return rows.map((v) => ({
+    uid: v.uid, created: v.created, duration: v.duration ?? null, ready: !!v.readyToStream,
+    thumbnail: v.thumbnail || `${deliveryBase()}/${v.uid}/thumbnails/thumbnail.jpg`,
+    watchUrl: `${deliveryBase()}/${v.uid}/watch`, iframe: `${deliveryBase()}/${v.uid}/iframe`, hls: hlsUrl(v.uid),
+  }));
+}
+
+function shapeDownload(r) {
+  const d = r?.default || {};
+  return { status: d.status || "none", percent: d.percentComplete ?? null, url: d.status === "ready" ? d.url : null };
+}
+/** MP4 download for a recording: GET reports status; POST starts preparing it (takes a minute or two). */
+export async function getDownload(videoUid) {
+  try { return shapeDownload(await api("GET", `/${encodeURIComponent(videoUid)}/downloads`)); }
+  catch (e) { if (e.status === 404) return { status: "none", percent: null, url: null }; throw e; }
+}
+export async function createDownload(videoUid) { return shapeDownload(await api("POST", `/${encodeURIComponent(videoUid)}/downloads`)); }

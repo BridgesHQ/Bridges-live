@@ -11,7 +11,10 @@ import { routeLead, logWhatsAppClick, isEmail as validEmail } from "./leads/rout
 import { runDueFollowups, unsubscribeToken } from "./leads/sequence.js";
 import { integrations } from "./leads/providers.js";
 import { scanReddit } from "./prospects/reddit.js";
-import { cloudflareEnabled, createLiveInput, getLiveInput, deleteLiveInput, hlsUrl as hlsUrlFor } from "./stream/cloudflare.js";
+import { cloudflareEnabled, createLiveInput, getLiveInput, deleteLiveInput, hlsUrl as hlsUrlFor, listRecordings, getDownload, createDownload } from "./stream/cloudflare.js";
+import { publicListings, syncListings, syncListingsIfStale, listingSource } from "./listings/sync.js";
+import { socialStatus, syncSocial, syncSocialIfStale, visibleVideos, videoFromUrl, tiktokConfigured, tiktokAuthUrl, tiktokStateOk, tiktokExchangeCode } from "./social/sync.js";
+import { getSetting } from "./db.js";
 import { liveNow } from "./stream/monitor.js";
 import { THEMES, aiEnabled, today, themeFor, generateForDate, recentPosts, ensureToday } from "./content/generator.js";
 import { videoProvider, renderVideo } from "./content/video.js";
@@ -141,6 +144,45 @@ api.get("/streams", wrap(async (req, res) => {
   // agents broadcasting right now first (stable otherwise)
   rows.sort((a, b) => (b.liveNow === true) - (a.liveNow === true));
   res.json({ streams: rows });
+}));
+
+// ------------------------------------------------------------------ stream slots
+// The grid: real live streams first (only these get LIVE + a real viewer count), then streams
+// that start soon, then recent videos from the connected social accounts, then clean
+// "upcoming" placeholders so the grid always has its shape. Nothing here is invented.
+const PLATFORM = { youtube: "YouTube", instagram: "Instagram", tiktok: "TikTok", bridges: "Bridges Live" };
+api.get("/slots", wrap(async (req, res) => {
+  const n = Math.min(Math.max(parseInt(req.query.n, 10) || 12, 1), 48);
+  const streams = (await listStreams()).filter((s) => config.showSeedStreams || s.applicant || s.owner).map(withViewers);
+  const videos = await visibleVideos(48);
+  const slots = [];
+  for (const s of streams.filter((x) => x.liveNow)) slots.push({ kind: "live", source: "bridges", stream: s, viewers: s.viewers });
+  for (const v of videos.filter((x) => x.is_live)) slots.push({ kind: "live", source: v.platform, video: shapeVideo(v), viewers: v.viewers ?? null });
+  for (const s of streams.filter((x) => !x.liveNow)) slots.push({ kind: "upcoming", source: "bridges", stream: s });
+  for (const v of videos.filter((x) => !x.is_live)) slots.push({ kind: "video", source: v.platform, video: shapeVideo(v) });
+  const minimum = Math.min(n, 6);
+  while (slots.length < minimum) slots.push({ kind: "upcoming", source: null });
+  res.json({ slots: slots.slice(0, n), liveCount: slots.filter((x) => x.kind === "live").length });
+}));
+function shapeVideo(v) {
+  return {
+    id: v.id, platform: v.platform, platformLabel: PLATFORM[v.platform] || v.platform, title: v.title, thumbnail: v.thumbnail,
+    embedUrl: v.embed_url, mediaUrl: v.media_url, permalink: v.permalink, publishedAt: v.published_at,
+    playable: !!(v.embed_url || v.media_url) && v.platform !== "tiktok",
+  };
+}
+
+// ------------------------------------------------------------------ real listings
+api.get("/listings", wrap(async (req, res) => {
+  res.json(await publicListings({ limit: req.query.limit, city: clean(req.query.city, 60) }));
+}));
+
+// TikTok OAuth return (state is HMAC-signed by the server, so only a flow started from /admin works)
+api.get("/social/tiktok/callback", wrap(async (req, res) => {
+  if (!tiktokConfigured() || !tiktokStateOk(req.query.state) || !req.query.code) return res.status(400).send("TikTok connection failed — start again from /admin → Social videos.");
+  await tiktokExchangeCode(String(req.query.code), `${config.appUrl}/api/social/tiktok/callback`);
+  await syncSocial().catch(() => {});
+  res.redirect("/admin/#social");
 }));
 
 api.get("/streams/:id", wrap(async (req, res) => {
@@ -305,10 +347,12 @@ api.post("/cron/followups", wrap(async (req, res) => {
   const a = Buffer.from(tok), b2 = Buffer.from(config.cronSecret || "");
   if (!config.cronSecret || a.length !== b2.length || !crypto.timingSafeEqual(a, b2)) return fail(res, 401, "Unauthorized");
   const followups = await runDueFollowups();
+  const social = await syncSocialIfStale().catch((e) => ({ error: e.message }));
+  const listings = await syncListingsIfStale().catch((e) => ({ error: e.message }));
   let content = null;
   try { const p = await ensureToday(sendEmail); content = p ? { date: p.post_date, source: p.source, emailed: !!p.emailed_at } : null; }
   catch (e) { content = { error: e.message }; }
-  res.json({ ...followups, content });
+  res.json({ ...followups, content, social, listings });
 }));
 
 api.post("/showings", rateLimit(8), wrap(async (req, res) => {
@@ -508,12 +552,80 @@ admin.get("/setup", wrap(async (req, res) => {
       !r.key ? "No RESEND_API_KEY" : !config.leads.ownerEmail ? "No LEAD_ALERT_EMAIL" : /@resend\.dev/i.test(r.from || "") ? "Using Resend's test sender — only you receive mail; leads get no follow-ups" : `Sending as ${r.from} → alerts to ${config.leads.ownerEmail}`,
       "Verify bridgesglobal.co in Resend (Domains → Add → copy the DNS records into Cloudflare DNS → Verify), then set RESEND_FROM=Dorota Maslowska <dd@bridgesglobal.co>."),
     item("crm", "CRM (HubSpot)", config.crm.hubspotToken || config.crm.ghlWebhook || config.crm.webhook, config.crm.hubspotToken ? "HubSpot connected" : config.crm.ghlWebhook ? "GoHighLevel webhook" : "Not connected", "Render → Environment: HUBSPOT_TOKEN (private app token)."),
-    item("followups", "Follow-ups on time (cron)", config.cronSecret, config.cronSecret ? "CRON_SECRET set — make sure cron-job.org calls /api/cron/followups every 15 min" : "No CRON_SECRET", "Set CRON_SECRET, then create a cron-job.org job (see Daily guide)."),
+    item("followups", "Follow-ups on time (cron)", config.cronSecret, config.cronSecret ? "CRON_SECRET set — make sure cron-job.org calls /api/cron/followups every 15 min" : "No CRON_SECRET", "Set CRON_SECRET, then create a cron-job.org job (see How to Operate)."),
     item("whatsapp", "WhatsApp button", config.leads.whatsappNumber, config.leads.whatsappNumber ? `+${config.leads.whatsappNumber}` : "No number", "assets/js/site-config.js → whatsappNumber."),
     item("cloudflare", "Phone streaming (Cloudflare Stream)", cloudflareEnabled(), cloudflareEnabled() ? "Ready — you and approved agents get stream keys" : `Missing ${missing([["CF_ACCOUNT_ID", cf.accountId], ["CF_STREAM_TOKEN", cf.token], ["CF_SUBDOMAIN", cf.customerCode]]).join(", ")}`, "Add CF_ACCOUNT_ID, CF_STREAM_TOKEN and CF_SUBDOMAIN in Render. Until then, use a YouTube/TikTok live link."),
     item("ai", "Today's Content AI (Anthropic)", aiEnabled(), aiEnabled() ? `Using ${config.anthropic.model}` : "Using the built-in templates", "Add ANTHROPIC_API_KEY in Render for fresh AI-written scripts every day."),
+    item("listings", "Real listings feed", listingSource(), listingSource() === "stellar-mls" ? "Stellar MLS via Bridge Interactive" : listingSource() === "realtyapi" ? "RealtyAPI (fallback) — switch to Stellar MLS when your token arrives" : "No feed — the homepage links to your bridgesglobal.co search", "Render → Environment: BRIDGE_API_SERVER_TOKEN (Stellar MLS data agreement via Bridge Interactive), or REALTYAPI_KEY."),
+    ...(() => { const st = socialStatus(); return [
+      item("youtube", "YouTube videos in the grid", st.youtube.configured, st.youtube.configured ? "Connected" : "Not connected", `Render → Environment: ${st.youtube.need}.`),
+      item("instagram", "Instagram Reels in the grid", st.instagram.configured, st.instagram.configured ? "Connected" : "Not connected", `Render → Environment: ${st.instagram.need}.`),
+      item("tiktok", "TikTok videos in the grid", st.tiktok.configured, st.tiktok.configured ? "App keys set — use Connect TikTok in 🎥 Videos" : "Not connected", `Render → Environment: ${st.tiktok.need}.`),
+    ]; })(),
+    item("holds", "Reserve hold button hidden", !config.holdsEnabled, config.holdsEnabled ? "Reserve hold is ON — make sure written hold terms exist" : "Hidden until written hold terms exist", "Set ENABLE_PROPERTY_HOLDS=false in Render."),
     item("demo", "No demo data on the site", !config.showSeedStreams && !config.demoMode, config.showSeedStreams || config.demoMode ? "Demo streams or demo viewer counts are on" : "Only real streams and real viewer counts", "Set SHOW_SEED_STREAMS=false and DEMO_MODE=false in Render."),
   ] });
+}));
+
+// ------------------------------------------------------------------ social videos
+admin.get("/social", wrap(async (req, res) => {
+  const rows = (await db.select("social_videos", {}).catch(() => [])).sort((a, b) => String(b.published_at || "").localeCompare(String(a.published_at || "")));
+  res.json({ status: socialStatus(), tiktokConnected: !!(await getSetting("tiktok_token"))?.refresh_token, lastSync: await getSetting("social_last_sync"), videos: rows.slice(0, 100) });
+}));
+admin.post("/social/sync", wrap(async (req, res) => res.json(await syncSocial())));
+admin.post("/social/add", wrap(async (req, res) => {
+  const v = await videoFromUrl(clean(req.body?.url, 500)).catch((e) => e);
+  if (v instanceof Error) return fail(res, v.status || 400, v.message);
+  const row = await db.upsert("social_videos", { ...v, hidden: false, source: "manual", synced_at: new Date().toISOString() });
+  res.json({ video: row });
+}));
+admin.post("/social/tiktok/connect", wrap(async (req, res) => {
+  if (!tiktokConfigured()) return fail(res, 409, "Add TIKTOK_CLIENT_KEY and TIKTOK_CLIENT_SECRET in Render first.");
+  res.json({ url: tiktokAuthUrl(`${config.appUrl}/api/social/tiktok/callback`) });
+}));
+admin.post("/social/:id", wrap(async (req, res) => {
+  const rows = await db.update("social_videos", { id: req.params.id }, { hidden: !!req.body?.hidden });
+  if (!rows.length) return fail(res, 404, "Video not found");
+  res.json({ video: rows[0] });
+}));
+
+// ------------------------------------------------------------------ listings feed
+admin.get("/listings", wrap(async (req, res) => {
+  const all = await db.select("mls_listings", {}).catch(() => []);
+  res.json({ source: listingSource(), lastSync: await getSetting("listings_last_sync"), active: all.filter((r) => r.status === "active").length, searchUrl: config.listings.searchUrl, preview: (await publicListings({ limit: 6 })).listings });
+}));
+admin.post("/listings/sync", wrap(async (req, res) => {
+  try { res.json(await syncListings()); } catch (e) { fail(res, 502, e.message); }
+}));
+
+// ------------------------------------------------------------------ recordings (Cloudflare)
+admin.get("/recordings", wrap(async (req, res) => {
+  if (!cloudflareEnabled()) return res.json({ enabled: false, recordings: [] });
+  const streams = (await db.select("streams", { provider: "cloudflare" }).catch(() => [])).filter((s) => s.meta?.cf_input_uid);
+  const out = [];
+  for (const s of streams) {
+    try {
+      for (const v of await listRecordings(s.meta.cf_input_uid)) out.push({ ...v, streamId: s.id, streamTitle: s.meta?.title || "", host: s.meta?.host_name || "", owner: !!s.meta?.owner, download: await getDownload(v.uid).catch(() => ({ status: "none" })) });
+    } catch (e) { console.warn("[recordings]", e.message); }
+  }
+  out.sort((a, b) => String(b.created).localeCompare(String(a.created)));
+  res.json({ enabled: true, recordings: out });
+}));
+admin.post("/recordings/:uid/download", wrap(async (req, res) => {
+  if (!cloudflareEnabled()) return fail(res, 409, "Cloudflare Stream is not configured.");
+  const uid = clean(req.params.uid, 64);
+  const cur = await getDownload(uid);
+  res.json(cur.status === "none" ? await createDownload(uid) : cur);
+}));
+admin.post("/recordings/:uid/publish", wrap(async (req, res) => {
+  if (!cloudflareEnabled()) return fail(res, 409, "Cloudflare Stream is not configured.");
+  const uid = clean(req.params.uid, 64), base = config.cloudflare.deliveryBase || `https://customer-${config.cloudflare.customerCode}.cloudflarestream.com`;
+  const row = await db.upsert("social_videos", {
+    id: `bridges:${uid}`, platform: "bridges", external_id: uid, title: clean(req.body?.title, 160) || "Recorded live tour",
+    thumbnail: `${base}/${uid}/thumbnails/thumbnail.jpg`, embed_url: `${base}/${uid}/iframe`, media_url: null, permalink: `${base}/${uid}/watch`,
+    published_at: new Date().toISOString(), is_live: false, viewers: null, hidden: false, source: "recording", synced_at: new Date().toISOString(),
+  });
+  res.json({ video: row });
 }));
 
 // ------------------------------------------------------------------ Today's Content

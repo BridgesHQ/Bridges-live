@@ -55,6 +55,11 @@ class LocalStore {
     this.flush();
     return structuredClone(r);
   }
+  async upsert(name, row, key = "id") {
+    const t = this.table(name), i = t.findIndex((r) => r[key] === row[key]);
+    if (i >= 0) { Object.assign(t[i], row); this.flush(); return structuredClone(t[i]); }
+    return this.insert(name, row);
+  }
   async update(name, match, patch) {
     const out = [];
     for (const r of this.table(name)) if (matches(r, match)) { Object.assign(r, patch); out.push(structuredClone(r)); }
@@ -86,6 +91,11 @@ class SupabaseStore {
     if (error) throw new Error(`${name}.insert: ${error.message}`);
     return data;
   }
+  async upsert(name, row, key = "id") {
+    const { data, error } = await this.sb.from(name).upsert(row, { onConflict: key }).select().single();
+    if (error) throw new Error(`${name}.upsert: ${error.message}`);
+    return data;
+  }
   async update(name, match, patch) {
     const { data, error } = await this._apply(this.sb.from(name).update(patch), match).select();
     if (error) throw new Error(`${name}.update: ${error.message}`);
@@ -104,7 +114,17 @@ export const db = {
   select: (...a) => store.select(...a),
   insert: (...a) => store.insert(...a),
   update: (...a) => store.update(...a),
+  upsert: (...a) => store.upsert(...a),
 };
+
+/** Small key/value settings (refreshed OAuth tokens, last sync times). */
+export async function getSetting(key) {
+  const r = (await db.select("app_settings", { key }).catch(() => []))[0];
+  return r ? r.value : null;
+}
+export async function setSetting(key, value) {
+  return db.upsert("app_settings", { key, value, updated_at: new Date().toISOString() }, "key").catch((e) => console.warn("[settings]", e.message));
+}
 
 /**
  * Verify Supabase is reachable and migrated. If not, fall back to the local store so the

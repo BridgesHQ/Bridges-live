@@ -38,7 +38,7 @@ before(async () => {
   const f = `http://localhost:${FAKE}`;
   proc = spawn(process.execPath, ["server/index.js"], {
     env: { ...process.env, PORT: String(PORT), NODE_ENV: "test", ADMIN_TOKEN: "t0ken", CRON_SECRET: "cron-secret-123456", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "",
-      PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", SHOW_SEED_STREAMS: "true", BL_LOCAL_DB: path.join(TMP, "db.json"), APP_URL: BASE,
+      PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", SHOW_SEED_STREAMS: "false", BL_LOCAL_DB: path.join(TMP, "db.json"), APP_URL: BASE,
       LEAD_ALERT_EMAIL: "owner@example.com", WHATSAPP_NUMBER: "301-379-6785",
       RESEND_API_KEY: "re_123", RESEND_FROM: "Dorota <dd@bridgesglobal.co>", RESEND_API_BASE: f,
       HUBSPOT_TOKEN: "pat-123", HUBSPOT_API_BASE: f, GHL_WEBHOOK_URL: `${f}/ghl` },
@@ -113,6 +113,7 @@ test("bots: honeypot filled → nothing sent; missing contact → 400", async ()
 });
 
 test("live stream viewer (Request a showing) goes through the same pipeline", async () => {
+  await fetch(BASE + "/api/admin/my-live", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer t0ken" }, body: JSON.stringify({ mode: "link", url: "https://www.youtube.com/live/dQw4w9WgXcQ", title: "Open house" }) });
   const s = (await get("/api/streams")).body.streams.find((x) => x.cta === "showing");
   const before = calls.length;
   const r = await post("/api/showings", { streamId: s.id, name: "Kai Viewer", email: "kai@example.com", phone: "813-555-7777", when: "Sat 10am" });

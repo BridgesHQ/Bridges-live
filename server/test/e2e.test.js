@@ -35,7 +35,7 @@ function socket() {
 before(async () => {
   // run from a temp copy root so the test DB never touches data/local-db.json
   proc = spawn(process.execPath, ["server/index.js"], {
-    env: { ...process.env, PORT: String(PORT), ADMIN_TOKEN: "t0ken", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "", PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", AUTO_APPROVE_STREAMS: "false", SHOW_SEED_STREAMS: "true", DEMO_MODE: "false", BL_LOCAL_DB: path.join(TMP, "db.json") },
+    env: { ...process.env, PORT: String(PORT), ADMIN_TOKEN: "t0ken", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "", PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", AUTO_APPROVE_STREAMS: "false", SHOW_SEED_STREAMS: "false", DEMO_MODE: "false", ENABLE_PROPERTY_HOLDS: "true", BL_LOCAL_DB: path.join(TMP, "db.json") },
     stdio: "pipe",
   });
   for (let i = 0; i < 50; i++) {
@@ -46,17 +46,35 @@ before(async () => {
 });
 after(() => proc?.kill());
 
-test("streams list: real estate only (no product / buy-now streams)", async () => {
+// A real (approved) agent stream to drive the tests — the site ships with no demo streams.
+let STREAM = null;
+async function agentStream() {
+  if (STREAM) return STREAM;
+  const auth = { Authorization: "Bearer t0ken" };
+  const r = await post("/api/streams", { name: "Ana Agent", email: "ana@example.com", title: "Waterfront tour", location: "Apollo Beach, FL", license: "SL1", playbackUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" });
+  await post(`/api/admin/streams/${r.body.streamId}/approve`, {}, auth);
+  STREAM = (await get(`/api/streams/${r.body.streamId}`)).body;
+  return STREAM;
+}
+
+test("no demo data: nothing is live until a real stream starts; no checkout", async () => {
   const { body } = await get("/api/streams");
-  assert.ok(body.streams.length > 20);
-  assert.ok(body.streams.every((s) => s.cta === "showing"));
-  assert.ok(!JSON.stringify(body).toLowerCase().includes("matcha"));
-  assert.equal((await post("/api/checkout", { streamId: body.streams[0].id })).status, 404, "checkout endpoint is gone");
+  assert.equal(body.streams.length, 0, "no seeded streams");
+  const slots = (await get("/api/slots")).body;
+  assert.equal(slots.liveCount, 0);
+  assert.ok(slots.slots.length >= 6 && slots.slots.every((x) => x.kind === "upcoming" && !x.viewers), "clean upcoming tiles, no fake LIVE");
+  assert.equal((await post("/api/checkout", { streamId: "x" })).status, 404, "checkout endpoint is gone");
+  const l = (await get("/api/listings")).body;
+  assert.deepEqual(l.listings, [], "no invented listings");
+  assert.match(l.searchUrl, /bridgesglobal\.co/);
 });
 
 test("chat + real viewer counts + moderation", async () => {
-  const { body } = await get("/api/streams");
-  const st = body.streams[0];
+  const st = await agentStream();
+  const sl = (await get("/api/slots")).body;
+  assert.equal(sl.slots[0].kind, "live");
+  assert.equal(sl.slots[0].stream.id, st.id);
+  assert.equal(sl.slots[0].viewers, 0, "real viewer count — nobody watching yet");
   const a = await socket(), b = await socket(), lobby = await socket();
   lobby.send(JSON.stringify({ type: "lobby" }));
   a.send(JSON.stringify({ type: "join", streamId: st.id, name: "Ana" }));
@@ -77,8 +95,7 @@ test("chat + real viewer counts + moderation", async () => {
 });
 
 test("property: request a showing + reserve hold (authorize) + admin void", async () => {
-  const { body } = await get("/api/streams");
-  const prop = body.streams.find((s) => s.cta === "showing");
+  const prop = await agentStream();
   const w = await socket();
   w.send(JSON.stringify({ type: "join", streamId: prop.id, name: "Kai" }));
   await w.waitFor((m) => m.type === "history");

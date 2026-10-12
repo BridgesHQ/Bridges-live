@@ -52,6 +52,33 @@ export const config = {
     deliveryBase: env.CF_DELIVERY_BASE || "",                  // tests only; default https://customer-<code>.cloudflarestream.com
     pollMs: Number(env.CF_POLL_MS || 20_000),
   },
+  // Real listings, in priority order: Stellar MLS (Bridge Interactive RESO Web API) → RealtyAPI.
+  // Lofty IDX has no reusable feed, so the site links out to your Lofty search instead.
+  listings: {
+    bridgeToken: (env.BRIDGE_API_SERVER_TOKEN || env.BRIDGE_API_TOKEN || "").trim(),
+    bridgeDataset: env.BRIDGE_DATASET || "stellar",
+    bridgeBase: env.BRIDGE_API_BASE || "https://api.bridgedataoutput.com/api/v2/OData",
+    realtyKey: (env.REALTYAPI_KEY || "").trim(),
+    realtyBase: env.REALTYAPI_BASE || "https://zillow.realtyapi.io",
+    cities: (env.LISTING_CITIES || "Tampa;Riverview;Brandon;Apollo Beach;Wesley Chapel;Parrish;Lithia;Ruskin").split(/[;,]/).map((c) => c.trim()).filter(Boolean),
+    max: Number(env.LISTING_MAX || 60),
+    searchUrl: env.LOFTY_SEARCH_URL || "https://bridgesglobal.co",
+  },
+  // Social videos that fill the stream grid. Each platform turns on when its keys are present.
+  social: {
+    youtubeKey: (env.YOUTUBE_API_KEY || "").trim(),
+    youtubeChannel: (env.YOUTUBE_CHANNEL_ID || "").trim(),        // UC… id, or
+    youtubeHandle: (env.YOUTUBE_HANDLE || "").trim().replace(/^@?/, "@").replace(/^@$/, ""),
+    youtubeBase: env.YOUTUBE_API_BASE || "https://www.googleapis.com/youtube/v3",
+    instagramToken: (env.INSTAGRAM_ACCESS_TOKEN || "").trim(),    // Instagram API with Instagram Login, long-lived
+    instagramBase: env.INSTAGRAM_API_BASE || "https://graph.instagram.com",
+    tiktokClientKey: (env.TIKTOK_CLIENT_KEY || "").trim(),
+    tiktokClientSecret: (env.TIKTOK_CLIENT_SECRET || "").trim(),
+    tiktokBase: env.TIKTOK_API_BASE || "https://open.tiktokapis.com",
+    tiktokAuthBase: env.TIKTOK_AUTH_BASE || "https://www.tiktok.com",
+    oembedTikTok: env.TIKTOK_OEMBED_BASE || "https://www.tiktok.com",
+    max: Number(env.SOCIAL_MAX_PER_PLATFORM || 12),
+  },
   // Demo property streams from seed data — off on the real site (clean empty state instead).
   // Today's Content: daily video scripts (Anthropic API). Without a key a built-in template is used.
   anthropic: {
@@ -67,7 +94,7 @@ export const config = {
   demoMode: bool(env.DEMO_MODE, false),
   autoApproveStreams: bool(env.AUTO_APPROVE_STREAMS, true),
   // Property reserve holds (PayPal authorization). Needs broker/attorney sign-off before live mode.
-  holdsEnabled: bool(env.ENABLE_PROPERTY_HOLDS, true),
+  holdsEnabled: bool(env.ENABLE_PROPERTY_HOLDS, false), // off until written hold terms exist
 };
 
 // WhatsApp number: one place to set it — assets/js/site-config.js (whatsappNumber) — or WHATSAPP_NUMBER.

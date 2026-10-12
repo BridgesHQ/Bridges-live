@@ -1,3 +1,4 @@
+// SUPERSEDED: the live site syncs Stellar MLS with server/listings/sync.js (Node). Kept for reference.
 // app/api/sync/stellar-mls/route.ts
 // Syncs ACTIVE Stellar MLS listings (via Bridge Interactive RESO Web API) → Supabase `listings`.
 // Aligned to Bridges schema: org_id + vertical_id + attributes JSONB.

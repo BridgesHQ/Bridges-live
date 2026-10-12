@@ -76,29 +76,26 @@
 
   // ---------------------------------------------------------------- styles
   var css = ""
-    + ".bl-ov{position:fixed;inset:0;z-index:5000;background:rgba(5,10,30,.62);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:16px;font-family:'DM Sans',system-ui,sans-serif}"
-    + ".bl-md{background:#fff;color:#0B1730;border-top:4px solid #C9A84C;border-radius:18px;width:100%;max-width:450px;max-height:calc(100vh - 32px);overflow:auto;padding:26px 24px 22px;box-shadow:0 30px 80px rgba(5,10,30,.4);animation:blIn .25s ease}"
-    + ".bl-md h3{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;font-size:28px;line-height:1.1;margin:0 0 6px;color:#0E1E52}"
-    + ".bl-md .sub{color:#4A5672;font-size:13.5px;margin-bottom:16px}"
-    + ".bl-md .sub span{color:#9C7F2E!important;font-weight:600}"
-    + ".bl-md label.row{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid rgba(14,30,82,.14);border-radius:11px;margin-bottom:10px;cursor:pointer;font-size:14px;background:#FAF8F3}"
-    + ".bl-md label.row b{color:#9C7F2E!important}"
-    + ".bl-md input[type=text],.bl-md input[type=email],.bl-md input[type=tel],.bl-md input[type=datetime-local],.bl-md textarea{width:100%;box-sizing:border-box;padding:13px 14px;border-radius:11px;border:1px solid rgba(14,30,82,.16);background:#fff;color:#0B1730;font-size:15px;margin-bottom:10px;font-family:inherit}"
-    + ".bl-md input:focus,.bl-md textarea:focus{outline:2px solid #C9A84C;outline-offset:0;border-color:transparent}"
-    + ".bl-md .tot{display:flex;justify-content:space-between;font-size:15px;margin:12px 0;padding-top:12px;border-top:1px solid rgba(14,30,82,.1)}"
-    + ".bl-md .tot b{color:#0E1E52;font-size:18px}"
-    + ".bl-md .btn{display:block;width:100%;border:none;border-radius:12px;padding:14px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}"
-    + ".bl-md .btn.go{background:#C9A84C;color:#0E1E52}.bl-md .btn.gold{background:#0E1E52;color:#fff}.bl-md .btn.ghost{background:transparent;color:#4A5672;margin-top:6px}"
+    + ".bl-ov{position:fixed;inset:0;z-index:5000;background:rgba(5,8,16,.72);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;font-family:'DM Sans',system-ui,sans-serif}"
+    + ".bl-md{background:#131a2b;color:#fff;border:1px solid rgba(216,188,106,.35);border-radius:16px;width:100%;max-width:440px;max-height:calc(100vh - 32px);overflow:auto;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.5)}"
+    + ".bl-md h3{font-family:Marcellus,serif;font-weight:400;font-size:21px;margin:0 0 4px;color:#fff}"
+    + ".bl-md .sub{color:#8fa0c0;font-size:13px;margin-bottom:14px}"
+    + ".bl-md label.row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #2a3550;border-radius:10px;margin-bottom:8px;cursor:pointer;font-size:14px}"
+    + ".bl-md label.row b{margin-left:auto;color:#D8BC6A;font-weight:600}"
+    + ".bl-md input[type=text],.bl-md input[type=email],.bl-md input[type=tel],.bl-md input[type=datetime-local],.bl-md textarea{width:100%;box-sizing:border-box;padding:11px 12px;border-radius:9px;border:1px solid #2a3550;background:#0f1626;color:#fff;font-size:14px;margin-bottom:9px;font-family:inherit}"
+    + ".bl-md .tot{display:flex;justify-content:space-between;font-size:15px;margin:12px 0;padding-top:12px;border-top:1px solid #1e2740}"
+    + ".bl-md .tot b{color:#D8BC6A;font-size:18px}"
+    + ".bl-md .btn{display:block;width:100%;border:none;border-radius:10px;padding:13px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}"
+    + ".bl-md .btn.go{background:#1A5C3A;color:#fff}.bl-md .btn.gold{background:#D8BC6A;color:#0a0e1a}.bl-md .btn.ghost{background:transparent;color:#8fa0c0;margin-top:6px}"
     + ".bl-md .btn[disabled]{opacity:.55;cursor:wait}"
-    + ".bl-md .err{color:#C0392B;font-size:13px;margin:4px 0 8px;min-height:1em}"
-    + ".bl-md .fine{color:#7B859B;font-size:11.5px;line-height:1.5;margin-top:12px}"
-    + ".bl-md .sim{border:1px dashed #C9A84C;border-radius:12px;padding:14px;text-align:center;margin-top:6px;background:#FAF8F3}"
-    + ".bl-md .sim .pp{font-weight:800;font-size:18px;color:#0E1E52;margin-bottom:4px}.bl-md .sim .pp span{color:#009cde}"
+    + ".bl-md .err{color:#ff8b80;font-size:13px;margin:6px 0;min-height:1em}"
+    + ".bl-md .fine{color:#8fa0c0;font-size:11.5px;line-height:1.45;margin-top:10px}"
+    + ".bl-md .sim{border:1px dashed #D8BC6A;border-radius:12px;padding:14px;text-align:center;margin-top:6px}"
+    + ".bl-md .sim .pp{font-weight:800;font-size:18px;color:#fff;margin-bottom:4px}.bl-md .sim .pp span{color:#009cde}"
     + ".bl-md .ok{text-align:center;padding:10px 0}.bl-md .ok .big{font-size:44px}"
-    + ".bl-md .ok p{color:#4A5672}"
-    + ".bl-x{float:right;background:#F3F1EA;border:none;color:#4A5672;width:34px;height:34px;border-radius:50%;font-size:20px;cursor:pointer;line-height:1;margin:-8px -6px 0 0}"
+    + ".bl-x{float:right;background:none;border:none;color:#8fa0c0;font-size:22px;cursor:pointer;line-height:1}"
     + ".bl-toasts{position:fixed;left:16px;bottom:16px;z-index:4500;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:min(360px,calc(100vw - 32px))}"
-    + ".bl-toast{background:rgba(14,30,82,.95);color:#fff;border:1px solid rgba(201,168,76,.5);border-radius:12px;padding:10px 14px;font:600 13.5px 'DM Sans',system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:blIn .35s ease}"
+    + ".bl-toast{background:rgba(10,14,26,.92);color:#fff;border:1px solid rgba(216,188,106,.45);border-radius:12px;padding:10px 14px;font:600 13.5px 'DM Sans',system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:blIn .35s ease}"
     + "@keyframes blIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}"
     + ".bl-player{position:absolute;inset:0;width:100%;height:100%;border:0;object-fit:cover;background:transparent}"
     + ".bl-poster{position:absolute;inset:0;background-size:cover;background-position:center;animation:blKen 18s ease-in-out infinite alternate}"
@@ -290,6 +287,35 @@
         success(m, "🏠", "Showing requested", "You're on the list. Dorota will follow up shortly to confirm a time.");
         if (typeof gtag === "function") gtag("event", "generate_lead", { source: "live-showing" });
       }).catch(function (x) { err.textContent = x.message; btn.disabled = false; btn.textContent = "Request a showing"; });
+    };
+  };
+
+  /** "Request a showing" for a listing or a video (no live room): goes through the lead pipeline. */
+  BL.requestShowingFor = function (ctx) {
+    ctx = ctx || {};
+    var head = ctx.heading || "Request a showing", btnText = ctx.button || "Request a showing";
+    var m = modal('<h3>' + esc(head) + '</h3><div class="sub">' + esc(ctx.title || "Tell us what you'd like to see") + (ctx.meta ? " · " + esc(ctx.meta) : "") + "</div>"
+      + '<form><input type="text" name="name" placeholder="Your name" required maxlength="80" value="' + esc(BL.name()) + '">'
+      + '<input type="email" name="email" placeholder="Email" required maxlength="120"><input type="tel" name="phone" placeholder="Phone / WhatsApp" maxlength="40">'
+      + (ctx.notify ? '<input type="hidden" name="when" value=""><input type="hidden" name="message" value="">' : '<input type="text" name="when" placeholder="Preferred day / time (e.g. Sat morning)" maxlength="80">'
+      + '<textarea name="message" placeholder="Questions (optional)" maxlength="800" style="min-height:64px"></textarea>')
+      + '<input name="company_website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">'
+      + '<div class="err"></div><button class="btn go" type="submit">' + esc(btnText) + '</button></form>'
+      + '<div class="fine">A licensed broker follows up — no obligation. Dorota Maslowska, Broker Associate · LPT Realty · FL BK3519799 · Equal Housing Opportunity.</div>');
+    var err = m.q(".err");
+    m.q("form").onsubmit = function (e) {
+      e.preventDefault();
+      var f = e.target, btn = f.querySelector("button");
+      BL.setName(f.name.value.trim().split(" ")[0]);
+      btn.disabled = true; btn.textContent = "Sending…";
+      BL.api("/lead-router", {
+        first_name: f.name.value.trim(), email: f.email.value.trim(), phone: f.phone.value.trim(), market: ctx.title || "",
+        source: ctx.source || "Website — Request a showing", company_website: f.company_website.value, page_url: location.href,
+        notes: [ctx.title, ctx.meta, ctx.link, "Preferred time: " + (f.when.value.trim() || "flexible"), f.message.value.trim()].filter(Boolean).join(" · "),
+      }).then(function () {
+        success(m, ctx.notify ? "🔔" : "🏠", ctx.notify ? "You're on the list" : "Showing requested", ctx.notify ? "We'll let you know when the next live tour starts." : "You're on the list. Dorota will follow up shortly to confirm a time.");
+        if (typeof gtag === "function") gtag("event", "generate_lead", { source: ctx.notify ? "notify-live" : "request-showing" });
+      }).catch(function (x) { err.textContent = x.message; btn.disabled = false; btn.textContent = btnText; });
     };
   };
 

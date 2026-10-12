@@ -57,11 +57,25 @@ services:
         value: "false"
       - key: ANTHROPIC_API_KEY
         sync: false
+      - key: BRIDGE_API_SERVER_TOKEN
+        sync: false
+      - key: REALTYAPI_KEY
+        sync: false
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: YOUTUBE_HANDLE
+        sync: false
+      - key: INSTAGRAM_ACCESS_TOKEN
+        sync: false
+      - key: TIKTOK_CLIENT_KEY
+        sync: false
+      - key: TIKTOK_CLIENT_SECRET
+        sync: false
       - key: DEMO_MODE
         value: "false"
       - key: AUTO_APPROVE_STREAMS
         value: "false"
       - key: ENABLE_PROPERTY_HOLDS
-        value: "true"
+        value: "false"
       - key: HOLDS_LEGAL_SIGNOFF
         value: "false"
