@@ -54,7 +54,9 @@ services:
       - key: CF_SUBDOMAIN
         sync: false
       - key: SHOW_SEED_STREAMS
-        value: "true"
+        value: "false"
+      - key: ANTHROPIC_API_KEY
+        sync: false
       - key: DEMO_MODE
         value: "false"
       - key: AUTO_APPROVE_STREAMS

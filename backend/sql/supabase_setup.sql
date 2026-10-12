@@ -491,6 +491,37 @@ drop policy if exists streams_public_read on streams;
 alter table streams enable row level security;
 
 
+-- >>>>>>>>>> migrations/005_content_and_cleanup.sql
+-- ============================================================
+-- 005 — Today's Content (daily video scripts) + real-estate-only cleanup.
+-- Idempotent. Run after 004.
+-- ============================================================
+create extension if not exists "uuid-ossp";
+
+create table if not exists content_posts (
+  id uuid primary key default uuid_generate_v4(),
+  post_date date not null unique,
+  theme text,
+  status text not null default 'draft',   -- draft | filmed | posted
+  source text,                            -- ai | template
+  data jsonb not null default '{}'::jsonb, -- title, hook, script[], caption, hashtags[], shotlist[] …
+  emailed_at timestamptz,
+  created_at timestamptz default now(),
+  updated_at timestamptz
+);
+alter table content_posts enable row level security; -- server (service key) only
+
+-- leads: status set from the admin Leads view
+alter table leads add column if not exists stage text default 'New';
+
+-- Real estate only: retire the old matcha / demo streams so they never reappear on the grid.
+-- (The server also hides demo streams unless SHOW_SEED_STREAMS=true.)
+update streams set status = 'ended'
+ where status = 'live'
+   and coalesce(meta->>'applicant', 'false') <> 'true'
+   and coalesce(meta->>'owner', 'false') <> 'true';
+
+
 -- >>>>>>>>>> seed
 -- ============================================================
 -- Bridges Live — seed data (verticals, orgs, host, listings, live streams).
@@ -499,8 +530,6 @@ alter table streams enable row level security;
 -- ============================================================
 insert into verticals (slug, name, compliance_rules) values
   ('real-estate', 'Real Estate', '{"license_required":true,"escrow_required":true,"holds_require_broker_signoff":true}'::jsonb),
-  ('matcha', 'Bridges Matcha', '{"license_required":false,"escrow_required":false}'::jsonb),
-  ('global-trade', 'Global Trade', '{"license_required":false,"escrow_required":false,"checkout":"rfq"}'::jsonb),
   ('nonprofit-housing', 'Nonprofit Housing (501c3)', '{"nonprofit":true,"commercial_routing":false}'::jsonb)
 on conflict (slug) do update set name = excluded.name, compliance_rules = excluded.compliance_rules;
 
@@ -512,8 +541,7 @@ insert into organizations (id, vertical_id, name, plan, sponsoring_broker) value
   ('06011a43-5002-544e-a520-5b621480a872', (select id from verticals where slug = 'real-estate'), 'Skyline Res.', 'brokerage', 'LPT Realty'),
   ('88b7910a-3565-52aa-af01-c886fc377994', (select id from verticals where slug = 'real-estate'), 'Triple Creek Homes', 'brokerage', 'LPT Realty'),
   ('4a553e66-0dd9-5a29-aecd-8b47cc578277', (select id from verticals where slug = 'real-estate'), 'NRR Homes', 'brokerage', 'LPT Realty'),
-  ('296b3483-d8d9-5291-a69c-39532514d3c6', (select id from verticals where slug = 'real-estate'), 'Dorota M.', 'brokerage', 'LPT Realty'),
-  ('904dfb02-1f07-5f20-ad92-da98640ec456', (select id from verticals where slug = 'matcha'), 'Bridges Matcha', 'merchant', null)
+  ('296b3483-d8d9-5291-a69c-39532514d3c6', (select id from verticals where slug = 'real-estate'), 'Dorota M.', 'brokerage', 'LPT Realty')
 on conflict (id) do update set vertical_id = excluded.vertical_id, name = excluded.name, plan = excluded.plan, sponsoring_broker = excluded.sponsoring_broker;
 
 insert into users (org_id, email, full_name, role) values
@@ -546,8 +574,7 @@ insert into listings (id, org_id, vertical_id, title, status, attributes) values
   ('d7c505e6-c8aa-5432-ad21-1ba7b53cd759', 'dbb0f8ad-f40b-5fd0-a0e7-91159ef10ae2', (select id from verticals where slug = 'real-estate'), 'Hyde Park Luxury', 'active', '{"kind":"property","price_label":"$2,100/mo","location":"Hyde Park, Tampa","image":"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80","hold":{"amount":500,"currency":"USD","label":"$500 refundable hold"}}'::jsonb),
   ('dfd4d549-3c07-58bb-a530-1854d1a53cd0', '296b3483-d8d9-5291-a69c-39532514d3c6', (select id from verticals where slug = 'real-estate'), 'Bradenton Riverfront', 'active', '{"kind":"property","price_label":"$389K","location":"Bradenton, FL","image":"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80","hold":{"amount":500,"currency":"USD","label":"$500 refundable hold"}}'::jsonb),
   ('35641ea3-560c-5c77-af83-3918dce8f39c', 'b89d15e2-c709-58ed-ae13-cd4ec5d5a27f', (select id from verticals where slug = 'real-estate'), 'Wiregrass Grand Opening', 'active', '{"kind":"property","price_label":"From the $380s","location":"Wesley Chapel, FL","image":"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80","hold":{"amount":500,"currency":"USD","label":"$500 refundable hold"}}'::jsonb),
-  ('9ff9c2e2-8bf6-5d30-a7aa-641118c5c30d', '88b7910a-3565-52aa-af01-c886fc377994', (select id from verticals where slug = 'real-estate'), 'Union Park Collection', 'active', '{"kind":"property","price_label":"From the $385s","location":"Wesley Chapel, FL","image":"https://images.unsplash.com/photo-1567496898669-ee935f5f647a?auto=format&fit=crop&w=800&q=80","hold":{"amount":500,"currency":"USD","label":"$500 refundable hold"}}'::jsonb),
-  ('9edd9c10-1071-5eb8-a97a-21b32cfb032a', '904dfb02-1f07-5f20-ad92-da98640ec456', (select id from verticals where slug = 'matcha'), 'Bridges Matcha — Ceremonial Tasting', 'active', '{"kind":"product","product":{"id":"prod_matcha_30","name":"Ceremonial Matcha 30g (Uji, Kyoto)","price":30,"currency":"USD","addons":[{"id":"whisk","name":"Bamboo whisk","price":18},{"id":"bowl","name":"Chawan bowl","price":24},{"id":"tin","name":"Gift tin","price":8}]},"price_label":"$30 · Buy now","location":"Uji, Kyoto","image":"/assets/img/matcha.jpg"}'::jsonb)
+  ('9ff9c2e2-8bf6-5d30-a7aa-641118c5c30d', '88b7910a-3565-52aa-af01-c886fc377994', (select id from verticals where slug = 'real-estate'), 'Union Park Collection', 'active', '{"kind":"property","price_label":"From the $385s","location":"Wesley Chapel, FL","image":"https://images.unsplash.com/photo-1567496898669-ee935f5f647a?auto=format&fit=crop&w=800&q=80","hold":{"amount":500,"currency":"USD","label":"$500 refundable hold"}}'::jsonb)
 on conflict (id) do update set org_id = excluded.org_id, vertical_id = excluded.vertical_id, title = excluded.title, status = excluded.status, attributes = excluded.attributes;
 
 insert into shows (id, host_id, org_id, vertical_id, title, category, status) values
@@ -576,8 +603,7 @@ insert into shows (id, host_id, org_id, vertical_id, title, category, status) va
   ('cbe3ea0b-edfd-55a9-ad21-bdca5fa96134', (select id from users where email = 'dd@bridgesglobal.co'), 'dbb0f8ad-f40b-5fd0-a0e7-91159ef10ae2', (select id from verticals where slug = 'real-estate'), 'Hyde Park Luxury', 'apt', 'live'),
   ('861537f6-340b-599b-ae7e-c10156f1fe95', (select id from users where email = 'dd@bridgesglobal.co'), '296b3483-d8d9-5291-a69c-39532514d3c6', (select id from verticals where slug = 'real-estate'), 'Bradenton Riverfront', 'new', 'live'),
   ('52abe59e-34e3-5042-a687-eba32de814fc', (select id from users where email = 'dd@bridgesglobal.co'), 'b89d15e2-c709-58ed-ae13-cd4ec5d5a27f', (select id from verticals where slug = 'real-estate'), 'Wiregrass Grand Opening', 'new', 'live'),
-  ('c7e16c4d-38b0-5230-af83-a0470537c7e8', (select id from users where email = 'dd@bridgesglobal.co'), '88b7910a-3565-52aa-af01-c886fc377994', (select id from verticals where slug = 'real-estate'), 'Union Park Collection', 'new', 'live'),
-  ('5842e398-0167-5ff0-a46f-591e3d040f5d', (select id from users where email = 'dd@bridgesglobal.co'), '904dfb02-1f07-5f20-ad92-da98640ec456', (select id from verticals where slug = 'matcha'), 'Bridges Matcha — Live Ceremonial Tasting', 'commerce', 'live')
+  ('c7e16c4d-38b0-5230-af83-a0470537c7e8', (select id from users where email = 'dd@bridgesglobal.co'), '88b7910a-3565-52aa-af01-c886fc377994', (select id from verticals where slug = 'real-estate'), 'Union Park Collection', 'new', 'live')
 on conflict (id) do update set host_id = excluded.host_id, org_id = excluded.org_id, vertical_id = excluded.vertical_id, title = excluded.title, category = excluded.category, status = excluded.status;
 
 insert into show_listings (show_id, listing_id) values
@@ -606,12 +632,10 @@ insert into show_listings (show_id, listing_id) values
   ('cbe3ea0b-edfd-55a9-ad21-bdca5fa96134', 'd7c505e6-c8aa-5432-ad21-1ba7b53cd759'),
   ('861537f6-340b-599b-ae7e-c10156f1fe95', 'dfd4d549-3c07-58bb-a530-1854d1a53cd0'),
   ('52abe59e-34e3-5042-a687-eba32de814fc', '35641ea3-560c-5c77-af83-3918dce8f39c'),
-  ('c7e16c4d-38b0-5230-af83-a0470537c7e8', '9ff9c2e2-8bf6-5d30-a7aa-641118c5c30d'),
-  ('5842e398-0167-5ff0-a46f-591e3d040f5d', '9edd9c10-1071-5eb8-a97a-21b32cfb032a')
+  ('c7e16c4d-38b0-5230-af83-a0470537c7e8', '9ff9c2e2-8bf6-5d30-a7aa-641118c5c30d')
 on conflict (show_id,listing_id) do nothing;
 
 insert into streams (id, show_id, provider, room_id, playback_url, status, viewer_count, meta) values
-  ('a01fd987-7752-5e07-aad0-7476111b16fe', '5842e398-0167-5ff0-a46f-591e3d040f5d', 'hls', 'room-matcha', 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'live', 210, '{"host_name":"Bridges Matcha","category":"commerce","category_label":"Live Commerce","likes":1890,"thumbnail":"/assets/img/matcha.jpg","cta":"buy"}'::jsonb),
   ('34763fe8-0c26-50cb-ad54-e93d50207708', 'a97b943c-a833-5dbe-a29b-cd5863077adb', 'youtube', 'room-1', 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'live', 343, '{"host_name":"Emerald Living","category":"new","category_label":"New Construction","likes":4758,"thumbnail":"https://images.unsplash.com/photo-1567496898669-ee935f5f647a?auto=format&fit=crop&w=800&q=80","cta":"showing"}'::jsonb),
   ('e5668b63-69bd-5c39-ae25-b9f2d9b053da', '290b226c-0fbd-5cb2-a8f1-d096f6cc6370', 'youtube', 'room-2', null, 'live', 282, '{"host_name":"Waterset Living","category":"lux","category_label":"Luxury","likes":5425,"thumbnail":"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80","cta":"showing"}'::jsonb),
   ('e3ea50eb-c382-57f9-a9a1-c0676448584f', 'ae2072c4-1749-5164-a0bc-d4a9458d8ba8', 'youtube', 'room-3', null, 'live', 280, '{"host_name":"Bridges TX","category":"apt","category_label":"Apartments","likes":2424,"thumbnail":"https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80","cta":"showing"}'::jsonb),

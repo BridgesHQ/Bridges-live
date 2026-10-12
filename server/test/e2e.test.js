@@ -35,7 +35,7 @@ function socket() {
 before(async () => {
   // run from a temp copy root so the test DB never touches data/local-db.json
   proc = spawn(process.execPath, ["server/index.js"], {
-    env: { ...process.env, PORT: String(PORT), ADMIN_TOKEN: "t0ken", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "", PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", AUTO_APPROVE_STREAMS: "false", BL_LOCAL_DB: path.join(TMP, "db.json") },
+    env: { ...process.env, PORT: String(PORT), ADMIN_TOKEN: "t0ken", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "", PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", AUTO_APPROVE_STREAMS: "false", SHOW_SEED_STREAMS: "true", DEMO_MODE: "false", BL_LOCAL_DB: path.join(TMP, "db.json") },
     stdio: "pipe",
   });
   for (let i = 0; i < 50; i++) {
@@ -46,26 +46,25 @@ before(async () => {
 });
 after(() => proc?.kill());
 
-test("streams list includes matcha pilot first + property streams", async () => {
+test("streams list: real estate only (no product / buy-now streams)", async () => {
   const { body } = await get("/api/streams");
   assert.ok(body.streams.length > 20);
-  assert.equal(body.streams[0].cta, "buy");
-  assert.equal(body.streams[0].product.price, 30);
-  assert.ok(body.streams.some((s) => s.cta === "showing"));
+  assert.ok(body.streams.every((s) => s.cta === "showing"));
+  assert.ok(!JSON.stringify(body).toLowerCase().includes("matcha"));
+  assert.equal((await post("/api/checkout", { streamId: body.streams[0].id })).status, 404, "checkout endpoint is gone");
 });
 
-test("chat + viewer count + buy now → item_purchased broadcast", async () => {
+test("chat + real viewer counts + moderation", async () => {
   const { body } = await get("/api/streams");
-  const matcha = body.streams[0];
+  const st = body.streams[0];
   const a = await socket(), b = await socket(), lobby = await socket();
   lobby.send(JSON.stringify({ type: "lobby" }));
-  a.send(JSON.stringify({ type: "join", streamId: matcha.id, name: "Ana" }));
-  b.send(JSON.stringify({ type: "join", streamId: matcha.id, name: "Ben" }));
-  const vc = await a.waitFor((m) => m.type === "viewer_count" && m.count === matcha.baselineViewers + 2);
-  assert.ok(vc);
-  await lobby.waitFor((m) => m.type === "counts" && m.counts[matcha.id] >= matcha.baselineViewers + 2);
+  a.send(JSON.stringify({ type: "join", streamId: st.id, name: "Ana" }));
+  b.send(JSON.stringify({ type: "join", streamId: st.id, name: "Ben" }));
+  assert.ok(await a.waitFor((m) => m.type === "viewer_count" && m.count === 2), "only real viewers are counted");
+  await lobby.waitFor((m) => m.type === "counts" && m.counts[st.id] >= 2);
 
-  a.send(JSON.stringify({ type: "chat", body: "How much is the whisk?" }));
+  a.send(JSON.stringify({ type: "chat", body: "How much is the HOA?" }));
   const chat = await b.waitFor((m) => m.type === "chat_message" && m.name === "Ana");
   assert.equal(chat.intent, "price");
 
@@ -74,19 +73,6 @@ test("chat + viewer count + buy now → item_purchased broadcast", async () => {
   assert.ok(held);
   await new Promise((r) => setTimeout(r, 150));
   assert.ok(!a.seen?.some?.((m) => m.body?.includes("scam")));
-
-  // client-supplied prices are ignored: server prices from catalog
-  const order = await post("/api/checkout", { streamId: matcha.id, addons: ["whisk", "bogus"], name: "Maria", price: 0.01 });
-  assert.equal(order.status, 201);
-  assert.equal(order.body.amount, 48);
-  const cap = await post(`/api/checkout/${order.body.orderId}/capture`, {});
-  assert.equal(cap.body.status, "paid");
-  const evt = await b.waitFor((m) => m.type === "item_purchased");
-  assert.equal(evt.buyerFirst, "Maria");
-  assert.deepEqual(evt.addons, ["Bamboo whisk"]);
-  await lobby.waitFor((m) => m.type === "item_purchased");
-  // idempotent capture
-  assert.equal((await post(`/api/checkout/${order.body.orderId}/capture`, {})).body.status, "paid");
   [a, b, lobby].forEach((w) => w.close());
 });
 
@@ -103,7 +89,6 @@ test("property: request a showing + reserve hold (authorize) + admin void", asyn
   assert.equal((await w.waitFor((m) => m.type === "showing_requested")).name, "Kai");
 
   assert.equal((await post("/api/holds", { streamId: prop.id, name: "Kai Lee", email: "kai@example.com" })).status, 400); // no agree
-  assert.equal((await post("/api/checkout", { streamId: prop.id })).status, 400); // property isn't "buy now"
   const hold = await post("/api/holds", { streamId: prop.id, name: "Kai Lee", email: "kai@example.com", agree: true });
   assert.equal(hold.status, 201);
   assert.equal(hold.body.amount, 500);
@@ -120,7 +105,7 @@ test("property: request a showing + reserve hold (authorize) + admin void", asyn
   assert.equal(lr.connected, false, "local DB has no ListingReel tables → explains instead of crashing");
   assert.match(lr.reason, /local test database/);
   const sum = (await get("/api/admin/summary", auth)).body;
-  assert.equal(sum.purchases, 1);
+  assert.equal(sum.purchases, 0);
   assert.ok(sum.leads >= 2);
   assert.ok(sum.intents.price >= 1);
   w.close();
@@ -149,4 +134,66 @@ test("static site served; private files are not", async () => {
   for (const p of ["/listingreel/.env.example", "/listingreel/lib/env.ts", "/server/api.js", "/.env", "/data/local-db.json", "/backend/sql/schema.sql", "/package.json", "/docs/TECHNICAL_SPEC.md"]) {
     assert.equal((await fetch(BASE + p)).status, 404, p);
   }
+});
+
+test("retired matcha / global-trade pages redirect; /brandon exists", async () => {
+  for (const [from, to] of [["/matcha", "/live-marketplace"], ["/global-trade/", "/"], ["/blog/best-of-japan-uji-matcha", "/blog/"]]) {
+    const r = await fetch(BASE + from, { redirect: "manual" });
+    assert.equal(r.status, 301, from);
+    assert.equal(new URL(r.headers.get("location"), BASE).pathname, to);
+  }
+  const b = await fetch(BASE + "/brandon");
+  assert.equal(b.status, 200);
+  assert.match(await b.text(), /Living in Brandon, Florida/);
+});
+
+test("Start My Live: paste a YouTube/TikTok link → on the grid first; stop → gone", async () => {
+  const auth = { Authorization: "Bearer t0ken" };
+  assert.equal((await get("/api/admin/my-live")).status, 401);
+  const none = (await get("/api/admin/my-live", auth)).body;
+  assert.equal(none.stream, null);
+  assert.equal(none.cloudflare, false);
+  // phone streaming needs Cloudflare keys — clear message instead of a crash
+  const cf = await post("/api/admin/my-live", { mode: "cloudflare" }, auth);
+  assert.equal(cf.status, 409);
+  assert.match(cf.body.error, /CF_ACCOUNT_ID/);
+  assert.equal((await post("/api/admin/my-live", { mode: "link", url: "http://youtube.com/x" }, auth)).status, 400);
+
+  const lobby = await socket();
+  lobby.send(JSON.stringify({ type: "lobby" }));
+  const r = await post("/api/admin/my-live", { mode: "link", url: "https://www.tiktok.com/@realtor_dorota/live", title: "Sunday open house tour", location: "Riverview, FL" }, auth);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.stream.onSite, true);
+  assert.equal(r.body.stream.provider, "tiktok");
+  await lobby.waitFor((m) => m.type === "stream_status" && m.streamId === r.body.stream.id && m.live === true);
+  const pub = (await get("/api/streams")).body.streams;
+  assert.equal(pub[0].id, r.body.stream.id, "owner's live is first on the grid");
+  assert.equal(pub[0].title, "Sunday open house tour");
+  assert.equal(pub[0].host, "Dorota Maslowska");
+  assert.equal(pub[0].location, "Riverview, FL");
+  assert.equal(pub[0].liveNow, true);
+  // viewers can request a showing on the owner's stream → lead pipeline
+  assert.equal((await post("/api/showings", { streamId: r.body.stream.id, name: "Lia Buyer", email: "lia@example.com" })).status, 201);
+
+  // switching to YouTube keeps the same stream
+  const y = await post("/api/admin/my-live", { mode: "link", url: "https://www.youtube.com/live/dQw4w9WgXcQ", title: "Model tour" }, auth);
+  assert.equal(y.body.stream.id, r.body.stream.id);
+  assert.equal(y.body.stream.provider, "youtube");
+
+  const stop = await post("/api/admin/my-live/stop", {}, auth);
+  assert.equal(stop.body.stream.onSite, false);
+  await lobby.waitFor((m) => m.type === "stream_status" && m.streamId === r.body.stream.id && m.live === false);
+  assert.ok(!(await get("/api/streams")).body.streams.some((s) => s.id === r.body.stream.id));
+  lobby.close();
+});
+
+test("admin Leads: list + change status", async () => {
+  const auth = { Authorization: "Bearer t0ken" };
+  const leads = (await get("/api/admin/leads", auth)).body.leads;
+  const lia = leads.find((l) => l.email === "lia@example.com");
+  assert.ok(lia, "showing request on the owner's live is a lead");
+  assert.equal((await post(`/api/admin/leads/${lia.id}`, { stage: "Bogus" }, auth)).status, 400);
+  const r = await post(`/api/admin/leads/${lia.id}`, { stage: "Contacted" }, auth);
+  assert.equal(r.body.lead.stage, "Contacted");
+  assert.equal((await post(`/api/admin/leads/nope`, { stage: "Contacted" }, auth)).status, 404);
 });

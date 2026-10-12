@@ -2,7 +2,7 @@
   "name": "bridges-live",
   "version": "0.1.0",
   "private": true,
-  "description": "Bridges Live \u2014 live-commerce platform (static site + API + WebSocket + PayPal checkout)",
+  "description": "Bridges Live — live real-estate platform (static site + API + WebSocket + lead pipeline)",
   "type": "module",
   "engines": {
     "node": ">=18"
@@ -14,9 +14,11 @@
     "db:check": "node server/db-check.js",
     "db:build-sql": "node server/build-sql.js && node server/migrate.js --print",
     "test": "node --test server/test/*.test.js",
-    "prospects:reddit": "node server/prospects/reddit.js"
+    "prospects:reddit": "node server/prospects/reddit.js",
+    "site:shell": "node server/site-shell.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.133.0",
     "@supabase/supabase-js": "^2.45.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",

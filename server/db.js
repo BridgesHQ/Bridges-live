@@ -175,17 +175,17 @@ export async function listStreams() {
       host: meta.host_name || O[show.org_id]?.name || "Bridges Live",
       orgId: show.org_id || null, hostId: show.host_id || null, vertical,
       category: meta.category || show.category, categoryLabel: meta.category_label || show.category,
-      priceLabel: attrs.price_label || "", location: attrs.location || "",
+      priceLabel: attrs.price_label || meta.price_label || "", location: attrs.location || meta.location || "",
       image: meta.thumbnail || attrs.image || null,
       playbackUrl: st.playback_url || null, provider: st.provider,
       baselineViewers: st.viewer_count || 0, likes: meta.likes || 0,
       cta: meta.cta || (attrs.kind === "product" ? "buy" : "showing"),
       product: attrs.product || null, hold: attrs.hold || null,
-      applicant: !!meta.applicant,
+      applicant: !!meta.applicant, owner: !!meta.owner,
     };
-  });
-  // matcha pilot first, then by audience
-  rows.sort((a, b) => (b.cta === "buy") - (a.cta === "buy") || b.baselineViewers - a.baselineViewers);
+  }).filter((r) => r.cta !== "buy"); // real estate only — legacy product streams never show
+  // the owner's channel first, then by audience
+  rows.sort((a, b) => b.owner - a.owner || b.baselineViewers - a.baselineViewers);
   cache = { at: Date.now(), rows };
   return rows;
 }

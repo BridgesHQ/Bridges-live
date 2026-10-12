@@ -45,3 +45,10 @@ Statuses: NOT STARTED · IN PROGRESS · BLOCKED · READY FOR TEST · TESTING · 
 | WhatsApp "Message us" button (site-wide + /live-show), taps logged as leads | READY FOR TEST | Claude | — | number set: +1 301-379-6785 |
 | Privacy policy page (Pixel / GA4 / RB2B disclosure) | NOT STARTED | Dorota | legal text | add /privacy |
 | Reddit prospects finder | READY FOR TEST | Claude | — | /admin → Prospects → Scan |
+| Cloudflare Stream: agents + owner go live from phones (stream keys), grid flips LIVE | READY FOR TEST | Claude | CF_ACCOUNT_ID, CF_STREAM_TOKEN, CF_SUBDOMAIN | paste in Render |
+| Redesign: navy/gold brand system, shared nav/footer + LPT disclosure on every page, new homepage + live marketplace + /live-show | READY FOR TEST | Claude | — | review on phone |
+| Real estate only: matcha / global-trade / builder-dashboard pages removed (301 redirects), checkout removed, demo data hidden | COMPLETE | Claude | — | run migration 005 |
+| /brandon neighborhood page + nav link fixed | COMPLETE | Claude | — | — |
+| /admin rebuilt: Today, Start My Live, Leads (one-tap respond + status), Today's Content, Daily guide, Setup checklist | READY FOR TEST | Claude | ADMIN_TOKEN | log in at /admin |
+| Today's Content: daily script + shotlist + caption (Anthropic), emailed each morning by cron | READY FOR TEST | Claude | ANTHROPIC_API_KEY (optional) | paste key; set up cron-job.org |
+

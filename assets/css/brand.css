@@ -1,0 +1,106 @@
+/* Bridges Global — shared design system (navy + gold).
+ * Loaded last on every page so it unifies type, color, nav, footer and the floating buttons
+ * on top of each page's own layout styles. Nav/footer markup is the same on every page
+ * (see scripts/site-shell.py). */
+:root{
+  --navy:#0E1E52;--navy-d:#0A1740;--navy-2:#16296B;
+  --gold:#C9A84C;--gold-l:#E3CD8A;--gold-d:#9C7F2E;
+  --ivory:#FAF8F3;--paper:#FFFFFF;--cream:#FFFFFF;
+  --ink:#0B1730;--mut:#4A5672;--line:rgba(14,30,82,.12);
+  --forest:#0E1E52; /* legacy accent → navy, so every page shares one palette */
+  --live:#D93B30;
+  --radius:14px;
+  --shadow:0 18px 50px rgba(10,23,64,.12);
+  --serif:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  --display:'Marcellus',Georgia,serif;
+  --sans:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased;overflow-x:clip}
+h1,h2{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;line-height:1.08}
+h3,h4{font-family:var(--display);font-weight:400;letter-spacing:.005em}
+h1{text-wrap:balance}h2{text-wrap:balance}
+img,video,iframe{max-width:100%}
+::selection{background:var(--gold-l);color:var(--navy)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.eyebrow{color:var(--gold-d)!important;letter-spacing:.18em}
+
+/* ------------------------------------------------------------------ nav */
+.bn{position:sticky;top:0;z-index:1000;background:rgba(14,30,82,.97);backdrop-filter:saturate(1.2) blur(14px);-webkit-backdrop-filter:saturate(1.2) blur(14px);border-bottom:1px solid rgba(201,168,76,.22)}
+.bn-in{max-width:1240px;margin:0 auto;padding:0 clamp(16px,4vw,40px);height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.bn-logo{display:flex;align-items:center;flex-shrink:0}
+.bn-logo img{height:38px;width:auto;display:block}
+.bn-menu{display:flex;align-items:center;gap:6px}
+.bn-menu>a,.bn-drop>a{color:rgba(255,255,255,.86);font:500 14px/1 var(--sans);letter-spacing:.01em;padding:10px 12px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .15s,background .15s;white-space:nowrap}
+.bn-menu>a:hover,.bn-drop:hover>a,.bn-drop:focus-within>a{color:#fff;background:rgba(255,255,255,.06)}
+.bn-menu a.on{color:var(--gold-l)}
+.bn-drop{position:relative}
+.bn-drop>a::after{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);opacity:.7}
+.bn-panel{position:absolute;top:calc(100% + 10px);left:0;min-width:250px;background:#fff;border-radius:14px;box-shadow:0 24px 60px rgba(10,23,64,.28);padding:10px;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .18s,transform .18s,visibility .18s;border:1px solid var(--line)}
+.bn-panel::before{content:"";position:absolute;left:0;right:0;top:-12px;height:12px}
+.bn-drop:hover .bn-panel,.bn-drop:focus-within .bn-panel{opacity:1;visibility:visible;transform:none}
+.bn-panel a{display:block;padding:10px 12px;border-radius:9px;color:var(--ink);font:500 14px/1.3 var(--sans);text-decoration:none}
+.bn-panel a small{display:block;color:#7B859B;font-size:12px;font-weight:400;margin-top:2px}
+.bn-panel a:hover{background:var(--ivory);color:var(--navy)}
+.bn-panel.grid{display:grid;grid-template-columns:1fr 1fr;min-width:400px;gap:0 4px}
+.bn-panel .lbl{grid-column:1/-1;font:600 10.5px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#8A93A2;padding:8px 12px 4px}
+.bn-live{background:var(--gold)!important;color:var(--navy)!important;font-weight:700!important;padding:11px 18px!important;border-radius:999px!important;margin-left:8px}
+.bn-live:hover{background:var(--gold-l)!important}
+.bn-dot{width:8px;height:8px;border-radius:50%;background:var(--live);box-shadow:0 0 0 0 rgba(217,59,48,.6);animation:bnpulse 1.6s infinite}
+@keyframes bnpulse{0%{box-shadow:0 0 0 0 rgba(217,59,48,.65)}70%{box-shadow:0 0 0 8px rgba(217,59,48,0)}100%{box-shadow:0 0 0 0 rgba(217,59,48,0)}}
+.bn-burger{display:none;width:44px;height:44px;border:0;background:transparent;border-radius:10px;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px}
+.bn-burger span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:transform .2s,opacity .2s}
+.bn.open .bn-burger span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.bn.open .bn-burger span:nth-child(2){opacity:0}
+.bn.open .bn-burger span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.bn-mlive{display:none}
+@media(max-width:1020px){
+  .bn-in{height:64px}
+  .bn-logo img{height:32px}
+  .bn-burger{display:flex}
+  .bn-mlive{display:inline-flex;align-items:center;gap:7px;margin-left:auto;background:var(--gold);color:var(--navy);font:700 13px var(--sans);padding:9px 14px;border-radius:999px;text-decoration:none}
+  .bn-menu{position:fixed;top:64px;left:0;right:0;bottom:0;background:var(--navy);flex-direction:column;align-items:stretch;gap:0;padding:8px 16px 40px;overflow-y:auto;opacity:0;transform:translateY(-10px);transition:opacity .2s ease,transform .2s ease,visibility .2s;visibility:hidden;pointer-events:none}
+  .bn.open .bn-menu{opacity:1;transform:none;visibility:visible;pointer-events:auto}
+  .bn-menu>a,.bn-drop>a{font-size:17px;padding:16px 6px;border-bottom:1px solid rgba(255,255,255,.08);border-radius:0;justify-content:space-between}
+  .bn-drop>a::after{display:none}
+  .bn-panel{position:static;opacity:1;visibility:visible;transform:none;background:transparent;box-shadow:none;border:0;padding:4px 0 12px;min-width:0}
+  .bn-panel.grid{grid-template-columns:1fr 1fr;min-width:0}
+  .bn-panel a{color:rgba(255,255,255,.78);padding:9px 6px;font-size:15px}
+  .bn-panel a small{display:none}
+  .bn-panel a:hover{background:transparent;color:var(--gold-l)}
+  .bn-panel .lbl{color:rgba(255,255,255,.45);padding:10px 6px 2px}
+  .bn-live{margin:18px 0 0;justify-content:center;font-size:16px!important;padding:16px!important}
+}
+body.bn-lock{overflow:hidden}
+
+/* ------------------------------------------------------------------ footer */
+footer.bf{background:var(--navy-d);color:rgba(255,255,255,.72);font:400 14px/1.6 var(--sans);margin:0;padding:0}
+.bf a{color:rgba(255,255,255,.78);text-decoration:none;font-size:inherit;margin:0;display:inline}
+.bf a:hover{color:var(--gold-l)}
+.bf-in{max-width:1240px;margin:0 auto;padding:64px clamp(16px,4vw,40px) 28px}
+.bf-top{display:grid;grid-template-columns:1.5fr repeat(4,1fr);gap:36px}
+.bf-brand img{height:38px;width:auto;margin-bottom:16px}
+.bf-brand p{font-family:var(--serif);font-size:21px;line-height:1.3;color:#fff;margin:0 0 18px;font-style:italic}
+.bf-contact a{display:flex;align-items:center;gap:9px;margin:7px 0;font-weight:500}
+.bf-contact svg{flex-shrink:0;opacity:.8}
+.bf h4{font:600 11px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:6px 0 14px}
+.bf-col a{display:block;padding:5px 0}
+.bf-legal{border-top:1px solid rgba(255,255,255,.1);margin-top:44px;padding-top:24px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start}
+.bf-eho{display:flex;align-items:center;gap:8px;font:600 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.75);white-space:nowrap}
+.bf-legal p{font-size:12.5px;line-height:1.7;color:rgba(255,255,255,.55);margin:0}
+.bf-legal b{color:rgba(255,255,255,.85);font-weight:600}
+.bf-bottom{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:22px;font-size:12px;color:rgba(255,255,255,.4)}
+.bf-bottom a{color:rgba(255,255,255,.45)}
+@media(max-width:960px){.bf-top{grid-template-columns:1fr 1fr}.bf-brand{grid-column:1/-1}}
+@media(max-width:560px){.bf-in{padding-top:48px}.bf-top{gap:26px}.bf-legal{grid-template-columns:1fr}}
+
+/* -------------------------------------------- floating WhatsApp / chat buttons */
+#bridges-wa{font-family:var(--sans)!important}
+@media(max-width:640px){
+  #bridges-wa{right:14px!important;bottom:18px!important;padding:0!important;width:54px;height:54px;justify-content:center;border-radius:50%!important}
+  #bridges-wa span{display:none}
+  #bgchat-btn~#bridges-wa{bottom:84px!important}
+  #bgchat-btn{right:14px!important;bottom:18px!important;padding:12px 16px!important;font-size:13px!important}
+}
+[hidden]{display:none!important}
+.related a{display:inline-block;margin:0 14px 8px 0!important}

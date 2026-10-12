@@ -1,4 +1,11 @@
-# Live streaming — many agents live at once (Cloudflare Stream)
+# Live streaming — you and many agents live at once (Cloudflare Stream)
+
+**You (owner):** /admin → 🔴 Go Live → **Start My Live**. Choose *Stream from my phone* (your own
+permanent stream key for Larix/OBS — needs the Cloudflare keys below) or *Paste a live link*
+(YouTube / TikTok / Facebook — works today, no keys). Your live is shown first on the homepage,
+/live-marketplace and /live-show, with chat and Request-a-showing. **End live** removes it.
+The 5-step phone guide is on that admin page. (TikTok has no embeddable live player, so a TikTok
+link shows your cover photo with a "Watch live on TikTok" button; YouTube and Facebook play on the site.)
 
 ```
 agent applies on /become-a-streamer ──► admin approves in /admin (or auto-approve)
@@ -22,7 +29,7 @@ Agents who paste a YouTube/other link instead keep using that (no Cloudflare inp
 | `CF_ACCOUNT_ID` | dash.cloudflare.com → any page → right sidebar **Account ID** |
 | `CF_STREAM_TOKEN` | My Profile → API Tokens → Create Token → Custom → permission **Account · Stream · Edit** |
 | `CF_SUBDOMAIN` | Stream → open any video/live input → the playback URL host, e.g. `customer-abc123.cloudflarestream.com` |
-| `SHOW_SEED_STREAMS` | `false` hides the demo streams once real agents broadcast |
+| `SHOW_SEED_STREAMS` | leave `false` (default) — demo streams are for local testing only |
 
 Check `/api/health` → `"video": "cloudflare"` when all three are set.
 
@@ -31,13 +38,14 @@ $1 per 1,000 minutes watched. Live inputs record automatically (replays); delete
 in the Cloudflare dashboard to keep storage low.
 
 ## Admin
-- **/admin → Approvals:** approving creates the agent's input and shows their host link.
+- **/admin → 👥 Agent streams:** approving creates the agent's input and shows their host link.
   **New host link** replaces a lost/leaked link (old one stops working). Rejecting deletes the input.
 - Cloudflare streams show an **on air / offline** pill (checked every 20 s).
 
 ## Database
-Run `backend/sql/migrations/004_streams_private.sql` in Supabase → SQL Editor (stops the public
-anon key from reading the streams table; the site reads streams through the server).
+Run `backend/sql/migrations/004_streams_private.sql` and `005_content_and_cleanup.sql` in Supabase →
+SQL Editor (004 stops the public anon key reading the streams table; 005 adds Today's Content and
+retires the old demo/matcha streams).
 
 ## Security
 The stream key is never stored — it is fetched from Cloudflare when the agent opens their link.

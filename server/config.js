@@ -39,7 +39,7 @@ export const config = {
     base: env.RESEND_API_BASE || "https://api.resend.com",
   },
   crm: {
-    hubspotToken: env.HUBSPOT_TOKEN || "", hubspotBase: env.HUBSPOT_API_BASE || "https://api.hubapi.com",
+    hubspotToken: env.HUBSPOT_TOKEN || env.HUBSPOT_ACCESS_TOKEN || "", hubspotBase: env.HUBSPOT_API_BASE || "https://api.hubapi.com",
     ghlWebhook: env.GHL_WEBHOOK_URL || "",            // GoHighLevel inbound-webhook workflow trigger
     webhook: env.CRM_WEBHOOK_URL || "",               // any other CRM / Zapier / Make
   },
@@ -52,9 +52,19 @@ export const config = {
     deliveryBase: env.CF_DELIVERY_BASE || "",                  // tests only; default https://customer-<code>.cloudflarestream.com
     pollMs: Number(env.CF_POLL_MS || 20_000),
   },
-  showSeedStreams: bool(env.SHOW_SEED_STREAMS, true),
-  // Demo mode: grid shows the seeded audience size on top of real sockets.
-  demoMode: bool(env.DEMO_MODE, true),
+  // Demo property streams from seed data — off on the real site (clean empty state instead).
+  // Today's Content: daily video scripts (Anthropic API). Without a key a built-in template is used.
+  anthropic: {
+    key: (env.ANTHROPIC_API_KEY || "").trim(),
+    model: env.ANTHROPIC_MODEL || "claude-opus-5-5",
+    baseURL: env.ANTHROPIC_BASE_URL || "", // tests only
+  },
+  // Optional AI video tool hook (server/content/video.js)
+  video: { provider: (env.VIDEO_PROVIDER || "").trim().toLowerCase(), webhookUrl: env.VIDEO_WEBHOOK_URL || "", higgsfieldKey: env.HIGGSFIELD_API_KEY || "" },
+  // Demo property streams from seed data — off on the real site (clean empty state instead).
+  showSeedStreams: bool(env.SHOW_SEED_STREAMS, false),
+  // Demo mode: grid shows the seeded audience size on top of real sockets (off = real viewers only).
+  demoMode: bool(env.DEMO_MODE, false),
   autoApproveStreams: bool(env.AUTO_APPROVE_STREAMS, true),
   // Property reserve holds (PayPal authorization). Needs broker/attorney sign-off before live mode.
   holdsEnabled: bool(env.ENABLE_PROPERTY_HOLDS, true),

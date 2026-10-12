@@ -1,4 +1,6 @@
 // Seed catalog for Bridges Live — verticals, orgs, host, listings, shows, streams.
+// The property streams are DEMO data for local development and tests only: the public site
+// hides them unless SHOW_SEED_STREAMS=true.
 // Deterministic UUIDs so seeding is idempotent (safe to re-run against Supabase).
 import crypto from "node:crypto";
 
@@ -12,19 +14,17 @@ export const DEMO_HLS = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
 
 export const VERTICALS = [
   { id: sid("v:real-estate"), slug: "real-estate", name: "Real Estate", compliance_rules: { license_required: true, escrow_required: true, holds_require_broker_signoff: true } },
-  { id: sid("v:matcha"), slug: "matcha", name: "Bridges Matcha", compliance_rules: { license_required: false, escrow_required: false } },
-  { id: sid("v:global-trade"), slug: "global-trade", name: "Global Trade", compliance_rules: { license_required: false, escrow_required: false, checkout: "rfq" } },
   { id: sid("v:nonprofit-housing"), slug: "nonprofit-housing", name: "Nonprofit Housing (501c3)", compliance_rules: { nonprofit: true, commercial_routing: false } },
 ];
 const V = Object.fromEntries(VERTICALS.map((v) => [v.slug, v.id]));
 
-const ORG_NAMES = ["Bridges Global", "Emerald Living", "Waterset Living", "Bridges TX", "Skyline Res.", "Triple Creek Homes", "NRR Homes", "Dorota M.", "Bridges Matcha"];
+const ORG_NAMES = ["Bridges Global", "Emerald Living", "Waterset Living", "Bridges TX", "Skyline Res.", "Triple Creek Homes", "NRR Homes", "Dorota M."];
 export const ORGS = ORG_NAMES.map((name) => ({
   id: sid("org:" + name),
-  vertical_id: name === "Bridges Matcha" ? V.matcha : V["real-estate"],
+  vertical_id: V["real-estate"],
   name,
-  plan: name === "Bridges Matcha" ? "merchant" : "brokerage",
-  sponsoring_broker: name === "Bridges Matcha" ? null : "LPT Realty",
+  plan: "brokerage",
+  sponsoring_broker: "LPT Realty",
 }));
 const ORG = Object.fromEntries(ORGS.map((o) => [o.name, o.id]));
 
@@ -74,19 +74,6 @@ const PROPERTY_STREAMS = [
   ["Triple Creek Homes", "Union Park Collection", "From the $385s", "new", "New Construction", "Wesley Chapel, FL", IMG.a, 61, 3083],
 ];
 
-// The matcha product — price is authoritative HERE (server side), never from the client.
-export const MATCHA_PRODUCT = {
-  id: "prod_matcha_30",
-  name: "Ceremonial Matcha 30g (Uji, Kyoto)",
-  price: 30.0,
-  currency: "USD",
-  addons: [
-    { id: "whisk", name: "Bamboo whisk", price: 18.0 },
-    { id: "bowl", name: "Chawan bowl", price: 24.0 },
-    { id: "tin", name: "Gift tin", price: 8.0 },
-  ],
-};
-
 // Property "reserve hold" terms — a PayPal AUTHORIZATION (funds held, not captured).
 export const HOLD_TERMS = { amount: 500.0, currency: "USD", label: "$500 refundable hold" };
 
@@ -111,22 +98,3 @@ PROPERTY_STREAMS.forEach(([org, title, price, cat, catLabel, location, img, view
     meta: { host_name: org, category: cat, category_label: catLabel, likes, thumbnail: img, cta: "showing" },
   });
 });
-
-// Matcha pilot stream (first-class: same engine, instant checkout)
-{
-  const listingId = sid("listing:matcha");
-  const showId = sid("show:matcha");
-  LISTINGS.push({
-    id: listingId, org_id: ORG["Bridges Matcha"], vertical_id: V.matcha, title: "Bridges Matcha — Ceremonial Tasting", status: "active",
-    attributes: { kind: "product", product: MATCHA_PRODUCT, price_label: "$30 · Buy now", location: "Uji, Kyoto", image: "/assets/img/matcha.jpg" },
-  });
-  SHOWS.push({ id: showId, host_id: HOST, org_id: ORG["Bridges Matcha"], vertical_id: V.matcha, title: "Bridges Matcha — Live Ceremonial Tasting", category: "commerce", status: "live" });
-  SHOW_LISTINGS.push({ show_id: showId, listing_id: listingId });
-  STREAMS.unshift({
-    id: sid("stream:matcha"), show_id: showId, provider: "hls", room_id: "room-matcha",
-    playback_url: DEMO_HLS, status: "live", viewer_count: 210,
-    meta: { host_name: "Bridges Matcha", category: "commerce", category_label: "Live Commerce", likes: 1890, thumbnail: "/assets/img/matcha.jpg", cta: "buy" },
-  });
-}
-
-export const MATCHA_STREAM_ID = sid("stream:matcha");

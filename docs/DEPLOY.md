@@ -24,6 +24,15 @@ Cloudflare → DNS for `bridgesglobal.co` → change the `live` record to
 certificate) → in Render → Settings → Custom Domains → add `live.bridgesglobal.co`.
 Keep the Cloudflare Pages project as a backup; the pages still work there in static mode.
 
+## 3b. Keys for the new features (Render → Environment)
+| Key | Turns on |
+|---|---|
+| `CF_ACCOUNT_ID`, `CF_STREAM_TOKEN`, `CF_SUBDOMAIN` | Streaming from phones with stream keys (you + agents) — docs/LIVE_STREAMING.md |
+| `ANTHROPIC_API_KEY` | AI-written daily video scripts — docs/CONTENT.md |
+| `SHOW_SEED_STREAMS=false`, `DEMO_MODE=false` | No demo streams / fake viewer counts (the defaults) |
+
+/admin → ⚙️ Setup shows what's connected and exactly what's missing.
+
 ## 4. PayPal webhook (optional backup confirmation)
 developer.paypal.com → your sandbox app → Webhooks → add
 `https://live.bridgesglobal.co/api/paypal/webhook` with `PAYMENT.CAPTURE.COMPLETED`,

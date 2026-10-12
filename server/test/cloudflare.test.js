@@ -123,3 +123,25 @@ test("YouTube applicants keep their own link (no Cloudflare input)", async () =>
   assert.equal(inputs.size, before);
   assert.equal((await get(`/api/streams/${y.streamId}`)).body.liveNow, true);
 });
+
+test("owner 'Start My Live' from the phone: same stream key every time, grid flips LIVE, end live", async () => {
+  const st = (await post("/api/admin/my-live", { mode: "cloudflare", title: "Live with Dorota", location: "Riverview, FL" }, admin)).body;
+  assert.equal(st.cloudflare, true);
+  assert.equal(st.stream.provider, "cloudflare");
+  assert.match(st.ingest.streamKey, /^key-in\d+$/);
+  assert.equal(st.ingest.rtmpsUrl, "rtmps://live.cloudflare.com:443/live/");
+  const uid = st.ingest.streamKey.replace("key-", "");
+  let pub = (await get("/api/streams")).body.streams;
+  assert.equal(pub.find((s) => s.id === st.stream.id).liveNow, false, "starts soon until the phone streams");
+  assert.ok(!JSON.stringify(pub).includes(st.ingest.streamKey), "key never public");
+  inputs.get(uid).live = true;
+  await wait(900);
+  pub = (await get("/api/streams")).body.streams;
+  assert.equal(pub[0].id, st.stream.id, "owner live first");
+  assert.equal(pub[0].liveNow, true);
+  // ending and restarting keeps the same input (Larix settings stay valid)
+  await post("/api/admin/my-live/stop", {}, admin);
+  const again = (await post("/api/admin/my-live", { mode: "cloudflare", title: "Round two" }, admin)).body;
+  assert.equal(again.ingest.streamKey, st.ingest.streamKey);
+  assert.equal([...inputs.keys()].filter((k) => !inputs.get(k).deleted).length >= 1, true);
+});

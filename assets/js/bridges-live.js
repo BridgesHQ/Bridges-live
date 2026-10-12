@@ -1,6 +1,6 @@
 /* Bridges Live — shared browser client.
  * Realtime (WebSocket chat, viewer counts, "just bought / just reserved"), live video player,
- * PayPal checkout (matcha "Buy now") and the same engine for property "Request a showing" /
+ * PayPal (reserve holds) and property "Request a showing" /
  * "Reserve hold". Works against the Node server in /server. If the API is unreachable (e.g. the
  * site is served as plain static files), BL.available resolves false and pages keep their
  * existing static behaviour.
@@ -69,7 +69,6 @@
 
   /** Text line for a commerce/social-proof event, or null. */
   BL.describe = function (m) {
-    if (m.type === "item_purchased") return "🍵 " + m.buyerFirst + " just bought " + m.product + (m.addons && m.addons.length ? " + " + m.addons.join(", ") : "") + "!";
     if (m.type === "hold_reserved") return "🔑 " + m.buyerFirst + " just reserved a hold on " + m.title + "!";
     if (m.type === "showing_requested") return "🏠 " + m.name + " just requested a showing of " + m.title;
     return null;
@@ -77,30 +76,34 @@
 
   // ---------------------------------------------------------------- styles
   var css = ""
-    + ".bl-ov{position:fixed;inset:0;z-index:5000;background:rgba(5,8,16,.72);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;font-family:'DM Sans',system-ui,sans-serif}"
-    + ".bl-md{background:#131a2b;color:#fff;border:1px solid rgba(216,188,106,.35);border-radius:16px;width:100%;max-width:440px;max-height:calc(100vh - 32px);overflow:auto;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.5)}"
-    + ".bl-md h3{font-family:Marcellus,serif;font-weight:400;font-size:21px;margin:0 0 4px;color:#fff}"
-    + ".bl-md .sub{color:#8fa0c0;font-size:13px;margin-bottom:14px}"
-    + ".bl-md label.row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #2a3550;border-radius:10px;margin-bottom:8px;cursor:pointer;font-size:14px}"
-    + ".bl-md label.row b{margin-left:auto;color:#D8BC6A;font-weight:600}"
-    + ".bl-md input[type=text],.bl-md input[type=email],.bl-md input[type=tel],.bl-md input[type=datetime-local],.bl-md textarea{width:100%;box-sizing:border-box;padding:11px 12px;border-radius:9px;border:1px solid #2a3550;background:#0f1626;color:#fff;font-size:14px;margin-bottom:9px;font-family:inherit}"
-    + ".bl-md .tot{display:flex;justify-content:space-between;font-size:15px;margin:12px 0;padding-top:12px;border-top:1px solid #1e2740}"
-    + ".bl-md .tot b{color:#D8BC6A;font-size:18px}"
-    + ".bl-md .btn{display:block;width:100%;border:none;border-radius:10px;padding:13px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}"
-    + ".bl-md .btn.go{background:#1A5C3A;color:#fff}.bl-md .btn.gold{background:#D8BC6A;color:#0a0e1a}.bl-md .btn.ghost{background:transparent;color:#8fa0c0;margin-top:6px}"
+    + ".bl-ov{position:fixed;inset:0;z-index:5000;background:rgba(5,10,30,.62);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:16px;font-family:'DM Sans',system-ui,sans-serif}"
+    + ".bl-md{background:#fff;color:#0B1730;border-top:4px solid #C9A84C;border-radius:18px;width:100%;max-width:450px;max-height:calc(100vh - 32px);overflow:auto;padding:26px 24px 22px;box-shadow:0 30px 80px rgba(5,10,30,.4);animation:blIn .25s ease}"
+    + ".bl-md h3{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;font-size:28px;line-height:1.1;margin:0 0 6px;color:#0E1E52}"
+    + ".bl-md .sub{color:#4A5672;font-size:13.5px;margin-bottom:16px}"
+    + ".bl-md .sub span{color:#9C7F2E!important;font-weight:600}"
+    + ".bl-md label.row{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid rgba(14,30,82,.14);border-radius:11px;margin-bottom:10px;cursor:pointer;font-size:14px;background:#FAF8F3}"
+    + ".bl-md label.row b{color:#9C7F2E!important}"
+    + ".bl-md input[type=text],.bl-md input[type=email],.bl-md input[type=tel],.bl-md input[type=datetime-local],.bl-md textarea{width:100%;box-sizing:border-box;padding:13px 14px;border-radius:11px;border:1px solid rgba(14,30,82,.16);background:#fff;color:#0B1730;font-size:15px;margin-bottom:10px;font-family:inherit}"
+    + ".bl-md input:focus,.bl-md textarea:focus{outline:2px solid #C9A84C;outline-offset:0;border-color:transparent}"
+    + ".bl-md .tot{display:flex;justify-content:space-between;font-size:15px;margin:12px 0;padding-top:12px;border-top:1px solid rgba(14,30,82,.1)}"
+    + ".bl-md .tot b{color:#0E1E52;font-size:18px}"
+    + ".bl-md .btn{display:block;width:100%;border:none;border-radius:12px;padding:14px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}"
+    + ".bl-md .btn.go{background:#C9A84C;color:#0E1E52}.bl-md .btn.gold{background:#0E1E52;color:#fff}.bl-md .btn.ghost{background:transparent;color:#4A5672;margin-top:6px}"
     + ".bl-md .btn[disabled]{opacity:.55;cursor:wait}"
-    + ".bl-md .err{color:#ff8b80;font-size:13px;margin:6px 0;min-height:1em}"
-    + ".bl-md .fine{color:#8fa0c0;font-size:11.5px;line-height:1.45;margin-top:10px}"
-    + ".bl-md .sim{border:1px dashed #D8BC6A;border-radius:12px;padding:14px;text-align:center;margin-top:6px}"
-    + ".bl-md .sim .pp{font-weight:800;font-size:18px;color:#fff;margin-bottom:4px}.bl-md .sim .pp span{color:#009cde}"
+    + ".bl-md .err{color:#C0392B;font-size:13px;margin:4px 0 8px;min-height:1em}"
+    + ".bl-md .fine{color:#7B859B;font-size:11.5px;line-height:1.5;margin-top:12px}"
+    + ".bl-md .sim{border:1px dashed #C9A84C;border-radius:12px;padding:14px;text-align:center;margin-top:6px;background:#FAF8F3}"
+    + ".bl-md .sim .pp{font-weight:800;font-size:18px;color:#0E1E52;margin-bottom:4px}.bl-md .sim .pp span{color:#009cde}"
     + ".bl-md .ok{text-align:center;padding:10px 0}.bl-md .ok .big{font-size:44px}"
-    + ".bl-x{float:right;background:none;border:none;color:#8fa0c0;font-size:22px;cursor:pointer;line-height:1}"
+    + ".bl-md .ok p{color:#4A5672}"
+    + ".bl-x{float:right;background:#F3F1EA;border:none;color:#4A5672;width:34px;height:34px;border-radius:50%;font-size:20px;cursor:pointer;line-height:1;margin:-8px -6px 0 0}"
     + ".bl-toasts{position:fixed;left:16px;bottom:16px;z-index:4500;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:min(360px,calc(100vw - 32px))}"
-    + ".bl-toast{background:rgba(10,14,26,.92);color:#fff;border:1px solid rgba(216,188,106,.45);border-radius:12px;padding:10px 14px;font:600 13.5px 'DM Sans',system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:blIn .35s ease}"
+    + ".bl-toast{background:rgba(14,30,82,.95);color:#fff;border:1px solid rgba(201,168,76,.5);border-radius:12px;padding:10px 14px;font:600 13.5px 'DM Sans',system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:blIn .35s ease}"
     + "@keyframes blIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}"
     + ".bl-player{position:absolute;inset:0;width:100%;height:100%;border:0;object-fit:cover;background:transparent}"
     + ".bl-poster{position:absolute;inset:0;background-size:cover;background-position:center;animation:blKen 18s ease-in-out infinite alternate}"
     + "@keyframes blKen{from{transform:scale(1)}to{transform:scale(1.08)}}"
+    + ".bl-ext{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;color:#0E1E52;font:700 14px Inter,sans-serif;padding:13px 20px;border-radius:999px;text-decoration:none;box-shadow:0 10px 30px rgba(0,0,0,.35);white-space:nowrap}"
     + ".bl-wait{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.55);color:rgba(255,255,255,.85);font:600 12px 'DM Sans',sans-serif;padding:7px 12px;border-radius:20px;white-space:nowrap}";
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 
@@ -133,7 +136,19 @@
     opts = opts || {};
     var url = s && s.playbackUrl, hls = null, node;
     el.innerHTML = "";
-    if (url && ytId(url)) {
+    if (url && /tiktok\.com\//.test(url)) {
+      // TikTok has no embeddable live player: show the cover with a "watch on TikTok" button.
+      node = document.createElement("div"); node.className = "bl-poster";
+      if (s.image) node.style.backgroundImage = "url('" + String(s.image).replace(/'/g, "%27") + "')";
+      el.appendChild(node);
+      var a = document.createElement("a"); a.className = "bl-ext"; a.href = url; a.target = "_blank"; a.rel = "noopener";
+      a.textContent = "▶ Watch live on TikTok"; el.appendChild(a);
+    } else if (url && /(facebook\.com|fb\.watch)\//.test(url)) {
+      node = document.createElement("iframe");
+      node.src = "https://www.facebook.com/plugins/video.php?href=" + encodeURIComponent(url) + "&show_text=false&autoplay=true&mute=1";
+      node.allow = "autoplay; encrypted-media; fullscreen; picture-in-picture"; node.allowFullscreen = true;
+      node.className = "bl-player"; el.appendChild(node);
+    } else if (url && ytId(url)) {
       node = document.createElement("iframe");
       node.src = "https://www.youtube.com/embed/" + ytId(url) + "?autoplay=1&mute=1&playsinline=1&rel=0";
       node.allow = "autoplay; fullscreen; picture-in-picture"; node.allowFullscreen = true;
@@ -221,43 +236,6 @@
     m.el.querySelector(".btn").onclick = m.close;
   }
 
-  /** Matcha "Buy now" — PayPal intent CAPTURE. */
-  BL.buy = function (s) {
-    var p = s.product;
-    if (!p) return BL.toast("Nothing for sale on this stream.");
-    var m = modal('<h3>' + esc(p.name) + '</h3><div class="sub">Live from ' + esc(s.host) + ' · ships from Bridges HQ</div>'
-      + '<label class="row"><input type="checkbox" checked disabled> ' + esc(p.name) + "<b>" + money(p.price, p.currency) + "</b></label>"
-      + p.addons.map(function (a) { return '<label class="row"><input type="checkbox" class="bl-addon" value="' + esc(a.id) + '"> + ' + esc(a.name) + "<b>" + money(a.price, p.currency) + "</b></label>"; }).join("")
-      + '<input type="text" name="nm" placeholder="First name (shown as “Maria just bought”)" maxlength="40" value="' + esc(BL.name()) + '">'
-      + '<div class="tot"><span>Total</span><b class="t"></b></div><div class="err"></div><div class="slot"></div>'
-      + '<div class="fine">Secure checkout by PayPal. Card or PayPal balance. Bridges never sees your card details.</div>');
-    function total() { return p.price + [].reduce.call(m.el.querySelectorAll("input.bl-addon:checked"), function (sum, c) { var a = p.addons.filter(function (x) { return x.id === c.value; })[0]; return sum + (a ? a.price : 0); }, 0); }
-    function refresh() {
-      m.q(".t").textContent = money(total(), p.currency);
-      var simBtn = m.q(".sim button"); if (simBtn && !simBtn.disabled) simBtn.textContent = "Pay " + money(total(), p.currency);
-    }
-    [].forEach.call(m.el.querySelectorAll("input.bl-addon"), function (c) { c.onchange = refresh; });
-    refresh();
-    var err = m.q(".err");
-    function onError(e) { err.textContent = e.message || "Payment failed — please try again."; }
-    (function render() {
-      BL.config().then(function (cfg) {
-        payWith(m.q(".slot"), cfg, "capture", function () {
-          err.textContent = "";
-          var nm = m.q("input[name=nm]").value.trim(); if (nm) BL.setName(nm);
-          var addons = [].map.call(m.el.querySelectorAll("input.bl-addon:checked"), function (c) { return c.value; });
-          return BL.api("/checkout", { streamId: s.id, addons: addons, name: nm }).then(function (j) { return j.orderId; });
-        }, function (orderId) {
-          return BL.api("/checkout/" + encodeURIComponent(orderId) + "/capture", {}).then(function (j) {
-            success(m, "🍵", "Order confirmed", "Thank you! Your matcha is on its way — receipt from PayPal. Order " + j.orderId + ".");
-            if (typeof gtag === "function") gtag("event", "purchase", { value: j.amount, currency: "USD", transaction_id: j.orderId });
-            return j;
-          });
-        }, onError, money(total(), p.currency));
-      });
-    })();
-  };
-
   /** Property "Reserve hold" — same engine, PayPal intent AUTHORIZE (funds held, not captured). */
   BL.reserveHold = function (s) {
     BL.config().then(function (cfg) {
@@ -315,6 +293,6 @@
     };
   };
 
-  /** CTA for a stream: matcha → Buy now; property → Request a showing (+ Reserve hold). */
-  BL.primaryAction = function (s) { return s.cta === "buy" ? BL.buy(s) : BL.requestShowing(s); };
+  /** CTA for a stream: Request a showing (Reserve hold is the secondary action). */
+  BL.primaryAction = function (s) { return BL.requestShowing(s); };
 })();

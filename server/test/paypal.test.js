@@ -28,7 +28,7 @@ let pp;
 before(async () => { pp = await import("../paypal.js"); });
 
 test("create order: sandbox host, auth, totals and items", async () => {
-  const o = await pp.createOrder({ intent: "CAPTURE", currency: "usd", customId: "local-1", description: "Matcha", items: [{ name: "Matcha", price: 30, qty: 1 }, { name: "Whisk", price: 18, qty: 1 }] });
+  const o = await pp.createOrder({ intent: "CAPTURE", currency: "usd", customId: "local-1", description: "Test order", items: [{ name: "Item A", price: 30, qty: 1 }, { name: "Item B", price: 18, qty: 1 }] });
   assert.equal(o.id, "ORDER1");
   assert.equal(o.total, 48);
   const tok = calls.find((c) => c.path === "/v1/oauth2/token");

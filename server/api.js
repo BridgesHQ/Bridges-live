@@ -1,18 +1,20 @@
-// REST API: streams, leads, showings, PayPal checkout (matcha) + reserve holds (property),
+// REST API: streams, leads, showings, PayPal reserve holds (property),
 // PayPal webhook, and token-protected admin/Command Center endpoints.
 import express from "express";
 import crypto from "node:crypto";
 import { config } from "./config.js";
 import { db, dbDiagnostics, listStreams, getStream, audit, invalidateStreams } from "./db.js";
 import * as paypal from "./paypal.js";
-import { broadcast, broadcastCommerce, roomSize } from "./realtime.js";
-import { HOLD_TERMS } from "./seed-data.js";
+import { broadcast, broadcastAll, broadcastCommerce, roomSize } from "./realtime.js";
+import { HOLD_TERMS, sid } from "./seed-data.js";
 import { routeLead, logWhatsAppClick, isEmail as validEmail } from "./leads/router.js";
 import { runDueFollowups, unsubscribeToken } from "./leads/sequence.js";
 import { integrations } from "./leads/providers.js";
 import { scanReddit } from "./prospects/reddit.js";
-import { cloudflareEnabled, createLiveInput, getLiveInput, deleteLiveInput } from "./stream/cloudflare.js";
+import { cloudflareEnabled, createLiveInput, getLiveInput, deleteLiveInput, hlsUrl as hlsUrlFor } from "./stream/cloudflare.js";
 import { liveNow } from "./stream/monitor.js";
+import { THEMES, aiEnabled, today, themeFor, generateForDate, recentPosts, ensureToday } from "./content/generator.js";
+import { videoProvider, renderVideo } from "./content/video.js";
 import { sendEmail } from "./leads/providers.js";
 
 /** Every captured lead goes through the same pipeline (save → alert → CRM → follow-up). */
@@ -134,7 +136,7 @@ api.get("/streams", wrap(async (req, res) => {
   const cat = clean(req.query.category, 20);
   const rows = (await listStreams())
     .filter((s) => !cat || cat === "all" || s.category === cat)
-    .filter((s) => config.showSeedStreams || s.applicant || s.cta === "buy")
+    .filter((s) => config.showSeedStreams || s.applicant || s.owner)
     .map(withViewers);
   // agents broadcasting right now first (stable otherwise)
   rows.sort((a, b) => (b.liveNow === true) - (a.liveNow === true));
@@ -147,21 +149,22 @@ api.get("/streams/:id", wrap(async (req, res) => {
   res.json(withViewers(s));
 }));
 
-// Spec §5 shape (POC_MATCHA_FIRST_SPEC)
 api.get("/streams/:id/product", wrap(async (req, res) => {
   const s = await getStream(req.params.id);
   if (!s) return fail(res, 404, "Stream not found");
   res.json({
     streamId: s.id, title: s.showTitle || s.title,
-    product: s.product || { id: s.listingId, name: s.title, priceLabel: s.priceLabel, hold: config.holdsEnabled ? s.hold : null },
-    cta: s.cta === "buy" ? { label: "Buy now", action: "checkout" } : { label: "Request a showing", action: "showing" },
+    product: { id: s.listingId, name: s.title, priceLabel: s.priceLabel, hold: config.holdsEnabled ? s.hold : null },
+    cta: { label: "Request a showing", action: "showing" },
     viewers: withViewers(s).viewers, live: true,
   });
 }));
 
 function playbackProvider(url) {
   if (!url) return null;
-  if (/youtu\.?be/.test(url)) return "youtube";
+  if (/^https:\/\/([\w-]+\.)*(youtube\.com|youtu\.be)\//.test(url)) return "youtube";
+  if (/^https:\/\/([\w-]+\.)*tiktok\.com\//.test(url)) return "tiktok";
+  if (/^https:\/\/([\w-]+\.)*(facebook\.com|fb\.watch)\//.test(url)) return "facebook";
   if (/\.m3u8(\?|$)/.test(url)) return "hls";
   if (/\.(mp4|webm)(\?|$)/.test(url)) return "file";
   return null;
@@ -174,7 +177,7 @@ api.post("/streams", rateLimit(5), wrap(async (req, res) => {
   const playbackUrl = clean(b.playbackUrl, 500);
   const provider = playbackProvider(playbackUrl);
   if (!name || !isEmail(email) || !title) return fail(res, 400, "Name, a valid email and a stream title are required.");
-  if (playbackUrl && (!/^https:\/\//.test(playbackUrl) || !provider)) return fail(res, 400, "Playback URL must be an https YouTube link or an .m3u8/.mp4 stream.");
+  if (playbackUrl && (!/^https:\/\//.test(playbackUrl) || !provider)) return fail(res, 400, "Video link must be an https YouTube, TikTok or Facebook live link, or an .m3u8/.mp4 stream.");
   const category = ["new", "apt", "lux", "reloc", "tx"].includes(b.category) ? b.category : "new";
   const labels = { new: "New Construction", apt: "Apartments", lux: "Luxury", reloc: "Relocation", tx: "Texas" };
   const verticals = await db.select("verticals", { slug: "real-estate" });
@@ -301,7 +304,11 @@ api.post("/cron/followups", wrap(async (req, res) => {
   const tok = (req.get("authorization") || "").replace(/^Bearer\s+/i, "");
   const a = Buffer.from(tok), b2 = Buffer.from(config.cronSecret || "");
   if (!config.cronSecret || a.length !== b2.length || !crypto.timingSafeEqual(a, b2)) return fail(res, 401, "Unauthorized");
-  res.json(await runDueFollowups());
+  const followups = await runDueFollowups();
+  let content = null;
+  try { const p = await ensureToday(sendEmail); content = p ? { date: p.post_date, source: p.source, emailed: !!p.emailed_at } : null; }
+  catch (e) { content = { error: e.message }; }
+  res.json({ ...followups, content });
 }));
 
 api.post("/showings", rateLimit(8), wrap(async (req, res) => {
@@ -325,61 +332,9 @@ api.post("/showings", rateLimit(8), wrap(async (req, res) => {
   res.status(201).json({ ok: true });
 }));
 
-// ------------------------------------------------------------------ checkout (matcha: Buy now)
-api.post("/checkout", rateLimit(15), wrap(async (req, res) => {
-  if (!paymentsAvailable(res)) return;
-  const b = req.body || {};
-  const s = await getStream(clean(b.streamId, 64));
-  if (!s || !s.product) return fail(res, 400, "This stream has no product for sale.");
-  const p = s.product;
-  const qty = Math.min(Math.max(parseInt(b.qty, 10) || 1, 1), 10);
-  const addonIds = Array.isArray(b.addons) ? b.addons.map((a) => clean(a, 20)) : [];
-  const addons = p.addons.filter((a) => addonIds.includes(a.id));
-  const items = [{ name: p.name, price: p.price, qty }, ...addons.map((a) => ({ name: a.name, price: a.price, qty: 1 }))];
-  const localId = crypto.randomUUID();
-  const order = await paypal.createOrder({ intent: "CAPTURE", currency: p.currency, items, description: `${p.name} — ${s.showTitle || s.title}`, customId: localId });
-  await db.insert("orders", {
-    id: localId, org_id: s.orgId, kind: "purchase", provider: "paypal", provider_order_id: order.id, status: "pending",
-    currency: p.currency.toLowerCase(), amount: order.total, items, stream_id: s.id, listing_id: s.listingId,
-    buyer_name: clean(b.name, 80) || null, buyer_email: isEmail(clean(b.email, 120)) ? clean(b.email, 120) : null,
-    meta: { product_id: p.id, addons: addons.map((a) => a.id), paypal_mode: config.paypal.mode },
-  });
-  res.status(201).json({ orderId: order.id, amount: order.total, currency: p.currency, mode: config.paypal.mode });
-}));
-
 async function orderByProviderId(id) {
   return (await db.select("orders", { provider: "paypal", provider_order_id: clean(id, 64) }))[0] || null;
 }
-
-async function completePurchase(order, cap) {
-  const [row] = await db.update("orders", { id: order.id }, {
-    status: "paid", provider_capture_id: cap.captureId, updated_at: new Date().toISOString(),
-    buyer_email: order.buyer_email || cap.payer?.email || null,
-    buyer_name: order.buyer_name || [cap.payer?.first, cap.payer?.last].filter(Boolean).join(" ") || null,
-  });
-  const product = order.items?.[0]?.name || "item";
-  const evt = {
-    type: "item_purchased", streamId: order.stream_id, product,
-    buyerFirst: publicName(cap.payer?.first || order.buyer_name, cap.payer?.last),
-    addons: (order.items || []).slice(1).map((i) => i.name), amount: Number(order.amount), currency: order.currency, ts: new Date().toISOString(),
-  };
-  broadcastCommerce(order.stream_id, evt);
-  await audit("order.paid", "orders", order.id, { provider_order_id: order.provider_order_id, amount: order.amount });
-  return row;
-}
-
-api.post("/checkout/:orderId/capture", rateLimit(20), wrap(async (req, res) => {
-  const order = await orderByProviderId(req.params.orderId);
-  if (!order || order.kind !== "purchase") return fail(res, 404, "Order not found");
-  if (order.status === "paid") return res.json({ ok: true, status: "paid", orderId: order.provider_order_id });
-  const cap = await paypal.captureOrder(order.provider_order_id);
-  if (cap.status !== "COMPLETED") {
-    await db.update("orders", { id: order.id }, { status: "failed", meta: { ...order.meta, paypal_status: cap.status } });
-    return fail(res, 402, `Payment not completed (${cap.status}).`);
-  }
-  await completePurchase(order, cap);
-  res.json({ ok: true, status: "paid", orderId: order.provider_order_id, amount: Number(order.amount) });
-}));
 
 // ------------------------------------------------------------------ property: Reserve hold (PayPal AUTHORIZE)
 api.post("/holds", rateLimit(6), wrap(async (req, res) => {
@@ -390,7 +345,7 @@ api.post("/holds", rateLimit(6), wrap(async (req, res) => {
   if (!name || !isEmail(email)) return fail(res, 400, "Name and a valid email are required.");
   if (b.agree !== true) return fail(res, 400, "Please confirm the hold terms.");
   const s = await getStream(clean(b.streamId, 64));
-  if (!s || s.cta === "buy") return fail(res, 400, "This stream has no property to hold.");
+  if (!s) return fail(res, 400, "This stream has no property to hold.");
   const lead = await captureLead({
     first_name: name, email, phone: clean(b.phone, 40), market: s.title, source: "Bridges Live — Reserve hold",
     notes: `Requested ${HOLD_TERMS.label} on ${s.title} (${s.host}) during live stream.`,
@@ -436,9 +391,7 @@ api.post("/paypal/webhook", wrap(async (req, res) => {
   const orderId = r.supplementary_data?.related_ids?.order_id || (evt.event_type === "CHECKOUT.ORDER.APPROVED" ? r.id : null);
   const order = orderId ? await orderByProviderId(orderId) : null;
   if (order) {
-    if (evt.event_type === "PAYMENT.CAPTURE.COMPLETED" && order.status !== "paid") {
-      await completePurchase(order, { captureId: r.id, payer: {} });
-    } else if (evt.event_type === "PAYMENT.CAPTURE.REFUNDED") {
+    if (evt.event_type === "PAYMENT.CAPTURE.REFUNDED") {
       await db.update("orders", { id: order.id }, { status: "refunded" });
     } else if (evt.event_type === "PAYMENT.AUTHORIZATION.VOIDED") {
       await db.update("orders", { id: order.id }, { status: "voided" });
@@ -468,6 +421,131 @@ admin.get("/summary", wrap(async (req, res) => {
     flagged: comments.filter((c) => c.moderation !== "visible").length,
   });
 }));
+// ------------------------------------------------------------------ "Start My Live" (owner channel)
+// One permanent stream for the site owner. Either a Cloudflare live input (stream from the phone
+// with Larix/OBS — same key every time) or a pasted YouTube / TikTok / Facebook live link.
+const OWNER = { stream: sid("stream:owner"), show: sid("show:owner"), listing: sid("listing:owner"), org: sid("org:Bridges Global") };
+const CATEGORY_LABELS = { new: "New Construction", apt: "Apartments", lux: "Luxury", reloc: "Relocation", tx: "Texas" };
+
+async function ownerState() {
+  const st = (await db.select("streams", { id: OWNER.stream }))[0] || null;
+  const out = { cloudflare: cloudflareEnabled(), stream: null, ingest: null };
+  if (!st) return out;
+  out.stream = {
+    id: st.id, status: st.status, onSite: st.status === "live", provider: st.provider, playbackUrl: st.playback_url,
+    title: st.meta?.title || "", location: st.meta?.location || "", priceLabel: st.meta?.price_label || "", category: st.meta?.category || "new",
+    liveNow: st.status === "live" && liveNow(st), watchUrl: `/live-marketplace?stream=${st.id}`,
+  };
+  if (st.meta?.cf_input_uid && cloudflareEnabled()) {
+    try { const i = await getLiveInput(st.meta.cf_input_uid); out.ingest = { rtmpsUrl: i.rtmpsUrl, streamKey: i.streamKey, srtUrl: i.srtUrl }; }
+    catch (e) { out.ingestError = e.message; }
+  }
+  return out;
+}
+
+admin.get("/my-live", wrap(async (req, res) => res.json(await ownerState())));
+
+admin.post("/my-live", wrap(async (req, res) => {
+  const b = req.body || {};
+  const mode = b.mode === "link" ? "link" : "cloudflare";
+  const title = clean(b.title, 120) || "Live with Dorota — Tampa Bay homes";
+  const category = CATEGORY_LABELS[b.category] ? b.category : "new";
+  const url = clean(b.url, 500);
+  const provider = mode === "link" ? playbackProvider(url) : "cloudflare";
+  if (mode === "link" && (!/^https:\/\//.test(url) || !provider)) return fail(res, 400, "Paste the https link of your YouTube, TikTok or Facebook live (or an .m3u8 stream).");
+  if (mode === "cloudflare" && !cloudflareEnabled()) return fail(res, 409, "Phone streaming needs Cloudflare Stream: add CF_ACCOUNT_ID, CF_STREAM_TOKEN and CF_SUBDOMAIN in Render. Meanwhile, paste a YouTube/TikTok live link instead.");
+
+  const verticalId = (await db.select("verticals", { slug: "real-estate" }))[0]?.id || null;
+  if (!(await db.select("organizations", { id: OWNER.org })).length) await db.insert("organizations", { id: OWNER.org, name: "Bridges Global", vertical_id: verticalId, plan: "brokerage", sponsoring_broker: "LPT Realty" });
+  const attrs = { kind: "property", price_label: clean(b.priceLabel, 40), location: clean(b.location, 80) || "Tampa Bay, FL", image: "/assets/hero-luxury.jpg", hold: HOLD_TERMS };
+  if ((await db.select("listings", { id: OWNER.listing })).length) await db.update("listings", { id: OWNER.listing }, { title, attributes: attrs });
+  else await db.insert("listings", { id: OWNER.listing, org_id: OWNER.org, vertical_id: verticalId, title, status: "active", attributes: attrs });
+  if ((await db.select("shows", { id: OWNER.show })).length) await db.update("shows", { id: OWNER.show }, { title, category, status: "live" });
+  else {
+    await db.insert("shows", { id: OWNER.show, org_id: OWNER.org, vertical_id: verticalId, title, category, status: "live" });
+    await db.insert("show_listings", { show_id: OWNER.show, listing_id: OWNER.listing });
+  }
+
+  const prev = (await db.select("streams", { id: OWNER.stream }))[0] || null;
+  const meta = {
+    ...(prev?.meta || {}), owner: true, title, category, category_label: CATEGORY_LABELS[category], cta: "showing",
+    host_name: "Dorota Maslowska", location: attrs.location, price_label: attrs.price_label, thumbnail: "/assets/hero-luxury.jpg", likes: prev?.meta?.likes || 0,
+  };
+  let playback = url;
+  if (mode === "cloudflare") {
+    if (!meta.cf_input_uid) {
+      const input = await createLiveInput({ name: "Dorota Maslowska — owner channel", streamId: OWNER.stream });
+      meta.cf_input_uid = input.uid;
+      playback = input.hls;
+    } else playback = hlsUrlFor(meta.cf_input_uid);
+  }
+  const row = { provider, playback_url: playback, status: "live", meta };
+  if (prev) await db.update("streams", { id: OWNER.stream }, row);
+  else await db.insert("streams", { id: OWNER.stream, show_id: OWNER.show, room_id: "room-owner", viewer_count: 0, ...row });
+  invalidateStreams();
+  if (mode === "link") broadcastAll({ type: "stream_status", streamId: OWNER.stream, live: true });
+  await audit("owner.live_started", "streams", OWNER.stream, { mode, provider });
+  res.json(await ownerState());
+}));
+
+admin.post("/my-live/stop", wrap(async (req, res) => {
+  const rows = await db.update("streams", { id: OWNER.stream }, { status: "ended" });
+  if (!rows.length) return fail(res, 404, "You haven't started a live yet.");
+  invalidateStreams();
+  broadcastAll({ type: "stream_status", streamId: OWNER.stream, live: false, ended: true });
+  await audit("owner.live_stopped", "streams", OWNER.stream);
+  res.json(await ownerState());
+}));
+
+// ------------------------------------------------------------------ setup checklist (admin home)
+admin.get("/setup", wrap(async (req, res) => {
+  const cf = config.cloudflare, r = config.resend;
+  const missing = (pairs) => pairs.filter(([, v]) => !v).map(([k]) => k);
+  const item = (key, label, ok, detail, fix) => ({ key, label, ok: !!ok, detail, fix: ok ? null : fix });
+  res.json({ items: [
+    item("database", "Database (Supabase)", db.kind === "supabase", dbDiagnostics.reason || db.kind, "Render → Environment: SUPABASE_URL and SUPABASE_SERVICE_KEY (the sb_secret_… key)."),
+    item("email", "Lead alert emails (Resend)", r.key && r.from && config.leads.ownerEmail && !/@resend\.dev/i.test(r.from),
+      !r.key ? "No RESEND_API_KEY" : !config.leads.ownerEmail ? "No LEAD_ALERT_EMAIL" : /@resend\.dev/i.test(r.from || "") ? "Using Resend's test sender — only you receive mail; leads get no follow-ups" : `Sending as ${r.from} → alerts to ${config.leads.ownerEmail}`,
+      "Verify bridgesglobal.co in Resend (Domains → Add → copy the DNS records into Cloudflare DNS → Verify), then set RESEND_FROM=Dorota Maslowska <dd@bridgesglobal.co>."),
+    item("crm", "CRM (HubSpot)", config.crm.hubspotToken || config.crm.ghlWebhook || config.crm.webhook, config.crm.hubspotToken ? "HubSpot connected" : config.crm.ghlWebhook ? "GoHighLevel webhook" : "Not connected", "Render → Environment: HUBSPOT_TOKEN (private app token)."),
+    item("followups", "Follow-ups on time (cron)", config.cronSecret, config.cronSecret ? "CRON_SECRET set — make sure cron-job.org calls /api/cron/followups every 15 min" : "No CRON_SECRET", "Set CRON_SECRET, then create a cron-job.org job (see Daily guide)."),
+    item("whatsapp", "WhatsApp button", config.leads.whatsappNumber, config.leads.whatsappNumber ? `+${config.leads.whatsappNumber}` : "No number", "assets/js/site-config.js → whatsappNumber."),
+    item("cloudflare", "Phone streaming (Cloudflare Stream)", cloudflareEnabled(), cloudflareEnabled() ? "Ready — you and approved agents get stream keys" : `Missing ${missing([["CF_ACCOUNT_ID", cf.accountId], ["CF_STREAM_TOKEN", cf.token], ["CF_SUBDOMAIN", cf.customerCode]]).join(", ")}`, "Add CF_ACCOUNT_ID, CF_STREAM_TOKEN and CF_SUBDOMAIN in Render. Until then, use a YouTube/TikTok live link."),
+    item("ai", "Today's Content AI (Anthropic)", aiEnabled(), aiEnabled() ? `Using ${config.anthropic.model}` : "Using the built-in templates", "Add ANTHROPIC_API_KEY in Render for fresh AI-written scripts every day."),
+    item("demo", "No demo data on the site", !config.showSeedStreams && !config.demoMode, config.showSeedStreams || config.demoMode ? "Demo streams or demo viewer counts are on" : "Only real streams and real viewer counts", "Set SHOW_SEED_STREAMS=false and DEMO_MODE=false in Render."),
+  ] });
+}));
+
+// ------------------------------------------------------------------ Today's Content
+admin.get("/content", wrap(async (req, res) => {
+  const date = today();
+  res.json({
+    today: date, theme: themeFor(date), ai: aiEnabled(), model: aiEnabled() ? config.anthropic.model : null, video: videoProvider(),
+    themes: Object.entries(THEMES).map(([d, t]) => ({ day: Number(d), key: t.key, label: t.label })),
+    posts: await recentPosts(14),
+  });
+}));
+admin.post("/content/generate", wrap(async (req, res) => {
+  const b = req.body || {};
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(b.date || "") ? b.date : today();
+  const theme = Object.values(THEMES).some((t) => t.key === b.theme) ? b.theme : undefined;
+  const r = await generateForDate(date, { theme, notes: clean(b.notes, 600) });
+  await audit("content.generated", "content_posts", r.post?.id, { date, source: r.post?.source });
+  res.json(r);
+}));
+admin.post("/content/:id", wrap(async (req, res) => {
+  const status = ["draft", "filmed", "posted"].includes(req.body?.status) ? req.body.status : null;
+  if (!status) return fail(res, 400, "Unknown status");
+  const rows = await db.update("content_posts", { id: req.params.id }, { status, updated_at: new Date().toISOString() });
+  if (!rows.length) return fail(res, 404, "Post not found");
+  res.json({ post: rows[0] });
+}));
+admin.post("/content/:id/video", wrap(async (req, res) => {
+  const post = (await db.select("content_posts", { id: req.params.id }))[0];
+  if (!post) return fail(res, 404, "Post not found");
+  res.json(await renderVideo(post));
+}));
+
 admin.get("/streams", wrap(async (req, res) => {
   const rows = await db.select("streams", {}, { order: "created_at", limit: 300 });
   res.json({ streams: rows.filter((r) => r.meta?.applicant).map((r) => {
@@ -543,7 +621,19 @@ admin.post("/streams/:id/host-link", wrap(async (req, res) => {
   res.json({ hostUrl: hostLink(await issueHostToken(s0)) }); // new link; the old one stops working
 }));
 admin.get("/orders", wrap(async (req, res) => res.json({ orders: await db.select("orders", {}, { order: "created_at", limit: 200 }) })));
-admin.get("/leads", wrap(async (req, res) => res.json({ leads: await db.select("leads", {}, { order: "created_at", limit: 200 }) })));
+admin.get("/leads", wrap(async (req, res) => res.json({ leads: await db.select("leads", {}, { order: "created_at", limit: 500 }) })));
+export const LEAD_STAGES = ["New", "Contacted", "Showing booked", "Under contract", "Closed", "Lost"];
+admin.post("/leads/:id", wrap(async (req, res) => {
+  const b = req.body || {};
+  const patch = {};
+  if (b.stage != null) { if (!LEAD_STAGES.includes(b.stage)) return fail(res, 400, "Unknown stage"); patch.stage = b.stage; }
+  if (b.notes != null) patch.notes = clean(b.notes, 2000);
+  if (!Object.keys(patch).length) return fail(res, 400, "Nothing to update");
+  const rows = await db.update("leads", { id: req.params.id }, patch);
+  if (!rows.length) return fail(res, 404, "Lead not found");
+  await audit("lead.updated", "leads", req.params.id, patch);
+  res.json({ lead: rows[0] });
+}));
 admin.get("/comments", wrap(async (req, res) => {
   const match = {};
   if (req.query.intent) match.intent = clean(req.query.intent, 20);
