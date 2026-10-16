@@ -22,9 +22,13 @@ async function getJSON(url, opts = {}) {
 }
 
 // ---------------------------------------------------------------- YouTube
+export async function youtubeChannel() {
+  const saved = await getSetting("youtube_channel");
+  return saved?.value || S().youtubeChannel || S().youtubeHandle || "";
+}
 export async function youtubeVideos() {
-  const s = S(), key = encodeURIComponent(s.youtubeKey);
-  const ch = await getJSON(`${s.youtubeBase}/channels?part=contentDetails,snippet&${s.youtubeChannel ? `id=${encodeURIComponent(s.youtubeChannel)}` : `forHandle=${encodeURIComponent(s.youtubeHandle)}`}&key=${key}`);
+  const s = S(), key = encodeURIComponent(s.youtubeKey), who = await youtubeChannel();
+  const ch = await getJSON(`${s.youtubeBase}/channels?part=contentDetails,snippet&${/^UC[\w-]{20,}$/.test(who) ? `id=${encodeURIComponent(who)}` : `forHandle=${encodeURIComponent(who.startsWith("@") ? who : "@" + who)}`}&key=${key}`);
   const channel = ch.items?.[0];
   if (!channel) throw new Error("YouTube channel not found — check YOUTUBE_CHANNEL_ID / YOUTUBE_HANDLE");
   const uploads = channel.contentDetails.relatedPlaylists.uploads;
@@ -70,18 +74,41 @@ export async function instagramVideos() {
   }));
 }
 
+// ---------------------------------------------------------------- OAuth state (HMAC-signed, 30 min)
+function signState(kind) {
+  const raw = `${kind}.${Date.now()}.${crypto.randomBytes(8).toString("hex")}`;
+  return `${raw}.${crypto.createHmac("sha256", config.adminToken || "bl").update(raw).digest("hex").slice(0, 20)}`;
+}
+export function stateOk(state, kind) {
+  const parts = String(state || "").split(".");
+  if (parts.length !== 4 || parts[0] !== kind || Date.now() - Number(parts[1]) > 30 * 60_000) return false;
+  const raw = parts.slice(0, 3).join(".");
+  return parts[3] === crypto.createHmac("sha256", config.adminToken || "bl").update(raw).digest("hex").slice(0, 20);
+}
+
+// ---------------------------------------------------------------- Instagram "Connect" (Instagram API with Instagram Login)
+export const instagramAppConfigured = () => !!(S().instagramAppId && S().instagramAppSecret);
+export function instagramAuthUrl(redirectUri) {
+  const q = new URLSearchParams({ client_id: S().instagramAppId, redirect_uri: redirectUri, response_type: "code", scope: "instagram_business_basic", state: signState("ig") });
+  return `${S().instagramAuthBase}/oauth/authorize?${q}`;
+}
+export async function instagramExchangeCode(code, redirectUri) {
+  const body = new URLSearchParams({ client_id: S().instagramAppId, client_secret: S().instagramAppSecret, grant_type: "authorization_code", redirect_uri: redirectUri, code: String(code).replace(/#_$/, "") });
+  const j = await getJSON(`${S().instagramOAuthBase}/oauth/access_token`, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body });
+  const short = j.access_token || j.data?.[0]?.access_token;
+  if (!short) throw new Error("Instagram did not return a token");
+  const long = await getJSON(`${S().instagramBase}/access_token?grant_type=ig_exchange_token&client_secret=${encodeURIComponent(S().instagramAppSecret)}&access_token=${encodeURIComponent(short)}`);
+  await setSetting("instagram_token", { token: long.access_token || short, refreshed_at: now(), connected_at: now(), user_id: j.user_id || j.data?.[0]?.user_id || null });
+  return true;
+}
+
 // ---------------------------------------------------------------- TikTok (OAuth + Display API)
 export const tiktokConfigured = () => !!(S().tiktokClientKey && S().tiktokClientSecret);
 export function tiktokAuthUrl(redirectUri) {
-  const state = crypto.randomBytes(16).toString("hex");
-  const sig = crypto.createHmac("sha256", config.adminToken || "bl").update(state).digest("hex").slice(0, 16);
-  const q = new URLSearchParams({ client_key: S().tiktokClientKey, scope: "user.info.basic,video.list", response_type: "code", redirect_uri: redirectUri, state: `${state}.${sig}` });
+  const q = new URLSearchParams({ client_key: S().tiktokClientKey, scope: "user.info.basic,video.list", response_type: "code", redirect_uri: redirectUri, state: signState("tt") });
   return `${S().tiktokAuthBase}/v2/auth/authorize/?${q}`;
 }
-export function tiktokStateOk(state) {
-  const [s, sig] = String(state || "").split(".");
-  return !!s && sig === crypto.createHmac("sha256", config.adminToken || "bl").update(s).digest("hex").slice(0, 16);
-}
+export const tiktokStateOk = (state) => stateOk(state, "tt");
 async function tiktokTokenCall(params) {
   const body = new URLSearchParams({ client_key: S().tiktokClientKey, client_secret: S().tiktokClientSecret, ...params });
   const j = await getJSON(`${S().tiktokBase}/v2/oauth/token/`, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body });
@@ -129,17 +156,18 @@ export async function videoFromUrl(url) {
 }
 
 // ---------------------------------------------------------------- status + sync
-export function socialStatus() {
+export async function socialStatus() {
   const s = S();
+  const [yt, ig, tt] = await Promise.all([youtubeChannel(), getSetting("instagram_token"), getSetting("tiktok_token")]);
   return {
-    youtube: { configured: !!(s.youtubeKey && (s.youtubeChannel || s.youtubeHandle)), need: "YOUTUBE_API_KEY + YOUTUBE_CHANNEL_ID (or YOUTUBE_HANDLE)" },
-    instagram: { configured: !!s.instagramToken, need: "INSTAGRAM_ACCESS_TOKEN (Instagram API with Instagram Login)" },
-    tiktok: { configured: tiktokConfigured(), need: "TIKTOK_CLIENT_KEY + TIKTOK_CLIENT_SECRET, then Connect TikTok in admin" },
+    youtube: { configured: !!(s.youtubeKey && yt), keySet: !!s.youtubeKey, channel: yt || null, need: s.youtubeKey ? "Type your channel handle in admin → Connect YouTube" : "YOUTUBE_API_KEY in Render, then your handle in admin" },
+    instagram: { configured: !!(ig?.token || s.instagramToken), appSet: instagramAppConfigured(), connectedAt: ig?.connected_at || null, need: instagramAppConfigured() ? "Click Connect Instagram in admin" : "INSTAGRAM_APP_ID + INSTAGRAM_APP_SECRET in Render (or INSTAGRAM_ACCESS_TOKEN)" },
+    tiktok: { configured: tiktokConfigured() && !!tt?.refresh_token, appSet: tiktokConfigured(), connectedAt: tt?.connected_at || null, need: tiktokConfigured() ? "Click Connect TikTok in admin" : "TIKTOK_CLIENT_KEY + TIKTOK_CLIENT_SECRET in Render" },
   };
 }
 
 export async function syncSocial() {
-  const st = socialStatus(), results = {};
+  const st = await socialStatus(), results = {};
   const jobs = { youtube: st.youtube.configured && youtubeVideos, instagram: st.instagram.configured && instagramVideos, tiktok: st.tiktok.configured && tiktokVideos };
   for (const [p, fn] of Object.entries(jobs)) {
     if (!fn) { results[p] = { ok: false, skipped: true }; continue; }

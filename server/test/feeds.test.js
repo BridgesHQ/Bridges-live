@@ -38,6 +38,9 @@ before(async () => {
         { id: "vidLIVE0001", snippet: { title: "Sunday open house LIVE", liveBroadcastContent: ytLive ? "live" : "none", publishedAt: "2026-10-12T15:00:00Z", thumbnails: { high: { url: "https://i.ytimg.com/vi/vidLIVE0001/hq.jpg" } } }, liveStreamingDetails: { concurrentViewers: "17", actualStartTime: "2026-10-12T15:00:00Z" }, status: { embeddable: true, privacyStatus: "public" } },
         { id: "vidTOUR0002", snippet: { title: "Model home tour — Riverview", liveBroadcastContent: "none", publishedAt: "2026-10-10T12:00:00Z", thumbnails: { high: { url: "https://i.ytimg.com/vi/vidTOUR0002/hq.jpg" } } }, status: { embeddable: true, privacyStatus: "public" } },
       ] });
+      // Instagram login (OAuth)
+      if (u.pathname === "/igo/oauth/access_token") { const p = new URLSearchParams(raw); return p.get("code") === "IGCODE" && p.get("client_secret") === "ig-secret" ? json(res, { access_token: "SHORT", user_id: 42 }) : json(res, { error_message: "bad code" }, 400); }
+      if (u.pathname === "/ig/access_token") return u.searchParams.get("access_token") === "SHORT" ? json(res, { access_token: (igToken = "IGLONG"), expires_in: 5184000 }) : json(res, { error: { message: "bad short token" } }, 400);
       // Instagram
       if (u.pathname === "/ig/refresh_access_token") return json(res, { access_token: (igToken = "IGTOKEN2"), expires_in: 5184000 });
       if (u.pathname === "/ig/me/media") {
@@ -64,8 +67,8 @@ before(async () => {
     env: { ...process.env, PORT: String(PORT), NODE_ENV: "test", ADMIN_TOKEN: "t0ken", CRON_SECRET: "cron-secret-123456", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "", BL_LOCAL_DB: path.join(TMP, "db.json"), APP_URL: BASE,
       DEMO_MODE: "false", SHOW_SEED_STREAMS: "false", ENABLE_PROPERTY_HOLDS: "false", ANTHROPIC_API_KEY: "", RESEND_API_KEY: "", HUBSPOT_TOKEN: "",
       BRIDGE_API_SERVER_TOKEN: "BRIDGE-TOKEN", BRIDGE_API_BASE: `${F}/bridge`, LISTING_CITIES: "Riverview;Brandon;Tampa", REALTYAPI_KEY: "",
-      YOUTUBE_API_KEY: "YT-KEY", YOUTUBE_HANDLE: "@realtordorota", YOUTUBE_API_BASE: `${F}/yt`,
-      INSTAGRAM_ACCESS_TOKEN: "IGTOKEN", INSTAGRAM_API_BASE: `${F}/ig`,
+      YOUTUBE_API_KEY: "YT-KEY", YOUTUBE_HANDLE: "", YOUTUBE_CHANNEL_ID: "", YOUTUBE_API_BASE: `${F}/yt`,
+      INSTAGRAM_ACCESS_TOKEN: "", INSTAGRAM_APP_ID: "ig-app", INSTAGRAM_APP_SECRET: "ig-secret", INSTAGRAM_API_BASE: `${F}/ig`, INSTAGRAM_OAUTH_BASE: `${F}/igo`,
       TIKTOK_CLIENT_KEY: "tt-key", TIKTOK_CLIENT_SECRET: "tt-secret", TIKTOK_API_BASE: `${F}/tt`, TIKTOK_AUTH_BASE: "https://www.tiktok.com", TIKTOK_OEMBED_BASE: `${F}/tt`,
       CF_ACCOUNT_ID: "acc1", CF_STREAM_TOKEN: "cf", CF_SUBDOMAIN: "abc", CF_API_BASE: `${F}/cf/client/v4`, CF_DELIVERY_BASE: `${F}/cfd`, CF_POLL_MS: "60000" },
     stdio: "pipe",
@@ -95,14 +98,34 @@ test("Stellar MLS listings: IDX filter, bearer token, brokerage attribution, no 
   assert.match(l.attribution, /Stellar MLS/);
 });
 
+test("Connect YouTube (handle typed in admin) and Connect Instagram (one login, signed state, long-lived token)", async () => {
+  const st0 = (await get("/api/admin/social")).body.status;
+  assert.equal(st0.youtube.configured, false); assert.equal(st0.youtube.keySet, true);
+  assert.equal(st0.instagram.configured, false); assert.equal(st0.instagram.appSet, true);
+  assert.equal((await post("/api/admin/social/youtube/connect", { channel: "not a handle!" })).status, 400);
+  const yt = (await post("/api/admin/social/youtube/connect", { channel: "@realtordorota" })).body;
+  assert.equal(yt.ok, true); assert.equal(yt.count, 2);
+  const ig = (await post("/api/admin/social/instagram/connect", {})).body;
+  const u = new URL(ig.url);
+  assert.equal(u.searchParams.get("client_id"), "ig-app");
+  assert.equal(u.searchParams.get("scope"), "instagram_business_basic");
+  assert.equal(u.searchParams.get("redirect_uri"), `${BASE}/api/social/instagram/callback`);
+  assert.equal((await get(`/api/social/instagram/callback?code=IGCODE&state=ig.${Date.now()}.abc.forged`, {})).status, 400, "forged state rejected");
+  const cb = await get(`/api/social/instagram/callback?code=IGCODE&state=${encodeURIComponent(u.searchParams.get("state"))}`, {});
+  assert.equal(cb.status, 302); assert.match(cb.headers.get("location"), /\/admin\/#videos/);
+  const st1 = (await get("/api/admin/social")).body.status;
+  assert.equal(st1.youtube.configured, true); assert.equal(st1.youtube.channel, "@realtordorota");
+  assert.equal(st1.instagram.configured, true);
+});
+
 test("social sync: YouTube live counts as LIVE with real viewers; Instagram reels play; images skipped; token refreshed", async () => {
   const r = await post("/api/admin/social/sync", {});
   assert.equal(r.body.youtube.count, 2, JSON.stringify(r.body));
   assert.equal(r.body.instagram.count, 1, "only videos");
-  assert.equal(r.body.tiktok.count, 0, "TikTok not connected yet → no videos");
+  assert.equal(r.body.tiktok.skipped, true, "TikTok not connected yet → no videos");
   const ch = calls.find((x) => x.path === "/yt/channels");
   assert.equal(ch.q.forHandle, "@realtordorota"); assert.equal(ch.q.key, "YT-KEY");
-  assert.ok(calls.some((x) => x.path === "/ig/refresh_access_token"), "Instagram token auto-refreshed");
+  assert.ok(calls.some((x) => x.path === "/ig/me/media" && x.q.access_token === "IGLONG"), "uses the long-lived token from Connect");
   const s = (await get("/api/slots", {})).body;
   assert.equal(s.liveCount, 1);
   assert.equal(s.slots[0].kind, "live");
@@ -125,6 +148,8 @@ test("TikTok: OAuth connect (signed state), token exchange, cover + Watch (not p
   assert.equal((await get("/api/social/tiktok/callback?code=abc&state=forged.123", {})).status, 400, "forged state rejected");
   const cb = await get(`/api/social/tiktok/callback?code=abc&state=${encodeURIComponent(u.searchParams.get("state"))}`, {});
   assert.equal(cb.status, 302);
+  assert.equal((await get("/api/admin/social")).body.status.tiktok.configured, true);
+  await post("/api/admin/social/sync", {});
   const tok = calls.find((x) => x.path === "/tt/v2/oauth/token/");
   assert.match(tok.raw, /grant_type=authorization_code/); assert.match(tok.raw, /client_secret=tt-secret/);
   const tt = (await get("/api/slots?n=24", {})).body.slots.find((x) => x.video?.platform === "tiktok");

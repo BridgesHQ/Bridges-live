@@ -45,7 +45,7 @@ before(async () => {
     env: { ...process.env, PORT: String(PORT), NODE_ENV: "test", ADMIN_TOKEN: "t0ken", CRON_SECRET: "cron-secret-123456", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "", BL_LOCAL_DB: path.join(TMP, "db.json"), APP_URL: BASE,
       PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", HUBSPOT_TOKEN: "", HUBSPOT_ACCESS_TOKEN: "", CF_ACCOUNT_ID: "", CF_STREAM_TOKEN: "", CF_SUBDOMAIN: "",
       LEAD_ALERT_EMAIL: "owner@example.com", RESEND_API_KEY: "re_123", RESEND_FROM: "Dorota <dd@bridgesglobal.co>", RESEND_API_BASE: `http://localhost:${FAKE}`,
-      ANTHROPIC_API_KEY: "sk-ant-test", DEMO_MODE: "false", SHOW_SEED_STREAMS: "false", ANTHROPIC_BASE_URL: `http://localhost:${FAKE}`, VIDEO_PROVIDER: "webhook", VIDEO_WEBHOOK_URL: `http://localhost:${FAKE}/video` },
+      ANTHROPIC_API_KEY: "sk-ant-test", CONTENT_EMAIL_ANYTIME: "true", DEMO_MODE: "false", SHOW_SEED_STREAMS: "false", ANTHROPIC_BASE_URL: `http://localhost:${FAKE}`, VIDEO_PROVIDER: "webhook", VIDEO_WEBHOOK_URL: `http://localhost:${FAKE}/video` },
     stdio: "pipe",
   });
   for (let i = 0; i < 50; i++) { try { if ((await fetch(BASE + "/api/health")).ok) return; } catch {} await new Promise((r) => setTimeout(r, 100)); }

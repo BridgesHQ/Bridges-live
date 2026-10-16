@@ -125,6 +125,32 @@ test("live stream viewer (Request a showing) goes through the same pipeline", as
   assert.ok(fresh.some((c) => c.kind === "hubspot" && c.body.inputs[0].id === "kai@example.com"));
 });
 
+test("admin 'Test the income loop': stream → Request a showing → lead → email alert → HubSpot → follow-up", async () => {
+  const adm = { Authorization: "Bearer t0ken", "Content-Type": "application/json" };
+  const before = calls.length;
+  const r = await (await fetch(BASE + "/api/admin/loop-test", { method: "POST", headers: adm, body: "{}" })).json();
+  const by = Object.fromEntries(r.steps.map((x) => [x.key, x]));
+  assert.equal(r.ok, true, JSON.stringify(r.steps));
+  assert.match(by.request.detail, /Live stream "Open house"/, "uses the real viewer path on the live stream");
+  assert.match(r.testEmail, /^owner\+looptest\w+@example\.com$/, "test lead goes to the owner's own inbox");
+  for (const k of ["saved", "alert", "crm", "followup", "sequence"]) assert.equal(by[k].status, "ok", k);
+  const fresh = calls.slice(before);
+  assert.ok(fresh.some((c) => c.kind === "resend" && c.body.to[0] === "owner@example.com" && /Loop Test/.test(c.body.subject)), "alert email");
+  assert.ok(fresh.some((c) => c.kind === "hubspot"), "HubSpot upsert");
+  assert.ok(fresh.some((c) => c.kind === "resend" && c.body.to[0] === r.testEmail), "follow-up #1 delivered");
+  // the test lead is tidied up: later touches cancelled, marked Lost
+  const leads = (await (await fetch(BASE + "/api/admin/leads", { headers: adm })).json()).leads;
+  const t = leads.find((l) => l.email === r.testEmail);
+  assert.equal(t.stage, "Lost"); assert.match(t.notes, /LOOP TEST/);
+  const last = await (await fetch(BASE + "/api/admin/loop-test", { headers: adm })).json();
+  assert.equal(last.ok, true);
+  // without a live stream the test uses the video/listing form path
+  await fetch(BASE + "/api/admin/my-live/stop", { method: "POST", headers: adm, body: "{}" });
+  const r2 = await (await fetch(BASE + "/api/admin/loop-test", { method: "POST", headers: adm, body: "{}" })).json();
+  assert.match(r2.steps[0].detail, /Video \/ listing/);
+  assert.equal(r2.ok, true, JSON.stringify(r2.steps));
+});
+
 test("unsubscribe cancels the remaining touches; cron endpoint is protected", async () => {
   const auth = { Authorization: "Bearer t0ken" };
   const welcome = calls.find((c) => c.kind === "resend" && c.body.to[0] === "ana@example.com" && /Got it/.test(c.body.subject));

@@ -65,7 +65,9 @@ services:
         sync: false
       - key: YOUTUBE_HANDLE
         sync: false
-      - key: INSTAGRAM_ACCESS_TOKEN
+      - key: INSTAGRAM_APP_ID
+        sync: false
+      - key: INSTAGRAM_APP_SECRET
         sync: false
       - key: TIKTOK_CLIENT_KEY
         sync: false

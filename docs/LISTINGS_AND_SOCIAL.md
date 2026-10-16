@@ -19,8 +19,8 @@ and real viewer count), streams starting soon, recent social videos, then "Upcom
 
 | Platform | Keys | What shows |
 |---|---|---|
-| YouTube | `YOUTUBE_API_KEY` + `YOUTUBE_HANDLE` (or `YOUTUBE_CHANNEL_ID`) | latest uploads, playable; a live broadcast shows as LIVE |
-| Instagram | `INSTAGRAM_ACCESS_TOKEN` (Instagram API with Instagram Login, Business/Creator account) | latest Reels, playable; token auto-refreshed |
+| YouTube | `YOUTUBE_API_KEY`, then **Connect YouTube** (type @handle) in /admin | latest uploads, playable; a live broadcast shows as LIVE |
+| Instagram | `INSTAGRAM_APP_ID` + `INSTAGRAM_APP_SECRET`, then **Connect Instagram** in /admin (Business/Creator account; redirect `https://live.bridgesglobal.co/api/social/instagram/callback`) | latest Reels, playable; token auto-refreshed |
 | TikTok | `TIKTOK_CLIENT_KEY` + `TIKTOK_CLIENT_SECRET`, then **Connect TikTok** in /admin | latest videos as cover + "Watch on TikTok" (TikTok blocks embedded playback) |
 | Any link | none | /admin → 🎥 Videos → Add a video by link (YouTube, TikTok, Instagram) |
 
@@ -34,3 +34,11 @@ Prepare MP4 → Download MP4, or Show on site (adds a replay tile).
 ## Database
 `backend/sql/migrations/006_listings_social.sql` — tables `mls_listings`, `social_videos`, `app_settings`;
 also ends the old demo streams, archives demo listings and deletes their demo chat.
+
+## Income loop self-test
+/admin → ⚙️ Setup → **Test the income loop** sends a test "Request a showing" through the same public
+endpoint a viewer uses (the live stream if one is on air, else the video/listing form) and reports:
+lead saved → email alert → HubSpot → follow-up #1 → follow-ups 2–5 scheduled. The test lead uses a
+plus-address of `LEAD_ALERT_EMAIL`, its later follow-ups are cancelled and it is marked Lost / LOOP TEST.
+
+Full click-by-click key steps: /admin → 🧭 How to Operate → 11 · Connections.

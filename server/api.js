@@ -13,7 +13,8 @@ import { integrations } from "./leads/providers.js";
 import { scanReddit } from "./prospects/reddit.js";
 import { cloudflareEnabled, createLiveInput, getLiveInput, deleteLiveInput, hlsUrl as hlsUrlFor, listRecordings, getDownload, createDownload } from "./stream/cloudflare.js";
 import { publicListings, syncListings, syncListingsIfStale, listingSource } from "./listings/sync.js";
-import { socialStatus, syncSocial, syncSocialIfStale, visibleVideos, videoFromUrl, tiktokConfigured, tiktokAuthUrl, tiktokStateOk, tiktokExchangeCode } from "./social/sync.js";
+import { socialStatus, syncSocial, syncSocialIfStale, visibleVideos, videoFromUrl, tiktokConfigured, tiktokAuthUrl, tiktokStateOk, tiktokExchangeCode, instagramAppConfigured, instagramAuthUrl, instagramExchangeCode, stateOk } from "./social/sync.js";
+import { setSetting } from "./db.js";
 import { getSetting } from "./db.js";
 import { liveNow } from "./stream/monitor.js";
 import { THEMES, aiEnabled, today, themeFor, generateForDate, recentPosts, ensureToday } from "./content/generator.js";
@@ -177,12 +178,20 @@ api.get("/listings", wrap(async (req, res) => {
   res.json(await publicListings({ limit: req.query.limit, city: clean(req.query.city, 60) }));
 }));
 
+// Instagram OAuth return
+api.get("/social/instagram/callback", wrap(async (req, res) => {
+  if (!instagramAppConfigured() || !stateOk(req.query.state, "ig") || !req.query.code) return res.status(400).send("Instagram connection failed — start again from /admin → Videos & recordings → Connect Instagram.");
+  await instagramExchangeCode(String(req.query.code), `${config.appUrl}/api/social/instagram/callback`);
+  await syncSocial().catch(() => {});
+  res.redirect("/admin/#videos");
+}));
+
 // TikTok OAuth return (state is HMAC-signed by the server, so only a flow started from /admin works)
 api.get("/social/tiktok/callback", wrap(async (req, res) => {
   if (!tiktokConfigured() || !tiktokStateOk(req.query.state) || !req.query.code) return res.status(400).send("TikTok connection failed — start again from /admin → Social videos.");
   await tiktokExchangeCode(String(req.query.code), `${config.appUrl}/api/social/tiktok/callback`);
   await syncSocial().catch(() => {});
-  res.redirect("/admin/#social");
+  res.redirect("/admin/#videos");
 }));
 
 api.get("/streams/:id", wrap(async (req, res) => {
@@ -543,6 +552,7 @@ admin.post("/my-live/stop", wrap(async (req, res) => {
 
 // ------------------------------------------------------------------ setup checklist (admin home)
 admin.get("/setup", wrap(async (req, res) => {
+  const SOC = await socialStatus();
   const cf = config.cloudflare, r = config.resend;
   const missing = (pairs) => pairs.filter(([, v]) => !v).map(([k]) => k);
   const item = (key, label, ok, detail, fix) => ({ key, label, ok: !!ok, detail, fix: ok ? null : fix });
@@ -557,20 +567,71 @@ admin.get("/setup", wrap(async (req, res) => {
     item("cloudflare", "Phone streaming (Cloudflare Stream)", cloudflareEnabled(), cloudflareEnabled() ? "Ready — you and approved agents get stream keys" : `Missing ${missing([["CF_ACCOUNT_ID", cf.accountId], ["CF_STREAM_TOKEN", cf.token], ["CF_SUBDOMAIN", cf.customerCode]]).join(", ")}`, "Add CF_ACCOUNT_ID, CF_STREAM_TOKEN and CF_SUBDOMAIN in Render. Until then, use a YouTube/TikTok live link."),
     item("ai", "Today's Content AI (Anthropic)", aiEnabled(), aiEnabled() ? `Using ${config.anthropic.model}` : "Using the built-in templates", "Add ANTHROPIC_API_KEY in Render for fresh AI-written scripts every day."),
     item("listings", "Real listings feed", listingSource(), listingSource() === "stellar-mls" ? "Stellar MLS via Bridge Interactive" : listingSource() === "realtyapi" ? "RealtyAPI (fallback) — switch to Stellar MLS when your token arrives" : "No feed — the homepage links to your bridgesglobal.co search", "Render → Environment: BRIDGE_API_SERVER_TOKEN (Stellar MLS data agreement via Bridge Interactive), or REALTYAPI_KEY."),
-    ...(() => { const st = socialStatus(); return [
-      item("youtube", "YouTube videos in the grid", st.youtube.configured, st.youtube.configured ? "Connected" : "Not connected", `Render → Environment: ${st.youtube.need}.`),
-      item("instagram", "Instagram Reels in the grid", st.instagram.configured, st.instagram.configured ? "Connected" : "Not connected", `Render → Environment: ${st.instagram.need}.`),
-      item("tiktok", "TikTok videos in the grid", st.tiktok.configured, st.tiktok.configured ? "App keys set — use Connect TikTok in 🎥 Videos" : "Not connected", `Render → Environment: ${st.tiktok.need}.`),
+    ...(() => { const st = SOC; return [
+      item("youtube", "YouTube videos in the grid", st.youtube.configured, st.youtube.configured ? `Connected (${st.youtube.channel})` : "Not connected", st.youtube.keySet ? "🎥 Videos → Connect YouTube (type your handle)." : "Render → Environment: YOUTUBE_API_KEY, then 🎥 Videos → Connect YouTube."),
+      item("instagram", "Instagram Reels in the grid", st.instagram.configured, st.instagram.configured ? "Connected" : "Not connected", st.instagram.appSet ? "🎥 Videos → Connect Instagram." : `Render → Environment: ${st.instagram.need}.`),
+      item("tiktok", "TikTok videos in the grid", st.tiktok.configured, st.tiktok.configured ? "Connected" : "Not connected", st.tiktok.appSet ? "🎥 Videos → Connect TikTok." : `Render → Environment: ${st.tiktok.need}.`),
     ]; })(),
     item("holds", "Reserve hold button hidden", !config.holdsEnabled, config.holdsEnabled ? "Reserve hold is ON — make sure written hold terms exist" : "Hidden until written hold terms exist", "Set ENABLE_PROPERTY_HOLDS=false in Render."),
     item("demo", "No demo data on the site", !config.showSeedStreams && !config.demoMode, config.showSeedStreams || config.demoMode ? "Demo streams or demo viewer counts are on" : "Only real streams and real viewer counts", "Set SHOW_SEED_STREAMS=false and DEMO_MODE=false in Render."),
   ] });
 }));
 
+// ------------------------------------------------------------------ income loop self-test
+// Sends a test "Request a showing" through the SAME public endpoint a viewer uses (on the live
+// stream if one is on air, otherwise the video/listing form), then reports every step:
+// saved → email alert → CRM → follow-up #1. The test lead goes to your own inbox (plus-address),
+// its later follow-ups are cancelled and it is marked as a test so it never counts as a real lead.
+admin.post("/loop-test", wrap(async (req, res) => {
+  const owner = config.leads.ownerEmail || "";
+  const testEmail = owner.includes("@") ? owner.replace("@", `+looptest${Date.now().toString(36)}@`).toLowerCase() : `looptest-${Date.now().toString(36)}@example.com`;
+  const live = (await listStreams()).map(withViewers).find((x) => x.liveNow && (x.owner || x.applicant));
+  const self = `http://127.0.0.1:${config.port}/api`;
+  const via = live ? `Live stream "${live.title}" → Request a showing` : "Video / listing → Request a showing";
+  const r = await fetch(live ? `${self}/showings` : `${self}/lead-router`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(live
+      ? { streamId: live.id, name: "Loop Test", email: testEmail, when: "Loop test", message: "Automatic income-loop test from /admin" }
+      : { first_name: "Loop Test", email: testEmail, source: "Website — Request a showing (loop test)", notes: "Automatic income-loop test from /admin" }),
+  });
+  const body = await r.json().catch(() => ({}));
+  const steps = [{ key: "request", label: "Viewer taps “Request a showing”", status: r.ok ? "ok" : "failed", detail: r.ok ? via : body.error || `HTTP ${r.status}` }];
+  if (!r.ok) return res.json({ ok: false, testEmail, steps });
+  // wait for the router + the immediate first follow-up
+  let ev = [], fu = [];
+  for (let i = 0; i < 30; i++) {
+    ev = await db.select("lead_events", { email: testEmail }).catch(() => []);
+    fu = await db.select("lead_followups", { email: testEmail }).catch(() => []);
+    const types = new Set(ev.map((e) => e.type));
+    const first = fu.find((f) => f.step === 1);
+    if (types.has("alert_email") && types.has("crm") && types.has("sequence") && first && first.status !== "pending") break;
+    await new Promise((ok) => setTimeout(ok, 200));
+  }
+  const e = (t) => ev.find((x) => x.type === t);
+  const st = (x) => (!x ? "failed" : ["sent", "new", "update", "scheduled"].includes(x.status) ? "ok" : x.status === "skipped" ? "skipped" : "failed");
+  const leadRow = (await db.select("leads", { email: testEmail }).catch(() => []))[0];
+  steps.push({ key: "saved", label: "Lead saved in Supabase → 📥 Leads", status: leadRow ? "ok" : "failed", detail: leadRow ? `${db.kind === "supabase" ? "Supabase" : "Local database"} · lead ${String(leadRow.id).slice(0, 8)}` : "not found" });
+  const al = e("alert_email");
+  steps.push({ key: "alert", label: "Email alert to you", status: st(al), detail: st(al) === "ok" ? `sent to ${config.leads.ownerEmail}` : al?.detail || "no LEAD_ALERT_EMAIL" });
+  steps.push({ key: "crm", label: "Contact added to HubSpot", status: st(e("crm")), detail: e("crm")?.detail || "" });
+  const first = fu.find((f) => f.step === 1);
+  steps.push({ key: "followup", label: "Follow-up email #1 sent to the lead", status: first ? (first.status === "sent" ? "ok" : first.status === "skipped" ? "skipped" : "failed") : "failed", detail: first ? (first.status === "sent" ? `sent to ${testEmail}` : `${first.status}${first.detail ? " — " + first.detail : ""} (to ${testEmail})`) : e("sequence")?.detail || "not scheduled" });
+  const later = fu.filter((f) => f.step > 1);
+  steps.push({ key: "sequence", label: "Follow-ups 2–5 scheduled (+1, +3, +7, +14 days)", status: later.length >= 4 ? "ok" : "failed", detail: later.length ? `${later.length} scheduled — cancelled for this test` : "none" });
+  // tidy up: test lead never counts as a real one
+  await db.update("lead_followups", { email: testEmail, status: "pending" }, { status: "cancelled", detail: "loop test" }).catch(() => {});
+  if (leadRow) await db.update("leads", { id: leadRow.id }, { stage: "Lost", notes: `[LOOP TEST — safe to delete] ${leadRow.notes || ""}`.slice(0, 2000) }).catch(() => {});
+  const result = { ok: steps.every((x) => x.status === "ok"), at: new Date().toISOString(), testEmail, steps };
+  await setSetting("loop_test_last", result);
+  await audit("loop.test", "leads", leadRow?.id, { ok: result.ok });
+  res.json(result);
+}));
+admin.get("/loop-test", wrap(async (req, res) => res.json((await getSetting("loop_test_last")) || null)));
+
 // ------------------------------------------------------------------ social videos
 admin.get("/social", wrap(async (req, res) => {
   const rows = (await db.select("social_videos", {}).catch(() => [])).sort((a, b) => String(b.published_at || "").localeCompare(String(a.published_at || "")));
-  res.json({ status: socialStatus(), tiktokConnected: !!(await getSetting("tiktok_token"))?.refresh_token, lastSync: await getSetting("social_last_sync"), videos: rows.slice(0, 100) });
+  res.json({ status: await socialStatus(), tiktokConnected: !!(await getSetting("tiktok_token"))?.refresh_token, lastSync: await getSetting("social_last_sync"), videos: rows.slice(0, 100) });
 }));
 admin.post("/social/sync", wrap(async (req, res) => res.json(await syncSocial())));
 admin.post("/social/add", wrap(async (req, res) => {
@@ -582,6 +643,19 @@ admin.post("/social/add", wrap(async (req, res) => {
 admin.post("/social/tiktok/connect", wrap(async (req, res) => {
   if (!tiktokConfigured()) return fail(res, 409, "Add TIKTOK_CLIENT_KEY and TIKTOK_CLIENT_SECRET in Render first.");
   res.json({ url: tiktokAuthUrl(`${config.appUrl}/api/social/tiktok/callback`) });
+}));
+admin.post("/social/instagram/connect", wrap(async (req, res) => {
+  if (!instagramAppConfigured()) return fail(res, 409, "Add INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET in Render first.");
+  res.json({ url: instagramAuthUrl(`${config.appUrl}/api/social/instagram/callback`) });
+}));
+admin.post("/social/youtube/connect", wrap(async (req, res) => {
+  if (!config.social.youtubeKey) return fail(res, 409, "Add YOUTUBE_API_KEY in Render first.");
+  const who = clean(req.body?.channel, 80).replace(/^https?:\/\/(www\.)?youtube\.com\//, "").replace(/\/.*$/, "");
+  if (!/^(@[\w.-]{3,40}|UC[\w-]{20,})$/.test(who)) return fail(res, 400, "Type your channel handle like @realtor_dorota (or a UC… channel id).");
+  await setSetting("youtube_channel", { value: who, connected_at: new Date().toISOString() });
+  const r = await syncSocial();
+  if (r.youtube && !r.youtube.ok) return fail(res, 400, `YouTube: ${r.youtube.error || "could not read that channel"}`);
+  res.json({ ok: true, channel: who, count: r.youtube?.count ?? 0 });
 }));
 admin.post("/social/:id", wrap(async (req, res) => {
   const rows = await db.update("social_videos", { id: req.params.id }, { hidden: !!req.body?.hidden });

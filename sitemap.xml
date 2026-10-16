@@ -46,4 +46,6 @@
   <url><loc>https://live.bridgesglobal.co/become-a-streamer</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://live.bridgesglobal.co/live-marketplace</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
   <url><loc>https://live.bridgesglobal.co/live-show</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://live.bridgesglobal.co/privacy</loc><priority>0.2</priority></url>
+<url><loc>https://live.bridgesglobal.co/terms</loc><priority>0.2</priority></url>
 </urlset>

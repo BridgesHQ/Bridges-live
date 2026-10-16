@@ -70,7 +70,11 @@ export const config = {
     youtubeChannel: (env.YOUTUBE_CHANNEL_ID || "").trim(),        // UC… id, or
     youtubeHandle: (env.YOUTUBE_HANDLE || "").trim().replace(/^@?/, "@").replace(/^@$/, ""),
     youtubeBase: env.YOUTUBE_API_BASE || "https://www.googleapis.com/youtube/v3",
-    instagramToken: (env.INSTAGRAM_ACCESS_TOKEN || "").trim(),    // Instagram API with Instagram Login, long-lived
+    instagramToken: (env.INSTAGRAM_ACCESS_TOKEN || "").trim(),    // Instagram API with Instagram Login, long-lived (or use Connect)
+    instagramAppId: (env.INSTAGRAM_APP_ID || "").trim(),          // for the one-login "Connect Instagram" button
+    instagramAppSecret: (env.INSTAGRAM_APP_SECRET || "").trim(),
+    instagramAuthBase: env.INSTAGRAM_AUTH_BASE || "https://www.instagram.com",
+    instagramOAuthBase: env.INSTAGRAM_OAUTH_BASE || "https://api.instagram.com",
     instagramBase: env.INSTAGRAM_API_BASE || "https://graph.instagram.com",
     tiktokClientKey: (env.TIKTOK_CLIENT_KEY || "").trim(),
     tiktokClientSecret: (env.TIKTOK_CLIENT_SECRET || "").trim(),
@@ -81,6 +85,7 @@ export const config = {
   },
   // Demo property streams from seed data — off on the real site (clean empty state instead).
   // Today's Content: daily video scripts (Anthropic API). Without a key a built-in template is used.
+  contentEmailHour: Number(env.CONTENT_EMAIL_HOUR || 7), // morning email of Today's Content (Tampa time)
   anthropic: {
     key: (env.ANTHROPIC_API_KEY || "").trim(),
     model: env.ANTHROPIC_MODEL || "claude-opus-5-5",

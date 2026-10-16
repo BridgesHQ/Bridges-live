@@ -149,12 +149,13 @@ export async function recentPosts(limit = 14) {
   return db.select("content_posts", {}, { order: "post_date", limit }).catch(() => []);
 }
 
-/** Called by the cron: make sure today's post exists; email it to the owner once. */
+/** Called by the cron: make sure today's post exists; email it to the owner once, from CONTENT_EMAIL_HOUR (7am Tampa time). */
 export async function ensureToday(sendEmail) {
   const date = today();
   let post = (await db.select("content_posts", { post_date: date }).catch(() => []))[0];
   if (!post) post = (await generateForDate(date)).post;
-  if (post && !post.emailed_at && config.leads.ownerEmail && sendEmail) {
+  const hour = Number(new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", hourCycle: "h23" }).format(new Date()));
+  if (post && !post.emailed_at && config.leads.ownerEmail && sendEmail && (hour >= config.contentEmailHour || process.env.CONTENT_EMAIL_ANYTIME === "true")) {
     const d = post.data || {};
     const esc = (s) => String(s || "").replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
     const r = await sendEmail({

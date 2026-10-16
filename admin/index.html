@@ -198,6 +198,7 @@ textarea.i{min-height:70px;resize:vertical}
   <div class="row" style="margin-top:4px"><button class="btn b-line" onclick="go('leads')">All leads →</button></div>
   <h2 class="st">Setup</h2>
   <div class="card" id="h-setup"><div class="empty">Loading…</div></div>
+  <div class="row" style="margin-top:10px"><button class="btn b-line" onclick="go('setup')">Test the income loop →</button></div>
 </section>
 
 <!-- ======================================================= GO LIVE -->
@@ -303,6 +304,17 @@ textarea.i{min-height:70px;resize:vertical}
     <ul><li>Agents apply at <a href="/become-a-streamer" target="_blank">/become-a-streamer</a>. Check their license, then <b>Approve</b> in <b>👥 Agent streams</b> — they get a private Go-Live link by email. <b>Take down</b> removes a stream immediately.</li></ul>
     <h3>10 · Something not working?</h3>
     <ul><li><b>⚙️ Setup</b> lists every connection (database, email, CRM, streaming, social accounts, listings) with exactly what to add in Render if one is missing.</li></ul>
+    <h3 id="connections">11 · Connections (one-time) — what to paste in Render</h3>
+    <p>Where to paste: <b>dashboard.render.com</b> → <b>bridges-live</b> → <b>Environment</b> → <b>Add Environment Variable</b> → name + value → <b>Save Changes</b> (the site restarts in about a minute). Then come back here and press the Connect button.</p>
+    <ol>
+      <li><b>AI daily scripts</b> — <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com/settings/keys</a> → <b>Create Key</b> → copy → Render <code>ANTHROPIC_API_KEY</code>. (Add a few dollars of credit under Plans &amp; Billing.)</li>
+      <li><b>YouTube</b> — <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener">console.cloud.google.com → YouTube Data API v3</a> → create/select a project → <b>Enable</b> → <b>Credentials</b> → <b>Create credentials → API key</b> → copy → Render <code>YOUTUBE_API_KEY</code>. Then 🎥 Videos → type <b>@realtor_dorota</b> → <b>Connect YouTube</b>.</li>
+      <li><b>Instagram</b> (must be a Business or Creator account) — <a href="https://developers.facebook.com/apps" target="_blank" rel="noopener">developers.facebook.com/apps</a> → <b>Create app</b> → use case <b>Manage messaging &amp; content on Instagram</b> → <b>API setup with Instagram login</b> → <b>Set up Instagram business login</b> → add the redirect URL <code>https://live.bridgesglobal.co/api/social/instagram/callback</code> → copy <b>Instagram app ID</b> and <b>Instagram app secret</b> → Render <code>INSTAGRAM_APP_ID</code>, <code>INSTAGRAM_APP_SECRET</code>. Then 🎥 Videos → <b>Connect Instagram</b> → log in → <b>Allow</b>.</li>
+      <li><b>TikTok</b> — <a href="https://developers.tiktok.com/apps" target="_blank" rel="noopener">developers.tiktok.com/apps</a> → <b>Connect an app</b> → fill in name, icon, category, Terms <code>https://live.bridgesglobal.co/terms</code>, Privacy <code>https://live.bridgesglobal.co/privacy</code> → add product <b>Login Kit</b> (web) with redirect URI <code>https://live.bridgesglobal.co/api/social/tiktok/callback</code> and scopes <b>user.info.basic</b> + <b>video.list</b> → <b>Submit for review</b> → once approved copy <b>Client key</b> + <b>Client secret</b> → Render <code>TIKTOK_CLIENT_KEY</code>, <code>TIKTOK_CLIENT_SECRET</code>. Then 🎥 Videos → <b>Connect TikTok</b> → log in as @realtor_dorota → <b>Authorize</b>.</li>
+      <li><b>MLS listings</b> (when Stellar approves your data agreement) — <a href="https://bridgedataoutput.com" target="_blank" rel="noopener">bridgedataoutput.com</a> → log in → your application → <b>API Access</b> → copy the <b>Server Token</b> → Render <code>BRIDGE_API_SERVER_TOKEN</code>. Then 🏡 Listings → <b>Sync now</b>.</li>
+      <li><b>Phone streaming</b> (optional) — Cloudflare: <code>CF_ACCOUNT_ID</code>, <code>CF_STREAM_TOKEN</code>, <code>CF_SUBDOMAIN</code> (see 🔴 Go Live).</li>
+    </ol>
+    <p>Finally run <b>⚙️ Setup → Test the income loop</b>: every line should show a green tick.</p>
     <h3>One-time setup</h3>
     <p><b>Emails reach your leads:</b> resend.com → Domains → Add <code>bridgesglobal.co</code> → copy the DNS records into Cloudflare DNS (DNS only) → Verify → Render: <code>RESEND_FROM=Dorota Maslowska &lt;dd@bridgesglobal.co&gt;</code>.</p>
     <p><b>Follow-ups, video sync, listings and the daily script on time:</b> cron-job.org → Create cronjob → URL <code>https://live.bridgesglobal.co/api/cron/followups</code>, every 15 minutes, method POST, header <code>Authorization: Bearer YOUR_CRON_SECRET</code>.</p>
@@ -384,6 +396,10 @@ textarea.i{min-height:70px;resize:vertical}
 <section class="panel" id="p-setup">
   <h1 class="pt">Setup</h1>
   <p class="ps">What's connected. Anything with an orange dot tells you exactly what to add in Render → Environment.</p>
+  <div class="card" id="loopcard" style="margin-bottom:16px">
+    <div class="row" style="justify-content:space-between"><div><b style="font:600 22px var(--serif);color:var(--navy)">Test the income loop</b><p class="muted" style="margin:4px 0 0">Sends a test “Request a showing” exactly like a viewer would, then checks every step. The test goes to your own inbox and never counts as a real lead.</p></div><button class="btn b-gold" id="loopbtn" onclick="runLoop()">Run the test</button></div>
+    <div id="looprows" style="margin-top:12px"></div>
+  </div>
   <div class="card" id="setuplist"><div class="empty">Loading…</div></div>
 </section>
 </main>
@@ -579,8 +595,18 @@ function genContent(auto) {
 }
 function setContentStatus(s) { if (!CUR) return; api("/content/" + CUR.id, { status: s }).then(function (r) { CUR = r.post; CONTENT.posts = CONTENT.posts.map(function (p) { return p.id === CUR.id ? CUR : p; }); showPost(CUR); toast("Marked " + s); }).catch(function (e) { toast(e.message); }); }
 
+// ------------------------------------------------------------ income loop test
+function renderLoop(r) {
+  if (!r) { $("looprows").innerHTML = '<div class="muted">Not run yet.</div>'; return; }
+  var ico = { ok: ["✓", ""], skipped: ["–", " no"], failed: ["!", " no"] };
+  $("looprows").innerHTML = '<div class="pill ' + (r.ok ? "ok" : "gold") + '" style="margin-bottom:6px">' + (r.ok ? "Every step worked" : "Some steps need attention") + " · " + when(r.at) + "</div>"
+    + r.steps.map(function (x) { var c = ico[x.status] || ico.failed; return '<div class="chk' + c[1] + '"><span class="d">' + c[0] + "</span><div><b>" + esc(x.label) + "</b><div>" + esc(x.status === "ok" ? x.detail : x.status + (x.detail ? " — " + x.detail : "")) + "</div></div></div>"; }).join("");
+}
+function runLoop() { var b = $("loopbtn"); b.disabled = true; b.textContent = "Testing… (~5 s)"; api("/loop-test", {}).then(function (r) { renderLoop(r); loadLeads(); }).catch(function (e) { toast(e.message); }).then(function () { b.disabled = false; b.textContent = "Run the test again"; }); }
+
 // ------------------------------------------------------------ setup
 function loadSetup() {
+  api("/loop-test").then(renderLoop).catch(function () {});
   return api("/setup").then(function (j) {
     var html = j.items.map(function (i) { return '<div class="chk' + (i.ok ? "" : " no") + '"><span class="d">' + (i.ok ? "✓" : "!") + "</span><div><b>" + esc(i.label) + "</b><div>" + esc(i.detail) + "</div>" + (i.fix ? '<div class="fx">→ ' + esc(i.fix) + "</div>" : "") + "</div></div>"; }).join("");
     $("setuplist").innerHTML = html;
@@ -673,12 +699,17 @@ function loadVideos() {
       instagram: "Reels play on the site. The token refreshes itself every few weeks.",
       tiktok: "TikTok can't be played inside other sites, so tiles show the cover with a Watch on TikTok button.",
     };
-    $("soc-accounts").innerHTML = ["youtube", "instagram", "tiktok"].map(function (k) {
-      var on = k === "tiktok" ? st.tiktok.configured && j.tiktokConnected : st[k].configured;
-      return '<div class="card"><div class="row" style="justify-content:space-between"><b style="font:600 20px var(--serif);color:var(--navy)">' + PLAT[k] + '</b><span class="pill ' + (on ? "ok" : "no") + '">' + (on ? "Connected" : "Not connected") + '</span></div><p class="muted" style="margin:8px 0">' + esc(help[k]) + "</p>"
-        + (on ? "" : '<div class="fx" style="color:#8A6D1E;font-size:12.5px">Needs: ' + esc(st[k].need) + "</div>")
-        + (k === "tiktok" && st.tiktok.configured ? '<button class="btn b-navy b-sm" style="margin-top:8px" onclick="connectTikTok()">' + (j.tiktokConnected ? "Reconnect TikTok" : "Connect TikTok") + "</button>" : "") + "</div>";
-    }).join("");
+    var card = function (k, on, body) { return '<div class="card"><div class="row" style="justify-content:space-between"><b style="font:600 20px var(--serif);color:var(--navy)">' + PLAT[k] + '</b><span class="pill ' + (on ? "ok" : "no") + '">' + (on ? "Connected" : "Not connected") + '</span></div><p class="muted" style="margin:8px 0">' + esc(help[k]) + "</p>" + body + "</div>"; };
+    $("soc-accounts").innerHTML =
+      card("youtube", st.youtube.configured, st.youtube.keySet
+        ? '<div class="row"><input class="i" id="yt-ch" style="flex:1;min-width:140px;padding:9px" value="' + esc(st.youtube.channel || "@realtor_dorota") + '" aria-label="YouTube handle"><button class="btn b-navy b-sm" onclick="connectYouTube()">' + (st.youtube.configured ? "Update" : "Connect YouTube") + "</button></div>"
+        : '<div class="fx" style="color:#8A6D1E;font-size:12.5px">First add YOUTUBE_API_KEY in Render — <a href="#" onclick="go(\'guide\');setTimeout(function(){$(\'connections\').scrollIntoView()},50);return false">steps</a>.</div>')
+      + card("instagram", st.instagram.configured, st.instagram.appSet
+        ? '<button class="btn b-navy b-sm" onclick="connectInstagram()">' + (st.instagram.configured ? "Reconnect Instagram" : "Connect Instagram") + "</button>" + (st.instagram.connectedAt ? '<div class="muted" style="font-size:12px;margin-top:6px">Connected ' + when(st.instagram.connectedAt) + "</div>" : "")
+        : '<div class="fx" style="color:#8A6D1E;font-size:12.5px">' + (st.instagram.configured ? "Connected with a pasted token." : "First add INSTAGRAM_APP_ID + INSTAGRAM_APP_SECRET in Render (see How to Operate → Connections).") + "</div>")
+      + card("tiktok", st.tiktok.configured, st.tiktok.appSet
+        ? '<button class="btn b-navy b-sm" onclick="connectTikTok()">' + (st.tiktok.configured ? "Reconnect TikTok" : "Connect TikTok") + "</button>" + (st.tiktok.connectedAt ? '<div class="muted" style="font-size:12px;margin-top:6px">Connected ' + when(st.tiktok.connectedAt) + "</div>" : "")
+        : '<div class="fx" style="color:#8A6D1E;font-size:12.5px">First add TIKTOK_CLIENT_KEY + TIKTOK_CLIENT_SECRET in Render (see How to Operate → Connections).</div>');
     var ls = j.lastSync; $("soc-last").textContent = ls ? "Last sync " + when(ls.at) + ": " + Object.keys(ls.results).map(function (k) { var r = ls.results[k]; return PLAT[k] + " " + (r.ok ? r.count + " videos" : r.skipped ? "not connected" : "error — " + r.error); }).join(" · ") : "Not synced yet.";
     var v = j.videos || [];
     $("soc-list").innerHTML = v.length ? v.map(function (x) {
@@ -690,6 +721,8 @@ function loadVideos() {
 function syncSocial() { var b = $("soc-sync"); b.disabled = true; b.textContent = "Syncing…"; api("/social/sync", {}).then(function () { toast("Videos synced"); loadVideos(); }).catch(function (e) { toast(e.message); }).then(function () { b.disabled = false; b.textContent = "Sync now"; }); }
 function addVideo() { var u = $("soc-url").value.trim(); $("soc-err").textContent = ""; if (!u) return; api("/social/add", { url: u }).then(function () { $("soc-url").value = ""; toast("Video added"); loadVideos(); }).catch(function (e) { $("soc-err").textContent = e.message; }); }
 function hideVideo(id, hidden) { api("/social/" + encodeURIComponent(id), { hidden: hidden }).then(function () { toast(hidden ? "Hidden from the site" : "Shown on the site"); loadVideos(); }).catch(function (e) { toast(e.message); }); }
+function connectInstagram() { api("/social/instagram/connect", {}).then(function (r) { location.href = r.url; }).catch(function (e) { toast(e.message); }); }
+function connectYouTube() { var v = $("yt-ch").value.trim(); toast("Connecting…"); api("/social/youtube/connect", { channel: v }).then(function (r) { toast("YouTube connected — " + r.count + " videos"); loadVideos(); }).catch(function (e) { toast(e.message); }); }
 function connectTikTok() { api("/social/tiktok/connect", {}).then(function (r) { location.href = r.url; }).catch(function (e) { toast(e.message); }); }
 function loadRecordings() {
   api("/recordings").then(function (j) {
