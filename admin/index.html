@@ -168,7 +168,6 @@ textarea.i{min-height:70px;resize:vertical}
   <button class="tab" data-p="agents">👥 Agent streams <span class="n" id="n-agents"></span></button>
   <button class="tab" data-p="chat">🛡 Chat moderation</button>
   <button class="tab" data-p="followups">📣 Follow-ups</button>
-  <button class="tab" data-p="holds">🔑 Showings &amp; holds</button>
   <button class="tab" data-p="prospects">🔎 Prospects</button>
   <button class="tab" data-p="lr">🎞 ListingReel</button>
   <button class="tab" data-p="setup">⚙️ Setup</button>
@@ -370,12 +369,6 @@ textarea.i{min-height:70px;resize:vertical}
   <div id="plbody"><div class="empty">Loading…</div></div>
 </section>
 
-<!-- ======================================================= HOLDS -->
-<section class="panel" id="p-holds">
-  <h1 class="pt">Showings &amp; holds</h1>
-  <p class="ps">Reserve holds are PayPal <b>authorizations</b> — funds are held, never captured automatically. Void a hold to release it. Earnest money never runs through this platform.</p>
-  <div id="holdlist" class="tbl"><div class="empty">Loading…</div></div>
-</section>
 
 <!-- ======================================================= PROSPECTS -->
 <section class="panel" id="p-prospects">
@@ -439,13 +432,13 @@ function enter() {
 (function () { var t = null; try { t = localStorage.getItem("bl_adm") || sessionStorage.getItem("bl_adm"); } catch (e) {} if (t) { ADM = t; api("/summary").then(enter).catch(function () { ADM = null; }); } })();
 
 // ------------------------------------------------------------ tabs
-var LOADERS = { videos: loadVideos, listings: loadListingsAdmin, agents: loadAgents, chat: loadCC, followups: loadPipeline, holds: loadHolds, prospects: loadProspects, lr: loadLR, setup: loadSetup, live: loadLive, leads: loadLeads, content: loadContent };
+var LOADERS = { videos: loadVideos, listings: loadListingsAdmin, agents: loadAgents, chat: loadCC, followups: loadPipeline, prospects: loadProspects, lr: loadLR, setup: loadSetup, live: loadLive, leads: loadLeads, content: loadContent };
 function go(p, first) {
   if (!$("p-" + p)) p = "home";
   document.querySelectorAll(".panel").forEach(function (x) { x.classList.toggle("on", x.id === "p-" + p); });
   document.querySelectorAll(".tab").forEach(function (x) { x.classList.toggle("on", x.getAttribute("data-p") === p); });
   if (!first && LOADERS[p]) LOADERS[p]();
-  if (first && LOADERS[p] && ["agents", "chat", "followups", "holds", "prospects", "lr", "videos", "listings"].indexOf(p) >= 0) LOADERS[p]();
+  if (first && LOADERS[p] && ["agents", "chat", "followups", "prospects", "lr", "videos", "listings"].indexOf(p) >= 0) LOADERS[p]();
   try { history.replaceState(null, "", "#" + p); } catch (e) {}
   window.scrollTo(0, 0);
 }
@@ -660,15 +653,6 @@ function loadPipeline() {
 }
 function stopSeq(email) { if (!confirm("Stop all automatic follow-ups to " + email + "?")) return; api("/followups/stop", { email: email }).then(loadPipeline).catch(function (e) { alert(e.message); }); }
 
-// ------------------------------------------------------------ holds
-function loadHolds() {
-  return api("/orders").then(function (j) {
-    var h = (j.orders || []).filter(function (o) { return o.kind === "hold"; });
-    $("holdlist").innerHTML = '<div class="tr th" style="grid-template-columns:1.3fr 1.6fr .7fr .9fr 1fr"><div>Buyer</div><div>Property</div><div>Amount</div><div>Status</div><div>Action</div></div>'
-      + (h.length ? h.map(function (x) { return '<div class="tr" style="grid-template-columns:1.3fr 1.6fr .7fr .9fr 1fr"><div><b>' + esc(x.buyer_name || "—") + '</b><div class="muted">' + esc(x.buyer_email || "") + "</div></div><div>" + esc(((x.items || [])[0] || {}).name || "") + "</div><div><b>$" + Number(x.amount).toFixed(0) + '</b></div><div><span class="pill ' + (x.status === "authorized" ? "gold" : "") + '">' + esc(x.status) + "</span></div><div>" + (x.status === "authorized" ? "<button class='btn b-red b-sm' onclick=\"voidHold('" + esc(x.id) + "')\">Release</button>" : "—") + "</div></div>"; }).join("") : '<div class="empty">No reserve holds yet. Showing requests are in 📥 Leads.</div>');
-  }).catch(function (e) { $("holdlist").innerHTML = '<div class="empty">' + esc(e.message) + "</div>"; });
-}
-function voidHold(id) { if (!confirm("Release this hold? The buyer's PayPal authorization is voided.")) return; api("/holds/" + id + "/void", {}).then(loadHolds).catch(function (e) { alert(e.message); }); }
 
 // ------------------------------------------------------------ prospects
 function loadProspects() {

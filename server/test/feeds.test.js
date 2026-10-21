@@ -65,7 +65,7 @@ before(async () => {
   }).listen(FAKE);
   proc = spawn(process.execPath, ["server/index.js"], {
     env: { ...process.env, PORT: String(PORT), NODE_ENV: "test", ADMIN_TOKEN: "t0ken", CRON_SECRET: "cron-secret-123456", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "", BL_LOCAL_DB: path.join(TMP, "db.json"), APP_URL: BASE,
-      DEMO_MODE: "false", SHOW_SEED_STREAMS: "false", ENABLE_PROPERTY_HOLDS: "false", ANTHROPIC_API_KEY: "", RESEND_API_KEY: "", HUBSPOT_TOKEN: "",
+      DEMO_MODE: "false", SHOW_SEED_STREAMS: "false", ANTHROPIC_API_KEY: "", RESEND_API_KEY: "", HUBSPOT_TOKEN: "",
       BRIDGE_API_SERVER_TOKEN: "BRIDGE-TOKEN", BRIDGE_API_BASE: `${F}/bridge`, LISTING_CITIES: "Riverview;Brandon;Tampa", REALTYAPI_KEY: "",
       YOUTUBE_API_KEY: "YT-KEY", YOUTUBE_HANDLE: "", YOUTUBE_CHANNEL_ID: "", YOUTUBE_API_BASE: `${F}/yt`,
       INSTAGRAM_ACCESS_TOKEN: "", INSTAGRAM_APP_ID: "ig-app", INSTAGRAM_APP_SECRET: "ig-secret", INSTAGRAM_API_BASE: `${F}/ig`, INSTAGRAM_OAUTH_BASE: `${F}/igo`,
@@ -187,8 +187,8 @@ test("recordings: list, prepare MP4 download, publish replay to the grid", async
   assert.equal(own.kind, "upcoming");
 });
 
-test("setup lists listing + social connections; holds hidden by default", async () => {
+test("setup lists listing + social connections; no reserve hold", async () => {
   const items = Object.fromEntries((await get("/api/admin/setup")).body.items.map((i) => [i.key, i]));
-  assert.equal(items.listings.ok, true, JSON.stringify(items)); assert.equal(items.youtube.ok, true); assert.equal(items.instagram.ok, true); assert.equal(items.holds.ok, true);
-  assert.equal((await get("/api/config", {})).body.holds.enabled, false, "Reserve hold hidden until terms exist");
+  assert.equal(items.listings.ok, true, JSON.stringify(items)); assert.equal(items.youtube.ok, true); assert.equal(items.instagram.ok, true); assert.equal(items.holds, undefined);
+  assert.equal((await get("/api/config", {})).body.holds, undefined, "Reserve hold removed");
 });

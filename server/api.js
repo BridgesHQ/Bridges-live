@@ -1,4 +1,4 @@
-// REST API: streams, leads, showings, PayPal reserve holds (property),
+// REST API: streams, leads, showings,
 // PayPal webhook, and token-protected admin/Command Center endpoints.
 import express from "express";
 import crypto from "node:crypto";
@@ -6,7 +6,7 @@ import { config } from "./config.js";
 import { db, dbDiagnostics, listStreams, getStream, audit, invalidateStreams } from "./db.js";
 import * as paypal from "./paypal.js";
 import { broadcast, broadcastAll, broadcastCommerce, roomSize } from "./realtime.js";
-import { HOLD_TERMS, sid } from "./seed-data.js";
+import { sid } from "./seed-data.js";
 import { routeLead, logWhatsAppClick, isEmail as validEmail } from "./leads/router.js";
 import { runDueFollowups, unsubscribeToken } from "./leads/sequence.js";
 import { integrations } from "./leads/providers.js";
@@ -121,7 +121,6 @@ async function streamByHostToken(req) {
 api.get("/config", (req, res) => {
   res.json({
     paypal: { mode: config.paypal.mode, clientId: config.paypal.mode === "mock" ? null : config.paypal.clientId, currency: "USD" },
-    holds: { enabled: config.holdsEnabled, ...HOLD_TERMS },
     demoMode: config.demoMode,
     database: db.kind,
   });
@@ -205,7 +204,7 @@ api.get("/streams/:id/product", wrap(async (req, res) => {
   if (!s) return fail(res, 404, "Stream not found");
   res.json({
     streamId: s.id, title: s.showTitle || s.title,
-    product: { id: s.listingId, name: s.title, priceLabel: s.priceLabel, hold: config.holdsEnabled ? s.hold : null },
+    product: { id: s.listingId, name: s.title, priceLabel: s.priceLabel },
     cta: { label: "Request a showing", action: "showing" },
     viewers: withViewers(s).viewers, live: true,
   });
@@ -241,7 +240,7 @@ api.post("/streams", rateLimit(5), wrap(async (req, res) => {
   const org = await db.insert("organizations", { name: clean(b.brokerage, 80) || name, vertical_id: verticalId, plan: "agent", sponsoring_broker: clean(b.brokerage, 80) || null });
   const listing = await db.insert("listings", {
     org_id: org.id, vertical_id: verticalId, title, status: "active",
-    attributes: { kind: "property", price_label: clean(b.priceLabel, 40), location: clean(b.location, 80), image: null, hold: HOLD_TERMS },
+    attributes: { kind: "property", price_label: clean(b.priceLabel, 40), location: clean(b.location, 80), image: null },
   });
   const status = config.autoApproveStreams ? "live" : "pending_review";
   const show = await db.insert("shows", { org_id: org.id, vertical_id: verticalId, title, category, status: status === "live" ? "live" : "scheduled" });
@@ -389,52 +388,6 @@ async function orderByProviderId(id) {
   return (await db.select("orders", { provider: "paypal", provider_order_id: clean(id, 64) }))[0] || null;
 }
 
-// ------------------------------------------------------------------ property: Reserve hold (PayPal AUTHORIZE)
-api.post("/holds", rateLimit(6), wrap(async (req, res) => {
-  if (!config.holdsEnabled) return fail(res, 403, "Reserve holds are not enabled — please request a showing instead.");
-  if (!paymentsAvailable(res)) return;
-  const b = req.body || {};
-  const name = clean(b.name, 80), email = clean(b.email, 120).toLowerCase();
-  if (!name || !isEmail(email)) return fail(res, 400, "Name and a valid email are required.");
-  if (b.agree !== true) return fail(res, 400, "Please confirm the hold terms.");
-  const s = await getStream(clean(b.streamId, 64));
-  if (!s) return fail(res, 400, "This stream has no property to hold.");
-  const lead = await captureLead({
-    first_name: name, email, phone: clean(b.phone, 40), market: s.title, source: "Bridges Live — Reserve hold",
-    notes: `Requested ${HOLD_TERMS.label} on ${s.title} (${s.host}) during live stream.`,
-    listing_id: s.listingId, org_id: s.orgId, host_id: s.hostId, stream_id: s.id,
-  });
-  const localId = crypto.randomUUID();
-  const items = [{ name: `Refundable reservation hold — ${s.title}`, price: HOLD_TERMS.amount, qty: 1 }];
-  const order = await paypal.createOrder({ intent: "AUTHORIZE", currency: HOLD_TERMS.currency, items, description: `Refundable hold: ${s.title}`, customId: localId });
-  await db.insert("orders", {
-    id: localId, org_id: s.orgId, kind: "hold", provider: "paypal", provider_order_id: order.id, status: "pending",
-    currency: HOLD_TERMS.currency.toLowerCase(), amount: HOLD_TERMS.amount, items, stream_id: s.id, listing_id: s.listingId,
-    buyer_name: name, buyer_email: email, buyer_phone: clean(b.phone, 40) || null, lead_ref: lead?.id != null ? String(lead.id) : null,
-    meta: { paypal_mode: config.paypal.mode, terms: "Authorization only — never captured automatically; voided on request or after review." },
-  });
-  res.status(201).json({ orderId: order.id, amount: HOLD_TERMS.amount, currency: HOLD_TERMS.currency, mode: config.paypal.mode });
-}));
-
-api.post("/holds/:orderId/authorize", rateLimit(20), wrap(async (req, res) => {
-  const order = await orderByProviderId(req.params.orderId);
-  if (!order || order.kind !== "hold") return fail(res, 404, "Hold not found");
-  if (order.status === "authorized") return res.json({ ok: true, status: "authorized" });
-  const auth = await paypal.authorizeOrder(order.provider_order_id);
-  if (auth.status !== "COMPLETED" || !auth.authorizationId) {
-    await db.update("orders", { id: order.id }, { status: "failed", meta: { ...order.meta, paypal_status: auth.status } });
-    return fail(res, 402, `Hold not authorized (${auth.status}).`);
-  }
-  await db.update("orders", { id: order.id }, {
-    status: "authorized", provider_capture_id: auth.authorizationId, updated_at: new Date().toISOString(),
-    meta: { ...order.meta, authorization_expires: auth.expires || null },
-  });
-  const title = (order.items?.[0]?.name || "").replace(/^Refundable reservation hold — /, "");
-  broadcastCommerce(order.stream_id, { type: "hold_reserved", streamId: order.stream_id, buyerFirst: publicName(order.buyer_name), title, amount: Number(order.amount), ts: new Date().toISOString() });
-  await audit("hold.authorized", "orders", order.id, { provider_order_id: order.provider_order_id });
-  res.json({ ok: true, status: "authorized" });
-}));
-
 // ------------------------------------------------------------------ PayPal webhook (backup confirmation)
 api.post("/paypal/webhook", wrap(async (req, res) => {
   const evt = req.body || {};
@@ -468,7 +421,6 @@ admin.get("/summary", wrap(async (req, res) => {
   res.json({
     database: db.kind, paypal: config.paypal.mode,
     revenue: paid.reduce((s, o) => s + Number(o.amount || 0), 0), purchases: paid.length,
-    holds: { authorized: orders.filter((o) => o.kind === "hold" && o.status === "authorized").length, voided: orders.filter((o) => o.kind === "hold" && o.status === "voided").length },
     leads: leads.length, comments: comments.length,
     intents: comments.reduce((m, c) => ((m[c.intent] = (m[c.intent] || 0) + 1), m), {}),
     flagged: comments.filter((c) => c.moderation !== "visible").length,
@@ -510,7 +462,7 @@ admin.post("/my-live", wrap(async (req, res) => {
 
   const verticalId = (await db.select("verticals", { slug: "real-estate" }))[0]?.id || null;
   if (!(await db.select("organizations", { id: OWNER.org })).length) await db.insert("organizations", { id: OWNER.org, name: "Bridges Global", vertical_id: verticalId, plan: "brokerage", sponsoring_broker: "LPT Realty" });
-  const attrs = { kind: "property", price_label: clean(b.priceLabel, 40), location: clean(b.location, 80) || "Tampa Bay, FL", image: "/assets/hero-luxury.jpg", hold: HOLD_TERMS };
+  const attrs = { kind: "property", price_label: clean(b.priceLabel, 40), location: clean(b.location, 80) || "Tampa Bay, FL", image: "/assets/hero-luxury.jpg" };
   if ((await db.select("listings", { id: OWNER.listing })).length) await db.update("listings", { id: OWNER.listing }, { title, attributes: attrs });
   else await db.insert("listings", { id: OWNER.listing, org_id: OWNER.org, vertical_id: verticalId, title, status: "active", attributes: attrs });
   if ((await db.select("shows", { id: OWNER.show })).length) await db.update("shows", { id: OWNER.show }, { title, category, status: "live" });
@@ -574,7 +526,6 @@ admin.get("/setup", wrap(async (req, res) => {
       item("instagram", "Instagram Reels in the grid", st.instagram.configured, st.instagram.configured ? "Connected" : "Not connected", st.instagram.appSet ? "🎥 Videos → Connect Instagram." : `Render → Environment: ${st.instagram.need}.`),
       item("tiktok", "TikTok videos in the grid", st.tiktok.configured, st.tiktok.configured ? "Connected" : "Not connected", st.tiktok.appSet ? "🎥 Videos → Connect TikTok." : `Render → Environment: ${st.tiktok.need}.`),
     ]; })(),
-    item("holds", "Reserve hold button hidden", !config.holdsEnabled, config.holdsEnabled ? "Reserve hold is ON — make sure written hold terms exist" : "Hidden until written hold terms exist", "Set ENABLE_PROPERTY_HOLDS=false in Render."),
     item("demo", "No demo data on the site", !config.showSeedStreams && !config.demoMode, config.showSeedStreams || config.demoMode ? "Demo streams or demo viewer counts are on" : "Only real streams and real viewer counts", "Set SHOW_SEED_STREAMS=false and DEMO_MODE=false in Render."),
   ] });
 }));
@@ -841,15 +792,6 @@ admin.post("/comments/:id", wrap(async (req, res) => {
   if (!rows.length) return fail(res, 404, "Comment not found");
   await audit(`moderation.${req.body.action}`, "comment_events", req.params.id);
   res.json({ ok: true, comment: rows[0] });
-}));
-admin.post("/holds/:id/void", wrap(async (req, res) => {
-  const order = (await db.select("orders", { id: req.params.id, kind: "hold" }))[0];
-  if (!order) return fail(res, 404, "Hold not found");
-  if (order.status !== "authorized") return fail(res, 409, `Hold is ${order.status}, not authorized.`);
-  await paypal.voidAuthorization(order.provider_capture_id);
-  await db.update("orders", { id: order.id }, { status: "voided", updated_at: new Date().toISOString() });
-  await audit("hold.voided", "orders", order.id);
-  res.json({ ok: true, status: "voided" });
 }));
 api.use("/admin", admin);
 

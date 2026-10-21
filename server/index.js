@@ -66,7 +66,7 @@ server.listen(config.port, () => {
   console.log(`\n  Bridges Live → ${config.appUrl}`);
   console.log(`  database: ${dbStatus}${db.kind === "local" && dbStatus === "local" ? " (data/local-db.json — set SUPABASE_URL + SUPABASE_SERVICE_KEY for Supabase)" : ""}`);
   console.log(`  paypal:   ${config.paypal.mode}${config.paypal.mode === "mock" ? " (simulator — set PAYPAL_CLIENT_ID + PAYPAL_SECRET for sandbox)" : ""}`);
-  console.log(`  holds:    ${config.holdsEnabled ? "enabled" : "disabled"} · demo mode: ${config.demoMode}`);
+  console.log(`  demo mode: ${config.demoMode}`);
   console.log(`  video:    cloudflare stream ${cloudflareEnabled() ? "on — agents get their own live input" : "off (set CF_ACCOUNT_ID, CF_STREAM_TOKEN, CF_SUBDOMAIN)"}`);
   const i = integrations();
   console.log(`  leads:    email alerts ${i.email && i.alertsTo.email ? "on" : "off"} · crm ${i.crm.join("+") || "off"} · whatsapp ${i.whatsapp ? "on" : "off (set whatsappNumber in assets/js/site-config.js)"}\n`);

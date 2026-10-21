@@ -40,8 +40,6 @@ developer.paypal.com → your sandbox app → Webhooks → add
 
 ## 5. Going live with real money (later)
 - Switch `PAYPAL_ENV=live` + live app credentials.
-- Property holds stay **off** in live mode until the broker/attorney confirms the $500
-  authorization isn't earnest money → then `HOLDS_LEGAL_SIGNOFF=true`.
 
 Production defaults in `render.yaml`: `DEMO_MODE=false` (real viewer counts),
 `AUTO_APPROVE_STREAMS=false` (you approve new hosts in /admin), `REQUIRE_SUPABASE=true`,

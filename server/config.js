@@ -99,8 +99,6 @@ export const config = {
   // Demo mode: grid shows the seeded audience size on top of real sockets (off = real viewers only).
   demoMode: bool(env.DEMO_MODE, false),
   autoApproveStreams: bool(env.AUTO_APPROVE_STREAMS, true),
-  // Property reserve holds (PayPal authorization). Needs broker/attorney sign-off before live mode.
-  holdsEnabled: bool(env.ENABLE_PROPERTY_HOLDS, false), // off until written hold terms exist
 };
 
 // WhatsApp number: one place to set it — assets/js/site-config.js (whatsappNumber) — or WHATSAPP_NUMBER.
@@ -114,7 +112,3 @@ export const config = {
 }
 
 config.paypal.mode = config.paypal.clientId && config.paypal.secret ? config.paypal.env : "mock";
-if (config.paypal.mode === "live" && config.holdsEnabled && !bool(env.HOLDS_LEGAL_SIGNOFF, false)) {
-  console.warn("[config] Property holds disabled in live PayPal mode until HOLDS_LEGAL_SIGNOFF=true (broker/attorney review).");
-  config.holdsEnabled = false;
-}

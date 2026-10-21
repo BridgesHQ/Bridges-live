@@ -14,7 +14,8 @@
     "db:check": "node server/db-check.js",
     "db:build-sql": "node server/build-sql.js && node server/migrate.js --print",
     "test": "node --test server/test/*.test.js",
-    "prospects:reddit": "node server/prospects/reddit.js"
+    "prospects:reddit": "node server/prospects/reddit.js",
+    "site:shell": "node server/site-shell.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",

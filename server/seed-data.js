@@ -29,9 +29,6 @@ export const USERS = [
   { id: sid("user:dorota"), org_id: ORG["Bridges Global"], email: "dd@bridgesglobal.co", full_name: "Dorota Maslowska", role: "listing_broker" },
 ];
 
-// Property "reserve hold" terms — a PayPal AUTHORIZATION (funds held, not captured).
-export const HOLD_TERMS = { amount: 500.0, currency: "USD", label: "$500 refundable hold" };
-
 export const LISTINGS = [];
 export const SHOWS = [];
 export const SHOW_LISTINGS = [];

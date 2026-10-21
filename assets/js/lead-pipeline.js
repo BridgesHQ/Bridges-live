@@ -73,7 +73,7 @@
     setTimeout(function () {
       var d = document.createElement("div");
       d.setAttribute("role", "status");
-      d.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:6000;max-width:340px;background:#0E1E52;color:#fff;border-radius:14px;padding:14px 18px;box-shadow:0 18px 50px rgba(0,0,0,.35);font:14px/1.45 'DM Sans',system-ui,sans-serif";
+      d.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:6000;max-width:340px;background:#0E1E52;color:#fff;border-radius:14px;padding:14px 18px;box-shadow:0 18px 50px rgba(0,0,0,.35);font:14px/1.45 Inter,system-ui,sans-serif";
       d.innerHTML = '<button aria-label="Close" style="float:right;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;margin-left:8px">×</button><b style="font-size:15px">✓ Request received</b><div style="margin-top:4px;opacity:.85">Dorota will follow up by email shortly.</div>';
       d.querySelector("button").onclick = function () { d.remove(); };
       document.body.appendChild(d);
@@ -110,7 +110,7 @@
     a.setAttribute("aria-label", "Message us on WhatsApp");
     a.innerHTML = WA_ICON + '<span>Message us</span>';
     var chat = document.getElementById("bgchat-btn");
-    a.style.cssText = "position:fixed;right:24px;bottom:" + (chat ? "88px" : "24px") + ";z-index:1499;display:flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;font:600 14px 'DM Sans',system-ui,sans-serif;padding:12px 18px;border-radius:50px;box-shadow:0 8px 26px rgba(0,0,0,.25)";
+    a.style.cssText = "position:fixed;right:24px;bottom:" + (chat ? "88px" : "24px") + ";z-index:1499;display:flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;font:600 14px Inter,system-ui,sans-serif;padding:12px 18px;border-radius:50px;box-shadow:0 8px 26px rgba(0,0,0,.25)";
     a.addEventListener("click", function () { a.href = whatsapp({}); });
     document.body.appendChild(a);
     // in-page "Message us on WhatsApp" buttons: <a data-whatsapp data-label="…" data-message="…">
@@ -125,7 +125,7 @@
   // ------------------------------------------------------------------ routing
   var nativeFetch = window.fetch.bind(window);
   var LEADS_REST = /\/rest\/v1\/leads(\?|$)/;
-  var ENGINE = /\/api\/(showings|holds|streams|leads)$/;   // Bridges Live modals already use the pipeline server-side
+  var ENGINE = /\/api\/(showings|streams|leads)$/;   // Bridges Live modals already use the pipeline server-side
 
   function submit(payload) {
     var c = formContext();
@@ -153,7 +153,7 @@
     }
     var p = nativeFetch(input, init);
     if (method === "POST" && ENGINE.test(url.split("?")[0])) {
-      p.then(function (r) { if (r.ok) afterLead(/showings/.test(url) ? "Bridges Live — Request a showing" : /holds/.test(url) ? "Bridges Live — Reserve hold" : "Bridges Live"); }).catch(function () {});
+      p.then(function (r) { if (r.ok) afterLead(/showings/.test(url) ? "Bridges Live — Request a showing" : "Bridges Live"); }).catch(function () {});
     }
     return p;
   };

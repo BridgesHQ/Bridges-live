@@ -77,7 +77,3 @@ services:
         value: "false"
       - key: AUTO_APPROVE_STREAMS
         value: "false"
-      - key: ENABLE_PROPERTY_HOLDS
-        value: "false"
-      - key: HOLDS_LEGAL_SIGNOFF
-        value: "false"

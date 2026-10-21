@@ -35,7 +35,7 @@ function socket() {
 before(async () => {
   // run from a temp copy root so the test DB never touches data/local-db.json
   proc = spawn(process.execPath, ["server/index.js"], {
-    env: { ...process.env, PORT: String(PORT), ADMIN_TOKEN: "t0ken", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "", PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", AUTO_APPROVE_STREAMS: "false", SHOW_SEED_STREAMS: "false", DEMO_MODE: "false", ENABLE_PROPERTY_HOLDS: "true", BL_LOCAL_DB: path.join(TMP, "db.json") },
+    env: { ...process.env, PORT: String(PORT), ADMIN_TOKEN: "t0ken", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "", PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", AUTO_APPROVE_STREAMS: "false", SHOW_SEED_STREAMS: "false", DEMO_MODE: "false", BL_LOCAL_DB: path.join(TMP, "db.json") },
     stdio: "pipe",
   });
   for (let i = 0; i < 50; i++) {
@@ -94,7 +94,7 @@ test("chat + real viewer counts + moderation", async () => {
   [a, b, lobby].forEach((w) => w.close());
 });
 
-test("property: request a showing + reserve hold (authorize) + admin void", async () => {
+test("property: request a showing is the only CTA; reserve hold is gone", async () => {
   const prop = await agentStream();
   const w = await socket();
   w.send(JSON.stringify({ type: "join", streamId: prop.id, name: "Kai" }));
@@ -105,19 +105,12 @@ test("property: request a showing + reserve hold (authorize) + admin void", asyn
   assert.equal(sh.status, 201);
   assert.equal((await w.waitFor((m) => m.type === "showing_requested")).name, "Kai");
 
-  assert.equal((await post("/api/holds", { streamId: prop.id, name: "Kai Lee", email: "kai@example.com" })).status, 400); // no agree
-  const hold = await post("/api/holds", { streamId: prop.id, name: "Kai Lee", email: "kai@example.com", agree: true });
-  assert.equal(hold.status, 201);
-  assert.equal(hold.body.amount, 500);
-  assert.equal((await post(`/api/holds/${hold.body.orderId}/authorize`, {})).body.status, "authorized");
-  assert.match((await w.waitFor((m) => m.type === "hold_reserved")).title, new RegExp(prop.title.slice(0, 10)));
+  assert.equal((await post("/api/holds", { streamId: prop.id, name: "Kai Lee", email: "kai@example.com", agree: true })).status, 404);
+  assert.equal((await get("/api/config", {})).body.holds, undefined);
 
   assert.equal((await get("/api/admin/orders")).status, 401);
   const auth = { Authorization: "Bearer t0ken" };
-  const orders = (await get("/api/admin/orders", auth)).body.orders;
-  const h = orders.find((o) => o.kind === "hold");
-  assert.equal(h.status, "authorized");
-  assert.equal((await post(`/api/admin/holds/${h.id}/void`, {}, auth)).body.status, "voided");
+  assert.equal((await get("/api/admin/orders", auth)).body.orders.length, 0);
   const lr = (await get("/api/admin/listingreel", auth)).body;
   assert.equal(lr.connected, false, "local DB has no ListingReel tables → explains instead of crashing");
   assert.match(lr.reason, /local test database/);

@@ -16,7 +16,7 @@ agent applies on /become-a-streamer ──► admin approves in /admin (or auto-
    ▼
 agent presses Go Live in Larix/OBS ──► Cloudflare ──► HLS playback on /live-marketplace
                                                        grid flips "OFFLINE" → "LIVE", live agents sort first
-viewers: "Request a showing" / "Reserve" ──► /api/showings, /api/holds ──► lead pipeline
+viewers: "Request a showing" ──► /api/showings ──► lead pipeline
          (Supabase lead → email alert → HubSpot → 5-touch follow-up), same as every other form
 ```
 
