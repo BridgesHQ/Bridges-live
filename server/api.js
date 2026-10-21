@@ -13,8 +13,8 @@ import { integrations } from "./leads/providers.js";
 import { scanReddit } from "./prospects/reddit.js";
 import { cloudflareEnabled, createLiveInput, getLiveInput, deleteLiveInput, hlsUrl as hlsUrlFor, listRecordings, getDownload, createDownload } from "./stream/cloudflare.js";
 import { publicListings, syncListings, syncListingsIfStale, listingSource } from "./listings/sync.js";
-import { socialStatus, syncSocial, syncSocialIfStale, visibleVideos, videoFromUrl, tiktokConfigured, tiktokAuthUrl, tiktokStateOk, tiktokExchangeCode, instagramAppConfigured, instagramAuthUrl, instagramExchangeCode, stateOk } from "./social/sync.js";
-import { setSetting } from "./db.js";
+import { youtubeVideos, socialStatus, syncSocial, syncSocialIfStale, visibleVideos, videoFromUrl, tiktokConfigured, tiktokAuthUrl, tiktokStateOk, tiktokExchangeCode, instagramAppConfigured, instagramAuthUrl, instagramExchangeCode, stateOk } from "./social/sync.js";
+import { setSetting, missingTables } from "./db.js";
 import { getSetting } from "./db.js";
 import { liveNow } from "./stream/monitor.js";
 import { THEMES, aiEnabled, today, themeFor, generateForDate, recentPosts, ensureToday } from "./content/generator.js";
@@ -552,11 +552,13 @@ admin.post("/my-live/stop", wrap(async (req, res) => {
 
 // ------------------------------------------------------------------ setup checklist (admin home)
 admin.get("/setup", wrap(async (req, res) => {
-  const SOC = await socialStatus();
+  const SOC = await socialStatus(), MISSING = await missingTables();
   const cf = config.cloudflare, r = config.resend;
   const missing = (pairs) => pairs.filter(([, v]) => !v).map(([k]) => k);
   const item = (key, label, ok, detail, fix) => ({ key, label, ok: !!ok, detail, fix: ok ? null : fix });
   res.json({ items: [
+    item("tables", "Database tables up to date", !MISSING.length, MISSING.length ? `Missing: ${MISSING.map((m) => m.table).join(", ")}` : "All tables present",
+      `Supabase → SQL Editor → run ${[...new Set(MISSING.map((m) => "backend/sql/migrations/" + m.migration))].join(" then ")} (safe to re-run).`),
     item("database", "Database (Supabase)", db.kind === "supabase", dbDiagnostics.reason || db.kind, "Render → Environment: SUPABASE_URL and SUPABASE_SERVICE_KEY (the sb_secret_… key)."),
     item("email", "Lead alert emails (Resend)", r.key && r.from && config.leads.ownerEmail && !/@resend\.dev/i.test(r.from),
       !r.key ? "No RESEND_API_KEY" : !config.leads.ownerEmail ? "No LEAD_ALERT_EMAIL" : /@resend\.dev/i.test(r.from || "") ? "Using Resend's test sender — only you receive mail; leads get no follow-ups" : `Sending as ${r.from} → alerts to ${config.leads.ownerEmail}`,
@@ -652,10 +654,16 @@ admin.post("/social/youtube/connect", wrap(async (req, res) => {
   if (!config.social.youtubeKey) return fail(res, 409, "Add YOUTUBE_API_KEY in Render first.");
   const who = clean(req.body?.channel, 80).replace(/^https?:\/\/(www\.)?youtube\.com\//, "").replace(/\/.*$/, "");
   if (!/^(@[\w.-]{3,40}|UC[\w-]{20,})$/.test(who)) return fail(res, 400, "Type your channel handle like @realtor_dorota (or a UC… channel id).");
-  await setSetting("youtube_channel", { value: who, connected_at: new Date().toISOString() });
+  // 1) read the channel with the handle exactly as typed (doesn't depend on anything saved)
+  let vids;
+  try { vids = await youtubeVideos(who); } catch (e) { return fail(res, 400, `YouTube: ${e.message}`); }
+  // 2) save the handle so the 15-minute sync uses it — fails loudly if the table is missing
+  try { await setSetting("youtube_channel", { value: who, connected_at: new Date().toISOString() }, { strict: true }); }
+  catch (e) { return fail(res, e.status || 500, `YouTube works (${vids.length} videos found on ${who}), but it couldn't be saved: ${e.message}`); }
+  // 3) store the videos
   const r = await syncSocial();
-  if (r.youtube && !r.youtube.ok) return fail(res, 400, `YouTube: ${r.youtube.error || "could not read that channel"}`);
-  res.json({ ok: true, channel: who, count: r.youtube?.count ?? 0 });
+  if (r.youtube && !r.youtube.ok) return fail(res, 400, `YouTube: ${r.youtube.error || r.youtube.reason || "sync failed"}`);
+  res.json({ ok: true, channel: who, count: r.youtube?.count ?? vids.length });
 }));
 admin.post("/social/:id", wrap(async (req, res) => {
   const rows = await db.update("social_videos", { id: req.params.id }, { hidden: !!req.body?.hidden });

@@ -4,6 +4,7 @@ import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const env = process.env;
+const key = (v) => String(v || "").trim().replace(/^["'`]+|["'`]+$/g, "").trim();
 const bool = (v, d) => (v == null || v === "" ? d : /^(1|true|yes|on)$/i.test(v));
 
 export const config = {
@@ -55,10 +56,10 @@ export const config = {
   // Real listings, in priority order: Stellar MLS (Bridge Interactive RESO Web API) → RealtyAPI.
   // Lofty IDX has no reusable feed, so the site links out to your Lofty search instead.
   listings: {
-    bridgeToken: (env.BRIDGE_API_SERVER_TOKEN || env.BRIDGE_API_TOKEN || "").trim(),
+    bridgeToken: key(env.BRIDGE_API_SERVER_TOKEN || env.BRIDGE_API_TOKEN),
     bridgeDataset: env.BRIDGE_DATASET || "stellar",
     bridgeBase: env.BRIDGE_API_BASE || "https://api.bridgedataoutput.com/api/v2/OData",
-    realtyKey: (env.REALTYAPI_KEY || "").trim(),
+    realtyKey: key(env.REALTYAPI_KEY),
     realtyBase: env.REALTYAPI_BASE || "https://zillow.realtyapi.io",
     cities: (env.LISTING_CITIES || "Tampa;Riverview;Brandon;Apollo Beach;Wesley Chapel;Parrish;Lithia;Ruskin").split(/[;,]/).map((c) => c.trim()).filter(Boolean),
     max: Number(env.LISTING_MAX || 60),
@@ -66,18 +67,18 @@ export const config = {
   },
   // Social videos that fill the stream grid. Each platform turns on when its keys are present.
   social: {
-    youtubeKey: (env.YOUTUBE_API_KEY || "").trim(),
-    youtubeChannel: (env.YOUTUBE_CHANNEL_ID || "").trim(),        // UC… id, or
-    youtubeHandle: (env.YOUTUBE_HANDLE || "").trim().replace(/^@?/, "@").replace(/^@$/, ""),
+    youtubeKey: key(env.YOUTUBE_API_KEY),
+    youtubeChannel: key(env.YOUTUBE_CHANNEL_ID),        // UC… id, or
+    youtubeHandle: key(env.YOUTUBE_HANDLE).replace(/^@?/, "@").replace(/^@$/, ""),
     youtubeBase: env.YOUTUBE_API_BASE || "https://www.googleapis.com/youtube/v3",
-    instagramToken: (env.INSTAGRAM_ACCESS_TOKEN || "").trim(),    // Instagram API with Instagram Login, long-lived (or use Connect)
-    instagramAppId: (env.INSTAGRAM_APP_ID || "").trim(),          // for the one-login "Connect Instagram" button
-    instagramAppSecret: (env.INSTAGRAM_APP_SECRET || "").trim(),
+    instagramToken: key(env.INSTAGRAM_ACCESS_TOKEN),    // Instagram API with Instagram Login, long-lived (or use Connect)
+    instagramAppId: key(env.INSTAGRAM_APP_ID),          // for the one-login "Connect Instagram" button
+    instagramAppSecret: key(env.INSTAGRAM_APP_SECRET),
     instagramAuthBase: env.INSTAGRAM_AUTH_BASE || "https://www.instagram.com",
     instagramOAuthBase: env.INSTAGRAM_OAUTH_BASE || "https://api.instagram.com",
     instagramBase: env.INSTAGRAM_API_BASE || "https://graph.instagram.com",
-    tiktokClientKey: (env.TIKTOK_CLIENT_KEY || "").trim(),
-    tiktokClientSecret: (env.TIKTOK_CLIENT_SECRET || "").trim(),
+    tiktokClientKey: key(env.TIKTOK_CLIENT_KEY),
+    tiktokClientSecret: key(env.TIKTOK_CLIENT_SECRET),
     tiktokBase: env.TIKTOK_API_BASE || "https://open.tiktokapis.com",
     tiktokAuthBase: env.TIKTOK_AUTH_BASE || "https://www.tiktok.com",
     oembedTikTok: env.TIKTOK_OEMBED_BASE || "https://www.tiktok.com",
@@ -87,7 +88,7 @@ export const config = {
   // Today's Content: daily video scripts (Anthropic API). Without a key a built-in template is used.
   contentEmailHour: Number(env.CONTENT_EMAIL_HOUR || 7), // morning email of Today's Content (Tampa time)
   anthropic: {
-    key: (env.ANTHROPIC_API_KEY || "").trim(),
+    key: key(env.ANTHROPIC_API_KEY),
     model: env.ANTHROPIC_MODEL || "claude-opus-5-5",
     baseURL: env.ANTHROPIC_BASE_URL || "", // tests only
   },

@@ -122,8 +122,28 @@ export async function getSetting(key) {
   const r = (await db.select("app_settings", { key }).catch(() => []))[0];
   return r ? r.value : null;
 }
-export async function setSetting(key, value) {
-  return db.upsert("app_settings", { key, value, updated_at: new Date().toISOString() }, "key").catch((e) => console.warn("[settings]", e.message));
+export async function setSetting(key, value, { strict = false } = {}) {
+  try { return await db.upsert("app_settings", { key, value, updated_at: new Date().toISOString() }, "key"); }
+  catch (e) { console.warn("[settings]", e.message); if (strict) throw explainDbError(e); }
+}
+
+/** Turns "table not found" from Supabase into the fix: which migration to run. */
+const TABLE_MIGRATION = { app_settings: "006_listings_social.sql", social_videos: "006_listings_social.sql", mls_listings: "006_listings_social.sql", content_posts: "005_content_and_cleanup.sql" };
+export function explainDbError(e) {
+  const m = String(e?.message || e).match(/table '?(?:public\.)?(\w+)'? |relation "?(?:public\.)?(\w+)"? does not exist|Could not find the table 'public\.(\w+)'/);
+  const table = m && (m[1] || m[2] || m[3]);
+  if (table && TABLE_MIGRATION[table]) return Object.assign(new Error(`Supabase is missing the "${table}" table — run backend/sql/migrations/${TABLE_MIGRATION[table]} in Supabase → SQL Editor, then try again.`), { status: 503 });
+  return e;
+}
+
+/** Which of the newer tables exist (for the Setup checklist). */
+export async function missingTables() {
+  if (db.kind !== "supabase") return [];
+  const out = [];
+  for (const t of Object.keys(TABLE_MIGRATION)) {
+    try { await db.select(t, {}, { limit: 1 }); } catch (e) { out.push({ table: t, migration: TABLE_MIGRATION[t], error: e.message }); }
+  }
+  return out;
 }
 
 /**

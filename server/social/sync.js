@@ -8,7 +8,7 @@
 // Rows live in `social_videos`; /admin can hide any video from the site.
 import crypto from "node:crypto";
 import { config } from "../config.js";
-import { db, getSetting, setSetting } from "../db.js";
+import { db, getSetting, setSetting, explainDbError } from "../db.js";
 
 const S = () => config.social;
 const now = () => new Date().toISOString();
@@ -26,11 +26,12 @@ export async function youtubeChannel() {
   const saved = await getSetting("youtube_channel");
   return saved?.value || S().youtubeChannel || S().youtubeHandle || "";
 }
-export async function youtubeVideos() {
-  const s = S(), key = encodeURIComponent(s.youtubeKey), who = await youtubeChannel();
+export async function youtubeVideos(channelOverride) {
+  const s = S(), key = encodeURIComponent(s.youtubeKey), who = channelOverride || (await youtubeChannel());
+  if (!who) throw new Error("No YouTube channel saved yet — type your handle in /admin → Videos → Connect YouTube.");
   const ch = await getJSON(`${s.youtubeBase}/channels?part=contentDetails,snippet&${/^UC[\w-]{20,}$/.test(who) ? `id=${encodeURIComponent(who)}` : `forHandle=${encodeURIComponent(who.startsWith("@") ? who : "@" + who)}`}&key=${key}`);
   const channel = ch.items?.[0];
-  if (!channel) throw new Error("YouTube channel not found — check YOUTUBE_CHANNEL_ID / YOUTUBE_HANDLE");
+  if (!channel) throw new Error(`YouTube has no channel "${who}" — check the spelling (it's the @name in your channel URL).`);
   const uploads = channel.contentDetails.relatedPlaylists.uploads;
   const pl = await getJSON(`${s.youtubeBase}/playlistItems?part=contentDetails&maxResults=${s.max}&playlistId=${encodeURIComponent(uploads)}&key=${key}`);
   const ids = (pl.items || []).map((i) => i.contentDetails.videoId).filter(Boolean);
@@ -170,13 +171,13 @@ export async function syncSocial() {
   const st = await socialStatus(), results = {};
   const jobs = { youtube: st.youtube.configured && youtubeVideos, instagram: st.instagram.configured && instagramVideos, tiktok: st.tiktok.configured && tiktokVideos };
   for (const [p, fn] of Object.entries(jobs)) {
-    if (!fn) { results[p] = { ok: false, skipped: true }; continue; }
+    if (!fn) { results[p] = { ok: false, skipped: true, reason: st[p].need }; continue; }
     try {
       const vids = await fn();
       const t = now();
       for (const v of vids) {
         const prev = (await db.select("social_videos", { id: v.id }).catch(() => []))[0];
-        await db.upsert("social_videos", { ...v, hidden: prev?.hidden ?? false, source: "api", synced_at: t });
+        await db.upsert("social_videos", { ...v, hidden: prev?.hidden ?? false, source: "api", synced_at: t }).catch((e) => { throw explainDbError(e); });
       }
       // live flags only last while the platform says so
       const stale = (await db.select("social_videos", { platform: p, is_live: true }).catch(() => [])).filter((r) => !vids.some((v) => v.id === r.id && v.is_live));
