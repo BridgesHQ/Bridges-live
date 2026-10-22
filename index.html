@@ -43,6 +43,52 @@
 .hx-act .bx-btn{min-height:58px;padding:0 34px;font-size:16px}
 @media(max-width:700px){.hx{max-height:none}.hx h1{font-size:clamp(42px,12.4vw,76px)}.hx-act,.hx-act .bx-btn{width:100%}.hx-top .r{display:none}}
 @media(prefers-reduced-motion:reduce){.hx-bg img{animation:none}}
+/* ---------- live-first hero: copy left, a big live player right (the stream itself when on air) */
+.hx2{height:auto;min-height:min(100svh,980px);max-height:none}
+.hx2::after{background:linear-gradient(90deg,rgba(18,18,17,.82) 0%,rgba(18,18,17,.55) 45%,rgba(18,18,17,.35) 100%)}
+.hx2-in{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:clamp(28px,5vw,80px);align-items:center;padding-top:calc(var(--nav-h) + clamp(28px,5vw,64px));padding-bottom:clamp(36px,5vw,72px);flex-direction:initial}
+.hx2-copy{display:grid;gap:clamp(18px,2.2vw,28px);align-content:center}
+.hx2 h1{margin:0;font-size:clamp(44px,6.6vw,112px)!important;line-height:.9!important}
+.hx2 h1 em{color:rgba(255,255,255,.7)!important}
+.hx2-copy>p{margin:0;max-width:44ch;font:400 clamp(17px,1.35vw,20px)/1.55 var(--sans);color:rgba(255,255,255,.9)}
+.hx2-st{display:inline-flex;align-items:center;gap:12px;justify-self:start;padding:9px 16px 9px 12px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(10px);font:500 13px/1 var(--sans);letter-spacing:.04em;color:#fff}
+.hx2-st b{font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px}
+.hx2-st i,.hx2-pill i{width:9px;height:9px;border-radius:50%;background:#E5484D;box-shadow:0 0 0 0 rgba(229,72,77,.6);animation:hxPulse 1.8s infinite}
+@keyframes hxPulse{0%{box-shadow:0 0 0 0 rgba(229,72,77,.55)}70%{box-shadow:0 0 0 10px rgba(229,72,77,0)}100%{box-shadow:0 0 0 0 rgba(229,72,77,0)}}
+.hx2 .hx-act{gap:12px}
+.bx-btn--wa{background:transparent!important;color:#fff!important;border:1px solid rgba(255,255,255,.55)!important;gap:10px}
+.bx-btn--wa svg{width:18px;height:18px}
+.bx-btn--wa:hover{background:rgba(255,255,255,.12)!important}
+.hx2-who{display:flex;flex-wrap:wrap;gap:8px 12px;margin:0;font:500 14px/1.4 var(--sans);color:rgba(255,255,255,.75)}
+.hx2-who a{color:#fff;text-decoration:underline;text-underline-offset:4px;text-decoration-color:rgba(255,255,255,.4)}
+.hx2-player{position:relative;isolation:isolate;aspect-ratio:4/5;max-height:72svh;justify-self:end;width:100%;max-width:520px;border-radius:26px;overflow:hidden;background:#111;box-shadow:0 40px 90px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.18)}
+.hx2-player::after{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(10,10,10,.35),rgba(10,10,10,.1) 35%,rgba(10,10,10,.85))}
+.hx2-player #hxLive{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hx2-player #hxLive iframe,.hx2-player #hxLive video,.hx2-player #hxLive img{position:absolute;inset:0;width:100%;height:100%;transform:none;top:0;left:0;object-fit:cover;border:0}
+.hx2-pl-top{position:absolute;z-index:2;top:18px;left:18px;right:18px;display:flex;justify-content:space-between;align-items:center}
+.hx2-pill{display:inline-flex;align-items:center;gap:9px;padding:8px 14px;border-radius:999px;background:rgba(17,17,17,.7);backdrop-filter:blur(8px);font:700 12px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#fff}
+.hx2:not(.is-live) .hx2-pill i{background:rgba(255,255,255,.55);animation:none}
+.hx2.is-live .hx2-pill{background:#E5484D}
+.hx2.is-live .hx2-pill i{background:#fff}
+.hx2-vw{font:600 13px/1 var(--sans);color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.hx2-pl-off,.hx2-pl-on{position:absolute;z-index:2;left:clamp(18px,2.4vw,28px);right:clamp(18px,2.4vw,28px);bottom:clamp(18px,2.4vw,28px);display:grid;gap:12px;color:#fff;text-decoration:none}
+.hx2-pl-off .bx-mono{font:600 11px/1.3 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.hx2-pl-off b,.hx2-pl-on .t{font:640 clamp(24px,2.2vw,32px)/1.08 var(--sans);letter-spacing:-.03em}
+.hx2-pl-off>span:not(.bx-mono){font:400 15px/1.5 var(--sans);color:rgba(255,255,255,.82)}
+.hx2-pl-off .bx-btn,.hx2-pl-on .bx-btn{justify-self:start;background:#F4F1EA!important;color:#1A1A1A!important;min-height:50px}
+.hx2-pl-on[hidden],.hx2-pl-off[hidden]{display:none}
+@media(max-width:900px){.hx2-in{grid-template-columns:1fr;align-items:start}.hx2-player{order:-1;justify-self:stretch;max-width:none;aspect-ratio:16/12;max-height:none}.hx2 .hx-act .bx-btn{width:auto;flex:1 1 auto}}
+@media(prefers-reduced-motion:reduce){.hx2-st i,.hx2-pill i{animation:none}}
+.hx2-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.hx2.is-live .hx2-poster{display:none}
+.hx2-player::after{z-index:1}
+.hx2 .hx-act .bx-btn.bx-btn--wa{background:transparent!important;color:#fff!important;border:1px solid rgba(255,255,255,.6)!important}
+.hx2 .hx-act .bx-btn.bx-btn--wa:hover{background:rgba(255,255,255,.14)!important}
+.hx2-brk{letter-spacing:.02em!important}
+@media(max-width:900px){.hx2-player{aspect-ratio:auto;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;padding:76px 0 0}
+  .hx2-pl-off,.hx2-pl-on{position:relative;left:auto;right:auto;bottom:auto;padding:0 20px 22px}}
+
+
 
 /* ---------- bento */
 .bt-live{min-height:clamp(420px,46vw,620px)}
@@ -81,34 +127,44 @@ body[data-nocta] .bx-foot-cta{display:none}
 <a href="/relocation">Relocation</a>
 <a href="/listings">Listings</a>
 </nav>
-<div class="bx-act"><a class="bx-tel" href="tel:+18137818888"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg><span>813-781-8888</span></a><a class="bx-btn" href="/listings" data-showing data-source="Website — Nav">Request a showing</a></div>
+<div class="bx-act"><a class="bx-login" href="/login">Log in</a><a class="bx-tel" href="tel:+18137818888"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg><span>813-781-8888<small>LPT Realty</small></span></a><a class="bx-btn" href="/listings" data-showing data-source="Website — Nav">Request a showing</a></div>
 <a class="bx-mlive" href="/live-marketplace"><span class="bx-dot"></span>Live</a>
 <button class="bx-burger" id="bx-burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="bx-sheet"><span></span></button>
 </div></header>
 <div class="bx-sheet" id="bx-sheet">
 <a href="/live-marketplace">Live</a><a href="/new-construction">New Construction</a><a href="/apartment-locating">Apartments</a>
-<details><summary>Neighborhoods</summary><div><a href="/neighborhoods">All neighborhoods</a><a href="/tampa">Tampa</a><a href="/brandon">Brandon</a><a href="/riverview">Riverview</a><a href="/apollo-beach">Apollo Beach</a><a href="/ruskin">Ruskin</a><a href="/lithia">Lithia &amp; FishHawk</a><a href="/sun-city-center">Sun City Center</a><a href="/wimauma">Wimauma</a><a href="/wesley-chapel">Wesley Chapel</a><a href="/parrish">Parrish</a><a href="/lakewood-ranch">Lakewood Ranch</a><a href="/bradenton">Bradenton</a><a href="/sarasota">Sarasota</a><a href="/st-petersburg">St. Petersburg</a><a href="/clearwater">Clearwater</a><a href="/orlando">Orlando</a></div></details><a href="/relocation">Relocation</a><a href="/listings">Listings</a><details><summary>More</summary><div><a href="/buy">Buy a home</a><a href="/sell">Sell your home</a><a href="/dorota-maslowska">Dorota Maslowska</a><a href="/become-a-streamer">Stream on Bridges Live</a><a href="/blog/">Insights</a><a href="/advertise">Advertise</a></div></details>
+<details><summary>Neighborhoods</summary><div><a href="/neighborhoods">All neighborhoods</a><a href="/tampa">Tampa</a><a href="/brandon">Brandon</a><a href="/riverview">Riverview</a><a href="/apollo-beach">Apollo Beach</a><a href="/ruskin">Ruskin</a><a href="/lithia">Lithia &amp; FishHawk</a><a href="/sun-city-center">Sun City Center</a><a href="/wimauma">Wimauma</a><a href="/wesley-chapel">Wesley Chapel</a><a href="/parrish">Parrish</a><a href="/lakewood-ranch">Lakewood Ranch</a><a href="/bradenton">Bradenton</a><a href="/sarasota">Sarasota</a><a href="/st-petersburg">St. Petersburg</a><a href="/clearwater">Clearwater</a><a href="/orlando">Orlando</a></div></details><a href="/relocation">Relocation</a><a href="/listings">Listings</a><a href="/login">Log in — clients &amp; agents</a><details><summary>More</summary><div><a href="/buy">Buy a home</a><a href="/sell">Sell your home</a><a href="/dorota-maslowska">Dorota Maslowska</a><a href="/become-a-streamer">Stream on Bridges Live</a><a href="/blog/">Insights</a><a href="/advertise">Advertise</a></div></details>
 <div class="bx-sheet-cta"><a class="bx-btn" href="/listings" data-showing data-source="Website — Mobile menu">Request a showing</a><a class="bx-btn bx-btn--line" href="tel:+18137818888"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>Call 813-781-8888</a>
 <small>Dorota Maslowska, Broker Associate · LPT Realty · FL BK3519799</small></div>
 </div><!--/bl:nav-->
 <main>
-<section class="hx" id="hx">
+<section class="hx hx2" id="hx">
   <div class="hx-bg"><img src="/assets/hero-luxury.jpg" alt="A Tampa Bay home at dusk, framed by palms" width="1200" height="800" fetchpriority="high"></div>
-  <div id="hxLive" aria-hidden="true"></div>
-  <div class="hx-in">
-    <div class="hx-top"><span class="bx-mono hx-st" id="hxSt"><i></i>Off air · Live home tours</span><span class="bx-mono r">Tampa Bay · Sarasota · Austin · Worldwide</span></div>
-    <h1 class="bx-display"><span class="bx-kin">Watch the house.</span><br><span class="bx-kin">Ask on camera.</span><br><span class="bx-kin"><em>Book the showing.</em></span></h1>
-    <div class="hx-foot">
-      <p id="hxLede">New construction, apartments and resale homes across Tampa Bay, Sarasota and Austin — toured live by licensed agents. Ask anything in the chat, then request a private showing in one tap.</p>
+  <div class="hx-in hx2-in">
+    <div class="hx2-copy">
+      <span class="hx2-st" id="hxSt"><i></i><b>Bridges Live</b><span id="hxStTxt">Real estate, streamed live</span></span>
+      <h1 class="bx-display"><span class="bx-kin">Watch the house.</span><br><span class="bx-kin">Ask on camera.</span><br><span class="bx-kin"><em>Book the showing.</em></span></h1>
+      <p id="hxLede">Licensed agents and builders stream homes live across Tampa Bay, Sarasota and Austin. Join the stream, ask anything in the chat, then request a private showing in one tap.</p>
       <div class="hx-act"><a id="yelp" class="bx-yelp" href="https://www.yelp.com/biz/dorota-maslowska-lpt-realty-riverview-3" target="_blank" rel="noopener" hidden></a>
-        <a class="bx-btn" id="hxCta" href="/listings" data-showing data-source="Homepage — hero">Request a showing <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+        <a class="bx-btn" id="hxCta" href="/listings" data-showing data-source="Homepage — hero">Request a showing <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a class="bx-btn bx-btn--wa" href="https://wa.me/13013796785" target="_blank" rel="noopener" data-whatsapp data-label="Homepage hero"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.4-3c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>WhatsApp</a></div>
+      <p class="hx2-brk">Dorota Maslowska, Broker Associate · LPT Realty · FL BK3519799</p>
+      <p class="hx2-who"><a href="/live-marketplace">Watch live tours</a><span aria-hidden="true">·</span><a href="/login">Log in — clients &amp; agents</a></p>
+    </div>
+    <div class="hx2-player" id="hxPlayer">
+      <img class="hx2-poster" src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80" alt="" onerror="this.onerror=null;this.src='/assets/photos/driveway.jpg'">
+      <div id="hxLive"></div>
+      <div class="hx2-pl-top"><span class="hx2-pill" id="hxPill"><i></i>Off air</span><span class="hx2-vw" id="hxVw"></span></div>
+      <div class="hx2-pl-off" id="hxOff"><span class="bx-mono">Bridges Live · Tampa Bay · Sarasota · Austin</span><b>The next live tour is being scheduled.</b><span>Get one message the moment a camera goes on air.</span>
+        <button class="bx-btn" type="button" id="hxNotify">Notify me when we go live</button></div>
+      <a class="hx2-pl-on" id="hxOn" href="/live-marketplace" hidden><span class="t" id="hxOnT"></span><span class="bx-btn">Watch live now <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
     </div>
   </div>
 </section>
 <!--bl:answer--><section class="bx-answer" aria-label="In short"><div class="bx-wrap"><span class="bx-eyebrow">In short</span><p>Bridges Live lets you watch homes on live video, ask the agent questions on camera and request a private showing in one tap. Tours cover new construction, apartments and resale homes across Tampa Bay, Sarasota and Austin, and every request goes to Dorota Maslowska, a licensed Broker Associate with LPT Realty.</p></div></section><!--/bl:answer-->
 
 <section class="bx-sec--tight" id="live"><div class="bx-wrap">
-  <div class="bx-head bx-rv"><div><span class="bx-eyebrow" id="liveKick">Bridges Live</span><h2 class="bx-h2">On air now: model homes, <em>new builds, apartments.</em></h2></div>
+  <div class="bx-head bx-rv"><div><span class="bx-eyebrow" id="liveKick">Bridges Live</span><h2 class="bx-h2">On air now. <em>Tap a tile to join.</em></h2></div>
     <a class="bx-link" href="/live-marketplace">Every live tour <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
   <div class="rx-tiles" id="liveTiles"></div>
 </div></section>
@@ -117,24 +173,24 @@ body[data-nocta] .bx-foot-cta{display:none}
   <div class="bx-head bx-rv"><div><span class="bx-eyebrow">How it works</span><h2 class="bx-h2">Watch the tour. Ask in the chat. <em>Book it from the stream.</em></h2></div>
     <p class="bx-lede">The way people already shop everything else — live, with someone on camera who can answer — applied to homes.</p></div>
   <div class="bx-bento">
-    <div class="bx-tile bx-tile--media bx-span-2 bx-row-2 bt-live off ph-tile bx-rv" id="btLive"><img class="ph" src="/assets/photos/entry.jpg" alt="Modern luxury home exterior at dusk" loading="lazy" decoding="async" onerror="this.remove()"><span class="bx-mono" style="color:rgba(244,241,234,.6)">Off air right now</span><h3>The next tour is being scheduled.</h3><p>Get one message the moment the camera goes on.</p><span><button type="button" class="bx-btn bx-btn--accent bx-btn--sm" data-notify-live>Notify me</button></span></div>
+    <div class="bx-tile bx-tile--media bx-span-2 bx-row-2 bt-live off ph-tile bx-rv" id="btLive"><img class="ph" src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=80" alt="Modern luxury home exterior at dusk" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/photos/entry.jpg'"><span class="bx-mono" style="color:rgba(244,241,234,.6)">Off air right now</span><h3>The next tour is being scheduled.</h3><p>Get one message the moment the camera goes on.</p><span><button type="button" class="bx-btn bx-btn--accent bx-btn--sm" data-notify-live>Notify me</button></span></div>
     <div class="bx-tile bt-step bx-rv d1"><div class="n">01<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="5" width="14" height="14" rx="3"/><path d="m16.5 10 5-3v10l-5-3"/></svg></div><div><h3>Watch</h3><p>Join a live tour from anywhere — no app, no sign-up.</p></div></div>
     <div class="bx-tile bt-step bx-rv d2"><div class="n">02<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.5 8.5 0 0 1-11.5 8L4 21l1.5-5.5A8.5 8.5 0 1 1 21 11.5z"/></svg></div><div><h3>Ask</h3><p>HOA, schools, the commute — answered on camera, in the moment.</p></div></div>
     <a class="bx-tile bx-tile--accent bt-step bx-rv d1" href="/listings" data-showing data-source="Homepage — bento"><div class="n">03<svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h3>Request a showing</h3><p>One tap. A licensed broker confirms it with you.</p></div></a>
-    <a class="bx-tile bx-tile--ink bt-homes ph-tile bx-rv d2" href="/listings" id="btHomes"><img class="ph" src="/assets/photos/garden-wing.jpg" alt="Bright living room in a luxury home" loading="lazy" decoding="async" onerror="this.remove()"><div class="n">For sale now</div><div><b id="btCount">MLS</b><p id="btHomesTxt">Every active home on the MLS — ask for a live tour of any one.</p></div></a>
+    <a class="bx-tile bx-tile--ink bt-homes ph-tile bx-rv d2" href="/listings" id="btHomes"><img class="ph" src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80" alt="Bright living room in a luxury home" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/photos/garden-wing.jpg'"><div class="n">For sale now</div><div><b id="btCount">MLS</b><p id="btHomesTxt">Every active home on the MLS — ask for a live tour of any one.</p></div></a>
   </div>
 </div></section>
 
 <section class="bx-sec bx-ivory"><div class="bx-wrap"><div class="bx-ed bx-rv">
-  <div class="bx-ed-img"><img src="/assets/photos/driveway.jpg" alt="Newly built modern home with a pool" loading="lazy" width="1600" height="1067" onerror="this.remove()"><span class="bx-mono">Model home · live tour</span></div>
+  <div class="bx-ed-img"><img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80" alt="Newly built modern home with a pool" loading="lazy" width="1600" height="1067" onerror="this.onerror=null;this.src='/assets/photos/driveway.jpg'"><span class="bx-mono">Model home · live tour</span></div>
   <div class="bx-ed-copy"><span class="bx-eyebrow">New construction</span><h2 class="bx-h2">New construction, streamed from <em>the model home.</em></h2>
     <p class="bx-lede">Builders across Tampa Bay, Sarasota and Austin stream the model, the lot and current incentives. Ask in real time — with your own broker representing you.</p>
     <a class="bx-link" href="/new-construction">Tour new builds live <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
 </div></div></section>
 
 <section class="bx-sec"><div class="bx-wrap"><div class="bx-bento">
-  <a class="bx-tile bx-tile--accent bx-span-2 v5-type bx-rv" href="/apartment-locating" style="min-height:460px"><div class="n">Apartments</div><div><h3 style="font-size:clamp(34px,3.6vw,56px)">Walk the actual unit before you apply.</h3><p>We shortlist communities in Tampa Bay, Sarasota and Austin and tour the specific unit on live video.</p></div></a>
-  <a class="bx-tile bx-tile--ink bx-span-2 ph-tile bx-rv d1" href="/relocation" style="min-height:460px"><img class="ph" src="/assets/photos/palms.jpg" alt="Luxury home interior with open-plan living" loading="lazy" decoding="async" onerror="this.remove()"><div class="n">Relocation</div><div><h3 style="font-size:clamp(34px,3.6vw,56px)">Moving from 2,000 miles away? Tour it live, in your time zone.</h3><p>From another state or another country — choose your home before you fly in. English or Polish.</p></div></a>
+  <a class="bx-tile bx-tile--accent bx-span-2 v5-type ph-tile bx-rv" href="/apartment-locating" style="min-height:460px"><img class="ph" src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1600&q=80" alt="Bright apartment living room" loading="lazy" onerror="this.remove()"><div class="n">Apartments</div><div><h3 style="font-size:clamp(34px,3.6vw,56px)">Walk the actual unit before you apply.</h3><p>We shortlist communities in Tampa Bay, Sarasota and Austin and tour the specific unit on live video.</p></div></a>
+  <a class="bx-tile bx-tile--ink bx-span-2 ph-tile bx-rv d1" href="/relocation" style="min-height:460px"><img class="ph" src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1600&q=80" alt="Luxury home interior with open-plan living" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/photos/palms.jpg'"><div class="n">Relocation</div><div><h3 style="font-size:clamp(34px,3.6vw,56px)">Moving from 2,000 miles away? Tour it live, in your time zone.</h3><p>From another state or another country — choose your home before you fly in. English or Polish.</p></div></a>
 </div></div></section>
 
 <section class="bx-sec"><div class="bx-wrap"><div class="bx-ed bx-ed--flip bx-rv">
@@ -160,7 +216,7 @@ body[data-nocta] .bx-foot-cta{display:none}
 <section class="bx-sec" id="areas"><div class="bx-wrap">
   <div class="bx-head bx-rv"><div><span class="bx-eyebrow">Areas we tour</span><h2 class="bx-h2">Tampa Bay, Sarasota, Austin — <em>and wherever you're moving from.</em></h2></div>
     <p class="bx-lede">We tour these markets live, for buyers and renters already here and for clients relocating from other states and countries.</p></div>
-  <div class="rx-areas bx-rv" id="areaCards"><a class="rx-area rx-area--type" href="/tampa"><span><b>Tampa Bay</b><small>Tampa, St. Petersburg, Clearwater, Riverview, Wesley Chapel</small></span></a><a class="rx-area rx-area--type" href="/sarasota"><span><b>Sarasota</b><small>Sarasota, Lakewood Ranch, Parrish, Bradenton</small></span></a><a class="rx-area rx-area--type" href="/neighborhoods"><span><b>Austin, Texas</b><small>Neighborhoods and new-home communities across Austin</small></span></a><a class="rx-area rx-area--type" href="/relocation"><span><b>Relocation</b><small>Moving from another state or country</small></span></a></div>
+  <div class="rx-areas bx-rv" id="areaCards"><a class="rx-area rx-area--type" href="/tampa"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80" alt="" loading="lazy" onerror="this.remove()"><span><b>Tampa Bay</b><small>Tampa, St. Petersburg, Clearwater, Riverview, Wesley Chapel</small></span></a><a class="rx-area rx-area--type" href="/sarasota"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80" alt="" loading="lazy" onerror="this.remove()"><span><b>Sarasota</b><small>Sarasota, Lakewood Ranch, Parrish, Bradenton</small></span></a><a class="rx-area rx-area--type" href="/neighborhoods"><img src="https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=800&q=80" alt="" loading="lazy" onerror="this.remove()"><span><b>Austin, Texas</b><small>Neighborhoods and new-home communities across Austin</small></span></a><a class="rx-area rx-area--type" href="/relocation"><img src="https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=800&q=80" alt="" loading="lazy" onerror="this.remove()"><span><b>Relocation</b><small>Moving from another state or country</small></span></a></div>
   <p style="margin-top:28px"><a class="bx-link" href="/neighborhoods">All neighborhoods <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></p>
 </div></section>
 
@@ -182,24 +238,27 @@ body[data-nocta] .bx-foot-cta{display:none}
 </div></div></section><!--/bl:trust-->
 </main>
 <!--bl:faq--><section class="bx-faq" aria-labelledby="faq-h"><div class="bx-wrap"><span class="bx-eyebrow">Questions</span><h2 id="faq-h">Good to know</h2><details><summary>What is Bridges Live?</summary><p>Bridges Live is a live video platform for real estate. Licensed agents and builders stream homes, model homes, apartments and neighborhoods; viewers chat, ask questions and request a private showing in one tap. Bridges Global is a marketing and technology service, not a brokerage.</p></details><details><summary>How do I request a showing?</summary><p>Tap “Request a showing” on any home, live tour or video, or call 813-781-8888. Dorota Maslowska, a licensed broker with LPT Realty, follows up to confirm a private showing in person or on live video.</p></details><details><summary>Which markets do you cover?</summary><p>Tampa Bay and Sarasota in Florida, and Austin, Texas. Relocation clients moving from other states and other countries are toured live on video in their own time zone.</p></details><details><summary>Who is the broker behind Bridges Global?</summary><p>Dorota Maslowska, Broker Associate with LPT Realty, licensed in Florida (BK3519799) and Texas (829789-SA). She works in English and Polish with buyers, sellers and renters, including clients relocating from other states and countries.</p></details></div></section><!--/bl:faq--><!--bl:footer--><footer class="bx-foot v5-foot"><div class="bx-wrap">
-<div class="bx-foot-cta"><h2>See it live. <em>Then walk in.</em></h2><div class="bx-btns"><a class="bx-btn bx-btn--gold" href="/listings" data-showing data-source="Website — Footer">Request a showing</a></div></div>
+<div class="bx-foot-cta"><h2>See it live. <em>Then walk in.</em></h2><div class="bx-btns"><a class="bx-btn bx-btn--gold" href="/listings" data-showing data-source="Website — Footer">Request a showing</a><a class="bx-btn bx-btn--glass" href="https://wa.me/13013796785" target="_blank" rel="noopener" data-whatsapp data-label="Footer CTA">WhatsApp</a></div></div>
 <div class="v5-brand"><a class="bx-logo" href="/" aria-label="Bridges Global — home"><svg viewBox="0 0 140 34" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><g class="gem l"><path d="M2 17 20 5 46 3 70 17 46 31 20 29Z"/><path d="M2 17h68M20 5l14 12-14 12M46 3 38 17l8 14M20 5l26 26M46 3 20 29"/></g><g class="gem r"><g transform="translate(140 0) scale(-1 1)"><path d="M2 17 20 5 46 3 70 17 46 31 20 29Z"/><path d="M2 17h68M20 5l14 12-14 12M46 3 38 17l8 14M20 5l26 26M46 3 20 29"/></g></g></svg><b>Bridges<i>Global</i></b></a><div><p class="v5-tag">Wisdom builds. Bridges connect.</p><p class="v5-verse">&ldquo;By wisdom a house is built, and through understanding it is established.&rdquo; &mdash; Proverbs 24:3</p></div></div>
 <div class="bx-foot-grid">
 <div class="bx-foot-brand"><p>Real estate, streamed live — Tampa Bay, Sarasota, Austin and relocation from anywhere, with a licensed broker on the other side of every request.</p>
-<div class="bx-foot-contact"><a href="tel:+18137818888"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>813-781-8888</a><a href="mailto:dd@bridgesglobal.co"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>dd@bridgesglobal.co</a><a href="https://wa.me/13013796785" data-whatsapp data-label="Footer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.4-3c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>WhatsApp</a></div></div>
+<div class="bx-foot-contact"><span class="bx-foot-brk">Dorota Maslowska, Broker Associate · LPT Realty</span><a href="tel:+18137818888"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>813-781-8888</a><a href="mailto:dd@bridgesglobal.co"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>dd@bridgesglobal.co</a><a href="https://wa.me/13013796785" data-whatsapp data-label="Footer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.4-3c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>WhatsApp</a></div></div>
 <div class="bx-foot-col"><h4>Live &amp; new builds</h4><a href="/live-marketplace">Watch live</a><a href="/new-construction">New construction</a><a href="/listings">Homes for sale</a><a href="/list-with-us">For builders</a><a href="/become-a-streamer">Stream with us</a></div>
 <div class="bx-foot-col"><h4>Rent &amp; move</h4><a href="/apartment-locating">Apartments</a><a href="/relocation">Relocation</a><a href="/relocation-guide/">Relocation guide</a><a href="/buy">Buy a home</a><a href="/sell">Sell your home</a></div>
 <div class="bx-foot-col"><h4>Neighborhoods</h4><a href="/neighborhoods">All neighborhoods</a><a href="/tampa">Tampa</a><a href="/st-petersburg">St. Petersburg</a><a href="/sarasota">Sarasota</a><a href="/lakewood-ranch">Lakewood Ranch</a><a href="/parrish">Parrish</a></div>
 <div class="bx-foot-col"><h4>Bridges</h4><a href="/dorota-maslowska">About Dorota</a><a href="/live-show">The live show</a><a href="/blog/">Insights</a><a href="/housing-resources">Housing resources</a></div>
 </div>
-<aside class="bx-min" aria-label="Giving back — Gift of God Ministries"><div><span class="k">Giving Back</span><h3>Gift of God Ministries</h3>
-<p>A portion of every Bridges transaction supports Gift of God Ministries &mdash; a 501(c)(3) nonprofit providing housing education, relocation resources, and support to families in need across our communities. Wisdom builds. Bridges connect.</p></div>
-<div class="bx-btns"><a class="bx-btn bx-btn--gold bx-btn--sm" href="https://giftofgodministries.org/housing-ministry/" target="_blank" rel="noopener">Visit Gift of God Ministries</a><a class="bx-btn bx-btn--glass bx-btn--sm" href="/housing-resources">Housing resources</a></div>
+<aside class="v5-gog" aria-label="Giving back — Gift of God Ministries">
+<div class="v5-gog-mk" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22 24 7l18 15"/><path d="M11 18v22h26V18"/><path d="M24 35s-7-4.4-7-9.2A3.8 3.8 0 0 1 24 24a3.8 3.8 0 0 1 7 1.8C31 30.6 24 35 24 35z" fill="currentColor" stroke="none"/></svg></div>
+<div class="v5-gog-b"><span class="k">Giving back</span><h3>Gift of God Ministries</h3>
+<p>A portion of every Bridges transaction supports Gift of God Ministries &mdash; a 501(c)(3) nonprofit providing housing education, relocation resources, and support to families in need across our communities. Wisdom builds. Bridges connect.</p>
+<ul class="v5-gog-t"><li>Housing education</li><li>Relocation resources</li><li>Families in need</li></ul></div>
+<div class="v5-gog-a"><a class="bx-btn" href="https://giftofgodministries.org/housing-ministry/" target="_blank" rel="noopener">Visit Gift of God Ministries</a><a class="bx-link" href="/housing-resources">Housing resources</a></div>
 <p class="note">Gift of God Ministries is a separate 501(c)(3) nonprofit organization, not a real estate brokerage. Real estate services are provided only through LPT Realty.</p></aside>
 <div class="bx-legal"><div class="bx-eho"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M9 14h6M9 17h6"/></svg>Equal Housing Opportunity</div>
 <p><b>Dorota Maslowska, Broker Associate · LPT Realty.</b> Florida License BK3519799 · Texas License 829789-SA. All real estate services are provided through LPT Realty. Bridges Global and Bridges Live are marketing and technology services, not a brokerage. Listing information is deemed reliable but not guaranteed; prices, incentives and market figures change frequently — verify before making decisions. Listings may be held by other brokerages. Earnest money is never collected through this website.</p></div>
 <p class="bx-lic">Dorota Maslowska, Broker Associate · LPT Realty · FL License BK3519799 · TX 829789-SA · Equal Housing Opportunity</p>
-<div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/sitemap.xml">Sitemap</a><a href="/admin" rel="nofollow">Owner login</a></nav></div>
+<div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://www.trec.texas.gov/forms/consumer-protection-notice" target="_blank" rel="noopener">TREC Consumer Protection Notice</a><a href="/sitemap.xml">Sitemap</a><a href="/admin" rel="nofollow">Owner login</a></nav></div>
 </div></footer><script src="/assets/js/site.js" defer></script><!--/bl:footer-->
 <div id="bgchat-btn" onclick="bgChatToggle()" style="position:fixed;bottom:24px;right:24px;z-index:1500;background:#1A1A1A;color:#fff;border-radius:50px;padding:14px 22px;box-shadow:0 8px 30px rgba(26,26,26,.35);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;display:flex;align-items:center;gap:9px">
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9CC3AE" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 01-11.5 8L4 21l1.5-5.5A8.5 8.5 0 1121 11.5z"/></svg>
@@ -280,14 +339,17 @@ var AREAS=[["/tampa","Tampa","Hillsborough"],["/brandon","Brandon","Hillsborough
 if($('areaList'))$('areaList').innerHTML=AREAS.map(function(a,i){return '<a href="'+a[0]+'"><span class="n">'+String(i+1).padStart(2,'0')+'</span><b>'+a[1]+'</b><span>'+(/Texas|Worldwide/.test(a[2])?a[2]:a[2]+' County')+'</span></a>';}).join('');
 
 var S={slots:[],listings:[],shown:[],cur:null};
+$('hxNotify').addEventListener('click',function(){BXC.notifyLive('Homepage — hero notify me');});
 function liveHero(x){
   var s=x.stream,v=x.video,box=$('hxLive');box.innerHTML='';
   $('hx').classList.add('is-live');
-  $('hxSt').innerHTML='<span class="bx-live">Live'+(x.viewers>0?' · '+x.viewers:'')+'</span>&nbsp; '+esc(BXC.slotTitle(x));
-  var c=$('hxCta');c.removeAttribute('data-showing');c.href='/live-marketplace?stream='+encodeURIComponent(s?s.id:v.id);c.firstChild.nodeValue='Watch Live Now ';
-  $('hxLede').textContent=s?[s.location,s.host].filter(Boolean).join(' · ')+' — join the chat and ask anything.':'Streaming now on '+v.platformLabel+'. Tap to watch, then request a showing.';
+  $('hxPill').innerHTML='<i></i>Live';$('hxVw').textContent=x.viewers>0?x.viewers+' watching':'';
+  $('hxStTxt').textContent='On air now';
+  $('hxOff').hidden=true;var on=$('hxOn');on.hidden=false;on.href='/live-marketplace?stream='+encodeURIComponent(s?s.id:v.id);$('hxOnT').textContent=BXC.slotTitle(x);
+  $('hxLede').textContent=s?[s.location,s.host].filter(Boolean).join(' · ')+' — live now. Join the chat and ask anything, then request a private showing.':'Streaming now on '+v.platformLabel+'. Tap to watch, then request a showing.';
   if(s&&s.playbackUrl&&!/tiktok\.com/.test(s.playbackUrl))BL.mountPlayer(box,s);
   else if(v&&v.embedUrl){var n=document.createElement('iframe');n.src=v.embedUrl+(v.embedUrl.indexOf('?')>0?'&':'?')+'autoplay=1&mute=1&controls=0&playsinline=1&loop=1&rel=0';n.allow='autoplay';n.tabIndex=-1;box.appendChild(n);}
+  else if(BXC.slotImage(x)){box.innerHTML='<img src="'+esc(BXC.slotImage(x))+'" alt="" onerror="this.remove()">';}
 }
 function bigTile(x,i){
   var t=$('btLive'),live=x.kind==='live',v=x.video,s=x.stream;
@@ -336,7 +398,7 @@ BL.on('counts',function(m){[].forEach.call(document.querySelectorAll('.bx-vw[dat
 // a stream started/ended: refresh the tiles; swap the hero only if the visitor is still at the top
 var t=null,wasLive=false;BL.on('stream_status',function(){clearTimeout(t);t=setTimeout(function(){BL.api('/slots?n=8').then(function(j){var nowLive=(j.slots||[]).some(function(x){return x.kind==='live';});
   if(nowLive!==wasLive&&window.scrollY<300)return location.reload();S.slots=j.slots||[];render();});},900);});
-RX.liveStrip(document.getElementById('liveTiles'),{max:6,source:'Homepage — live tile',offLabel:'The next live tour is being scheduled.',hideEmpty:document.getElementById('live')});
+RX.liveStrip(document.getElementById('liveTiles'),{max:6,source:'Homepage — live tile',offLabel:'The next live tour is being scheduled.',});
 renderHomes(null);
 BL.available.then(function(ok){if(!ok){renderHomes({});return;}
   load().catch(function(){});BL.api('/listings?limit=6').then(renderHomes).catch(function(){renderHomes({});});

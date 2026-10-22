@@ -53,13 +53,13 @@ ${dd("Neighborhoods", `<div class="lbl">Tampa Bay, Sarasota &amp; Austin</div><a
 <a href="/relocation">Relocation</a>
 <a href="/listings">Listings</a>
 </nav>
-<div class="bx-act"><a class="bx-tel" href="tel:+18137818888">${I.phone}<span>813-781-8888</span></a><a class="bx-btn" href="/listings" data-showing data-source="Website — Nav">Request a showing</a></div>
+<div class="bx-act"><a class="bx-login" href="/login">Log in</a><a class="bx-tel" href="tel:+18137818888">${I.phone}<span>813-781-8888<small>LPT Realty</small></span></a><a class="bx-btn" href="/listings" data-showing data-source="Website — Nav">Request a showing</a></div>
 <a class="bx-mlive" href="/live-marketplace"><span class="bx-dot"></span>Live</a>
 <button class="bx-burger" id="bx-burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="bx-sheet"><span></span></button>
 </div></header>
 <div class="bx-sheet" id="bx-sheet">
 <a href="/live-marketplace">Live</a><a href="/new-construction">New Construction</a><a href="/apartment-locating">Apartments</a>
-${sheetGroup("Neighborhoods", [["/neighborhoods", "All neighborhoods"], ...AREAS])}<a href="/relocation">Relocation</a><a href="/listings">Listings</a>${sheetGroup("More", [["/buy", "Buy a home"], ["/sell", "Sell your home"], ...ABOUT.map(([h, t]) => [h, t])])}
+${sheetGroup("Neighborhoods", [["/neighborhoods", "All neighborhoods"], ...AREAS])}<a href="/relocation">Relocation</a><a href="/listings">Listings</a><a href="/login">Log in — clients &amp; agents</a>${sheetGroup("More", [["/buy", "Buy a home"], ["/sell", "Sell your home"], ...ABOUT.map(([h, t]) => [h, t])])}
 <div class="bx-sheet-cta"><a class="bx-btn" href="/listings" data-showing data-source="Website — Mobile menu">Request a showing</a><a class="bx-btn bx-btn--line" href="tel:+18137818888">${I.phone}Call 813-781-8888</a>
 <small>Dorota Maslowska, Broker Associate · LPT Realty · FL BK3519799</small></div>
 </div><!--/bl:nav-->`;
@@ -82,12 +82,12 @@ export const FOOTER = `<!--bl:footer--><footer class="bx-foot bx-grain"><div cla
 <div class="bx-btns"><a class="bx-btn bx-btn--gold bx-btn--sm" href="https://giftofgodministries.org/housing-ministry/" target="_blank" rel="noopener">Visit Gift of God Ministries</a><a class="bx-btn bx-btn--glass bx-btn--sm" href="/housing-resources">Housing resources</a></div>
 <p class="note">Gift of God Ministries is a separate 501(c)(3) nonprofit organization, not a real estate brokerage. Real estate services are provided only through LPT Realty.</p></aside>
 <p class="bx-lic">Dorota Maslowska, Broker Associate · LPT Realty · FL License BK3519799 · TX 829789-SA · Equal Housing Opportunity</p>
-<div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/sitemap.xml">Sitemap</a><a href="/admin" rel="nofollow">Owner login</a></nav></div>
+<div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://www.trec.texas.gov/forms/consumer-protection-notice" target="_blank" rel="noopener">TREC Consumer Protection Notice</a><a href="/sitemap.xml">Sitemap</a><a href="/admin" rel="nofollow">Owner login</a></nav></div>
 </div></footer><script src="/assets/js/site.js" defer></script><!--/bl:footer-->`;
 
 // ---------------------------------------------------------------- v4 (cream / near-black / Bottega green)
 // Rolled out page by page: only the pages in V4 get it; everything else keeps the shell above.
-export const V4 = new Set(["index.html", "listings/index.html", "buy/index.html", "new-construction/index.html", "apartment-locating/index.html", "sell/index.html", "live-marketplace/index.html", "neighborhoods/index.html"]);
+export const V4 = new Set(["index.html", "listings/index.html", "buy/index.html", "new-construction/index.html", "apartment-locating/index.html", "sell/index.html", "live-marketplace/index.html", "neighborhoods/index.html", "login/index.html"]);
 // Colour-version preview (v1 green touch, v2 petrol blue): ?theme= sets it and it follows you across pages.
 const THEME_JS = "<script>(function(){var d=document.documentElement,t='v1';try{var m=location.search.match(/[?&]theme=(v[12])/);if(m)sessionStorage.setItem('bl-theme',m[1]);t=sessionStorage.getItem('bl-theme')||t}catch(e){}d.className=d.className.replace(/\\s*theme-v\\d/g,'')+' theme-'+t})();</script>";
 const HEAD_V4 = '<!--bl:head-->' + THEME_JS + '<link rel="icon" type="image/svg+xml" href="/assets/mark-v4.svg">'
@@ -101,24 +101,27 @@ const NAV_V4 = NAV.replace(LOGO, LOGO_V4);
 // The branded footer for the redesigned pages: the real logo (two gems), the Proverbs 24:3 tagline, Gift of God
 // Ministries, the LPT compliance line. A faint texture sits behind it — no oversized wordmark.
 const FOOTER_V4 = `<!--bl:footer--><footer class="bx-foot v5-foot"><div class="bx-wrap">
-<div class="bx-foot-cta"><h2>See it live. <em>Then walk in.</em></h2><div class="bx-btns"><a class="bx-btn bx-btn--gold" href="/listings" data-showing data-source="Website — Footer">Request a showing</a></div></div>
+<div class="bx-foot-cta"><h2>See it live. <em>Then walk in.</em></h2><div class="bx-btns"><a class="bx-btn bx-btn--gold" href="/listings" data-showing data-source="Website — Footer">Request a showing</a><a class="bx-btn bx-btn--glass" href="https://wa.me/13013796785" target="_blank" rel="noopener" data-whatsapp data-label="Footer CTA">WhatsApp</a></div></div>
 <div class="v5-brand">${LOGO_V4}<div><p class="v5-tag">Wisdom builds. Bridges connect.</p><p class="v5-verse">&ldquo;By wisdom a house is built, and through understanding it is established.&rdquo; &mdash; Proverbs 24:3</p></div></div>
 <div class="bx-foot-grid">
 <div class="bx-foot-brand"><p>Real estate, streamed live — Tampa Bay, Sarasota, Austin and relocation from anywhere, with a licensed broker on the other side of every request.</p>
-<div class="bx-foot-contact"><a href="tel:+18137818888">${I.phone}813-781-8888</a><a href="mailto:dd@bridgesglobal.co">${I.mail}dd@bridgesglobal.co</a><a href="https://wa.me/13013796785" data-whatsapp data-label="Footer">${I.wa}WhatsApp</a></div></div>
+<div class="bx-foot-contact"><span class="bx-foot-brk">Dorota Maslowska, Broker Associate · LPT Realty</span><a href="tel:+18137818888">${I.phone}813-781-8888</a><a href="mailto:dd@bridgesglobal.co">${I.mail}dd@bridgesglobal.co</a><a href="https://wa.me/13013796785" data-whatsapp data-label="Footer">${I.wa}WhatsApp</a></div></div>
 <div class="bx-foot-col"><h4>Live &amp; new builds</h4><a href="/live-marketplace">Watch live</a><a href="/new-construction">New construction</a><a href="/listings">Homes for sale</a><a href="/list-with-us">For builders</a><a href="/become-a-streamer">Stream with us</a></div>
 <div class="bx-foot-col"><h4>Rent &amp; move</h4><a href="/apartment-locating">Apartments</a><a href="/relocation">Relocation</a><a href="/relocation-guide/">Relocation guide</a><a href="/buy">Buy a home</a><a href="/sell">Sell your home</a></div>
 <div class="bx-foot-col"><h4>Neighborhoods</h4><a href="/neighborhoods">All neighborhoods</a><a href="/tampa">Tampa</a><a href="/st-petersburg">St. Petersburg</a><a href="/sarasota">Sarasota</a><a href="/lakewood-ranch">Lakewood Ranch</a><a href="/parrish">Parrish</a></div>
 <div class="bx-foot-col"><h4>Bridges</h4><a href="/dorota-maslowska">About Dorota</a><a href="/live-show">The live show</a><a href="/blog/">Insights</a><a href="/housing-resources">Housing resources</a></div>
 </div>
-<aside class="bx-min" aria-label="Giving back — Gift of God Ministries"><div><span class="k">Giving Back</span><h3>Gift of God Ministries</h3>
-<p>A portion of every Bridges transaction supports Gift of God Ministries &mdash; a 501(c)(3) nonprofit providing housing education, relocation resources, and support to families in need across our communities. Wisdom builds. Bridges connect.</p></div>
-<div class="bx-btns"><a class="bx-btn bx-btn--gold bx-btn--sm" href="https://giftofgodministries.org/housing-ministry/" target="_blank" rel="noopener">Visit Gift of God Ministries</a><a class="bx-btn bx-btn--glass bx-btn--sm" href="/housing-resources">Housing resources</a></div>
+<aside class="v5-gog" aria-label="Giving back — Gift of God Ministries">
+<div class="v5-gog-mk" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22 24 7l18 15"/><path d="M11 18v22h26V18"/><path d="M24 35s-7-4.4-7-9.2A3.8 3.8 0 0 1 24 24a3.8 3.8 0 0 1 7 1.8C31 30.6 24 35 24 35z" fill="currentColor" stroke="none"/></svg></div>
+<div class="v5-gog-b"><span class="k">Giving back</span><h3>Gift of God Ministries</h3>
+<p>A portion of every Bridges transaction supports Gift of God Ministries &mdash; a 501(c)(3) nonprofit providing housing education, relocation resources, and support to families in need across our communities. Wisdom builds. Bridges connect.</p>
+<ul class="v5-gog-t"><li>Housing education</li><li>Relocation resources</li><li>Families in need</li></ul></div>
+<div class="v5-gog-a"><a class="bx-btn" href="https://giftofgodministries.org/housing-ministry/" target="_blank" rel="noopener">Visit Gift of God Ministries</a><a class="bx-link" href="/housing-resources">Housing resources</a></div>
 <p class="note">Gift of God Ministries is a separate 501(c)(3) nonprofit organization, not a real estate brokerage. Real estate services are provided only through LPT Realty.</p></aside>
 <div class="bx-legal"><div class="bx-eho">${I.eho}Equal Housing Opportunity</div>
 <p><b>Dorota Maslowska, Broker Associate · LPT Realty.</b> Florida License BK3519799 · Texas License 829789-SA. All real estate services are provided through LPT Realty. Bridges Global and Bridges Live are marketing and technology services, not a brokerage. Listing information is deemed reliable but not guaranteed; prices, incentives and market figures change frequently — verify before making decisions. Listings may be held by other brokerages. Earnest money is never collected through this website.</p></div>
 <p class="bx-lic">Dorota Maslowska, Broker Associate · LPT Realty · FL License BK3519799 · TX 829789-SA · Equal Housing Opportunity</p>
-<div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/sitemap.xml">Sitemap</a><a href="/admin" rel="nofollow">Owner login</a></nav></div>
+<div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://www.trec.texas.gov/forms/consumer-protection-notice" target="_blank" rel="noopener">TREC Consumer Protection Notice</a><a href="/sitemap.xml">Sitemap</a><a href="/admin" rel="nofollow">Owner login</a></nav></div>
 </div></footer><script src="/assets/js/site.js" defer></script><!--/bl:footer-->`;
 
 // "Why Bridges" — the trust panel stamped into <!--bl:trust--> on the key pages. Every line is a verifiable fact.
