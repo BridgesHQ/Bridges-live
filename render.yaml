@@ -57,6 +57,8 @@ services:
         value: "false"
       - key: ANTHROPIC_API_KEY
         sync: false
+      - key: MLSGRID_ACCESS_TOKEN
+        sync: false
       - key: BRIDGE_API_SERVER_TOKEN
         sync: false
       - key: REALTYAPI_KEY

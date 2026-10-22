@@ -53,12 +53,18 @@ export const config = {
     deliveryBase: env.CF_DELIVERY_BASE || "",                  // tests only; default https://customer-<code>.cloudflarestream.com
     pollMs: Number(env.CF_POLL_MS || 20_000),
   },
-  // Real listings, in priority order: Stellar MLS (Bridge Interactive RESO Web API) → RealtyAPI.
+  // Real listings — Stellar MLS only (IDX): MLS Grid or Bridge Interactive, whichever feed the MLS approved.
+  // RealtyAPI (public, non-MLS data) is off unless LISTINGS_ALLOW_NON_MLS=true.
   // Lofty IDX has no reusable feed, so the site links out to your Lofty search instead.
   listings: {
     bridgeToken: key(env.BRIDGE_API_SERVER_TOKEN || env.BRIDGE_API_TOKEN),
     bridgeDataset: env.BRIDGE_DATASET || "stellar",
     bridgeBase: env.BRIDGE_API_BASE || "https://api.bridgedataoutput.com/api/v2/OData",
+    mlsgridToken: key(env.MLSGRID_ACCESS_TOKEN || env.MLS_GRID_TOKEN),
+    mlsgridBase: env.MLSGRID_API_BASE || "https://api.mlsgrid.com/v2",
+    mlsgridSystem: env.MLSGRID_SYSTEM || "stellar",          // OriginatingSystemName in the MLS Grid feed
+    provider: String(env.LISTINGS_PROVIDER || "").toLowerCase(), // "mlsgrid" | "bridge" — only needed if a token is shared
+    allowNonMls: String(env.LISTINGS_ALLOW_NON_MLS || "").toLowerCase() === "true",
     realtyKey: key(env.REALTYAPI_KEY),
     realtyBase: env.REALTYAPI_BASE || "https://zillow.realtyapi.io",
     cities: (env.LISTING_CITIES || "Tampa;Riverview;Brandon;Apollo Beach;Wesley Chapel;Parrish;Lithia;Ruskin").split(/[;,]/).map((c) => c.trim()).filter(Boolean),

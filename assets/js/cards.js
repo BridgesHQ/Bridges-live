@@ -7,7 +7,7 @@
   C.esc = esc;
   C.money = function (n) { return n ? "$" + Number(n).toLocaleString("en-US", { maximumFractionDigits: 0 }) : ""; };
   C.date = function (iso) { try { return iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : ""; } catch (e) { return ""; } };
-  var MARK = '<span class="bx-mk"><svg viewBox="0 0 44 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M4 26Q22 0 40 26"/><path d="M1 26h42"/><path d="M13 26v-9M22 26V12M31 26v-9"/></svg></span>';
+  var MARK = '<span class="bx-mk"><svg viewBox="0 0 48 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 26C9 7 27 7 33 26"/><path d="M31 26c2.4-7 9.6-7 12 0"/><path d="M1 26h46"/><path d="M12 26v-8M18 26V13M24 26v-8"/></svg></span>';
   var PLAY = '<span class="bx-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span>';
   var ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   C.ARROW = ARROW;
@@ -55,10 +55,10 @@
     if (!BL) return;
     BL.requestShowingFor({ title: l.address + (l.city ? ", " + l.city : ""), meta: C.money(l.price), link: l.url || (l.mlsNumber ? "MLS# " + l.mlsNumber : ""), source: "Listing — Request a showing" });
   };
-  C.searchCard = function (url) {
-    return '<a class="bx-search bx-rv" href="' + esc(url || "https://bridgesglobal.co") + '" target="_blank" rel="noopener"><span class="bx-eyebrow">Stellar MLS search</span>'
+  C.searchCard = function (url, wide) {
+    return '<a class="bx-search bx-rv' + (wide ? " bx-search--wide" : "") + '" href="' + esc(url || "https://bridgesglobal.co") + '" target="_blank" rel="noopener"><span class="bx-eyebrow">Stellar MLS search</span>'
       + "<b>Every home for sale in Tampa Bay.</b><span>Live MLS data, updated throughout the day — save searches and get new listings first.</span>"
-      + '<span class="bx-link">Search all homes ' + ARROW + "</span></a>";
+      + '<span class="bx-btn bx-btn--gold">Search every MLS home ' + ARROW + "</span></a>";
   };
 
   /** Placeholder cards with the real cards' proportions, so the grid doesn't jump when data lands. */

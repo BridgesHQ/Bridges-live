@@ -74,5 +74,13 @@
     });
   });
 
+  // signature hover: the button's glow follows the pointer
+  d.addEventListener("pointermove", function (e) {
+    var b = e.target.closest && e.target.closest(".bx-btn");
+    if (!b) return;
+    var r = b.getBoundingClientRect();
+    b.style.setProperty("--mx", (e.clientX - r.left) + "px"); b.style.setProperty("--my", (e.clientY - r.top) + "px");
+  }, { passive: true });
+
   [].forEach.call(d.querySelectorAll(".bx-y"), function (e) { e.textContent = new Date().getFullYear(); });
 })();

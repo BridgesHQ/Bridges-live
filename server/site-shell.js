@@ -5,17 +5,22 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { PAGES, PERSON, faqJsonLd } from "./seo-content.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SKIP = new Set(["live/index.html", "admin/index.html"]); // redirect stub, own app shell
 
-// fonts are self-hosted (Inter + Playfair Display, OFL) — no third-party font request, no swap shift
-const HEAD = '<!--bl:head--><link rel="preload" href="/assets/fonts/playfair.woff2" as="font" type="font/woff2" crossorigin>'
-  + '<link rel="preload" href="/assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>'
+// Fraunces is self-hosted (OFL); General Sans comes from Fontshare's CDN (free licence; not on npm).
+const HEAD = '<!--bl:head--><link rel="preload" href="/assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>'
+  + '<link rel="preconnect" href="https://api.fontshare.com" crossorigin><link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>'
+  + '<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap">'
   + '<link rel="stylesheet" href="/assets/css/site.css"><!--/bl:head-->';
 
-const MARK = '<svg viewBox="0 0 44 32" aria-hidden="true" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round"><path d="M4 26Q22 0 40 26"/><path d="M1 26h42"/><path d="M13 26v-9M22 26V12M31 26v-9"/></svg>';
-export const LOGO = `<a class="bx-logo" href="/" aria-label="Bridges Global — home">${MARK}<b>BRIDGES <i>GLOBAL</i></b></a>`;
+// Bespoke mark: a long span and a short span over the Gulf, with the sun just above the water.
+export const MARK = '<svg viewBox="0 0 48 32" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle class="sun" cx="40" cy="8" r="3" fill="#1FA595"/>'
+  + '<g stroke="#C9A84C" stroke-width="2.2"><path d="M3 26C9 7 27 7 33 26"/><path d="M31 26c2.4-7 9.6-7 12 0"/><path d="M1 26h46"/></g>'
+  + '<path d="M12 26v-8M18 26V13M24 26v-8" stroke="#C9A84C" stroke-width="1.4"/><path d="M7 30h10M24 30h16" stroke="#1FA595" stroke-width="1.4" opacity=".7"/></svg>';
+export const LOGO = `<a class="bx-logo" href="/" aria-label="Bridges Global — home">${MARK}<b>Bridges<i>Global</i></b></a>`;
 const CARET = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
 const I = {
   phone: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>',
@@ -61,7 +66,7 @@ ${sheetGroup("Buy", BUY.slice(1))}${sheetGroup("Sell", SELL)}${sheetGroup("Neigh
 <small>Dorota Maslowska, Broker Associate · LPT Realty · FL BK3519799</small></div>
 </div><!--/bl:nav-->`;
 
-export const FOOTER = `<!--bl:footer--><footer class="bx-foot"><div class="bx-wrap">
+export const FOOTER = `<!--bl:footer--><footer class="bx-foot bx-grain"><div class="bx-wrap">
 <div class="bx-foot-cta"><h2>See it live. <em>Then see it in person.</em></h2><div class="bx-btns"><a class="bx-btn bx-btn--gold" href="/listings" data-showing data-source="Website — Footer">Request a showing</a><a class="bx-btn bx-btn--glass" href="/live-marketplace"><span class="bx-dot"></span>Watch live tours</a></div></div>
 <div class="bx-foot-grid">
 <div class="bx-foot-brand">${LOGO}<p>Tampa Bay real estate, streamed live — with a licensed broker on the other side of every request.</p>
@@ -73,6 +78,11 @@ export const FOOTER = `<!--bl:footer--><footer class="bx-foot"><div class="bx-wr
 </div>
 <div class="bx-legal"><div class="bx-eho">${I.eho}Equal Housing Opportunity</div>
 <p><b>Dorota Maslowska, Broker Associate · LPT Realty.</b> Florida License BK3519799 · Texas License 829789-SA. All real estate services are provided through LPT Realty. Bridges Global and Bridges Live are marketing and technology services, not a brokerage. Listing information is deemed reliable but not guaranteed; prices, incentives and market figures change frequently — verify before making decisions. Listings may be held by other brokerages. No fees to renters or buyers; compensation is paid by property owners and builders per applicable state law. Earnest money is never collected through this website.</p></div>
+<aside class="bx-min" aria-label="Giving back — Gift of God Ministries"><div><span class="k">Giving Back</span><h3>Gift of God Ministries</h3>
+<p class="v">&ldquo;By wisdom a house is built, and through understanding it is established.&rdquo; &mdash; Proverbs 24:3</p>
+<p>A portion of every Bridges transaction supports Gift of God Ministries &mdash; a 501(c)(3) nonprofit providing housing education, relocation resources, and support to families in need across our communities. Wisdom builds. Bridges connect.</p></div>
+<div class="bx-btns"><a class="bx-btn bx-btn--gold bx-btn--sm" href="https://giftofgodministries.org/housing-ministry/" target="_blank" rel="noopener">Visit Gift of God Ministries</a><a class="bx-btn bx-btn--glass bx-btn--sm" href="/housing-resources">Housing resources</a></div>
+<p class="note">Gift of God Ministries is a separate 501(c)(3) nonprofit organization, not a real estate brokerage. Real estate services are provided only through LPT Realty.</p></aside>
 <div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/sitemap.xml">Sitemap</a><a href="/admin" rel="nofollow">Owner login</a></nav></div>
 </div></footer><script src="/assets/js/site.js" defer></script><!--/bl:footer-->`;
 
@@ -81,7 +91,26 @@ function block(html, name, value, fallback) {
   return re.test(html) ? html.replace(re, () => value) : fallback(html);
 }
 
-export function stamp(html) {
+const escH = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const ld = (o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`;
+const answerBlock = (c) => `<!--bl:answer--><section class="bx-answer" aria-label="In short"><div class="bx-wrap"><span class="bx-eyebrow">In short</span><p>${escH(c.answer)}</p></div></section><!--/bl:answer-->`;
+const faqBlock = (c) => `<!--bl:faq--><section class="bx-faq" aria-labelledby="faq-h"><div class="bx-wrap"><span class="bx-eyebrow">Questions</span><h2 id="faq-h">Good to know</h2>`
+  + c.faqs.map((f) => `<details><summary>${escH(f.q)}</summary><p>${escH(f.a)}</p></details>`).join("") + `</div></section><!--/bl:faq-->`;
+
+/** Answer-engine blocks for the key pages: "In short" lead, visible FAQ, FAQPage (+ Person/RealEstateAgent) JSON-LD. */
+function seo(html, rel) {
+  const c = PAGES[rel];
+  if (!c) return html;
+  const graph = [faqJsonLd(c.faqs), ...(rel === "index.html" || rel === "dorota-maslowska/index.html" ? [PERSON] : [])];
+  const schema = `<!--bl:schema-->${graph.map(ld).join("")}<!--/bl:schema-->`;
+  html = block(html, "schema", schema, (h) => h.replace("</head>", () => schema + "\n</head>"));
+  html = block(html, "answer", answerBlock(c), (h) => h.replace(/(<header class="hero[^"]*"[\s\S]*?<\/header>)/, (m) => m + answerBlock(c)));
+  html = block(html, "faq", faqBlock(c), (h) => h.replace("<!--bl:footer-->", () => faqBlock(c) + "<!--bl:footer-->"));
+  return html;
+}
+
+export function stamp(html, rel = "") {
+  html = seo(html, rel);
   html = block(html, "head", HEAD, (h) => h
     .replace(/<link rel="preconnect" href="https:\/\/fonts\.(googleapis|gstatic)\.com"[^>]*>\s*/g, "")
     .replace(/<link href="https:\/\/fonts\.googleapis\.com\/css2[^>]*>\s*/g, "")
@@ -112,7 +141,7 @@ export function pages() {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   let changed = 0;
   for (const rel of pages()) {
-    const f = path.join(ROOT, rel), before = fs.readFileSync(f, "utf8"), after = stamp(before);
+    const f = path.join(ROOT, rel), before = fs.readFileSync(f, "utf8"), after = stamp(before, rel);
     if (after !== before) { fs.writeFileSync(f, after); changed++; }
   }
   console.log(`site shell stamped on ${changed} page(s)`);

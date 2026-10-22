@@ -1,14 +1,17 @@
 // Real property listings for the site — never invented. Sources, in priority order:
-//   1. Stellar MLS via Bridge Interactive's RESO Web API (BRIDGE_API_SERVER_TOKEN). IDX-approved
-//      listings only (InternetEntireListingDisplayYN), shown with the listing brokerage.
-//   2. RealtyAPI (REALTYAPI_KEY) — for-sale homes by city, used only when the MLS token isn't set.
+//   1. Stellar MLS via MLS Grid (MLSGRID_ACCESS_TOKEN) — IDX rows only (MlgCanView + MlgCanUse "IDX").
+//   2. Stellar MLS via Bridge Interactive's RESO Web API (BRIDGE_API_SERVER_TOKEN) — IDX rows only
+//      (InternetEntireListingDisplayYN). LISTINGS_PROVIDER=mlsgrid uses that token against MLS Grid.
+//   3. RealtyAPI (REALTYAPI_KEY) — public, non-MLS data; off unless LISTINGS_ALLOW_NON_MLS=true.
+// Every row is shown with its listing brokerage; until a feed is connected the site shows an MLS search link.
 // Lofty IDX (bridgesglobal.co) has no feed we may reuse, so the site links out to it instead.
 // Rows are cached in `mls_listings`; listings that drop out of the feed are marked inactive.
 import { config } from "../config.js";
 import { db, setSetting, getSetting } from "../db.js";
 
 const L = () => config.listings;
-export const listingSource = () => (L().bridgeToken ? "stellar-mls" : L().realtyKey ? "realtyapi" : null);
+const mlsgridToken = () => L().mlsgridToken || (L().provider === "mlsgrid" ? L().bridgeToken : "");
+export const listingSource = () => (mlsgridToken() ? "mlsgrid" : L().bridgeToken ? "stellar-mls" : L().allowNonMls && L().realtyKey ? "realtyapi" : null);
 
 const num = (v) => { const n = Number(String(v ?? "").replace(/[^0-9.]/g, "")); return Number.isFinite(n) && n > 0 ? n : null; };
 const str = (v, n = 200) => (v == null ? "" : String(v).trim().slice(0, n));
@@ -46,7 +49,30 @@ async function fetchBridge() {
   return out.slice(0, L().max);
 }
 
-// ---------------------------------------------------------------- RealtyAPI (fallback)
+// ---------------------------------------------------------------- Stellar MLS (MLS Grid, RESO)
+// MLS Grid only filters on a few fields (system, status, MlgCanView, ModificationTimestamp), so the
+// residential / city / IDX filtering happens here. Pulls the most recently changed active rows.
+async function fetchMlsGrid() {
+  const since = new Date(Date.now() - 30 * 864e5).toISOString().replace(/\.\d+Z$/, "Z");
+  const filter = `OriginatingSystemName eq '${L().mlsgridSystem}' and StandardStatus eq 'Active' and MlgCanView eq true and ModificationTimestamp gt ${since}`;
+  let url = `${L().mlsgridBase}/Property?$filter=${encodeURIComponent(filter)}&$expand=Media&$top=500`;
+  const want = new Set(L().cities.map((c) => c.toLowerCase())), out = [];
+  for (let page = 0; url && out.length < L().max && page < 10; page++) {
+    const r = await fetch(url, { headers: { Authorization: `Bearer ${mlsgridToken()}`, Accept: "application/json", "Accept-Encoding": "gzip" }, signal: AbortSignal.timeout(30_000) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(`MLS Grid ${r.status}: ${j.error?.message || j.message || r.statusText}`);
+    for (const p of j.value || []) {
+      const idx = !Array.isArray(p.MlgCanUse) || p.MlgCanUse.includes("IDX");
+      if (!idx || p.MlgCanView === false || (p.PropertyType && p.PropertyType !== "Residential")) continue;
+      if (want.size && !want.has(String(p.City || "").toLowerCase())) continue;
+      out.push({ ...mapReso(p), id: `mlsgrid:${p.ListingKey || p.ListingId}`, source: "mlsgrid" });
+    }
+    url = j["@odata.nextLink"] || null;
+  }
+  return out.slice(0, L().max);
+}
+
+// ---------------------------------------------------------------- RealtyAPI (opt-in, non-MLS)
 function findArray(j) {
   if (Array.isArray(j)) return j;
   for (const k of ["results", "searchResults", "listResults", "props", "listings", "data", "homes"]) {
@@ -90,8 +116,8 @@ async function fetchRealty() {
 // ---------------------------------------------------------------- sync + read
 export async function syncListings() {
   const source = listingSource();
-  if (!source) return { ok: false, source: null, reason: "No listing feed connected yet (BRIDGE_API_SERVER_TOKEN or REALTYAPI_KEY)." };
-  const rows = source === "stellar-mls" ? await fetchBridge() : await fetchRealty();
+  if (!source) return { ok: false, source: null, reason: "No MLS feed connected yet (MLSGRID_ACCESS_TOKEN or BRIDGE_API_SERVER_TOKEN)." };
+  const rows = source === "mlsgrid" ? await fetchMlsGrid() : source === "stellar-mls" ? await fetchBridge() : await fetchRealty();
   const now = new Date().toISOString();
   for (const r of rows) await db.upsert("mls_listings", { ...r, synced_at: now });
   // anything from this source that wasn't in the feed is no longer active
@@ -110,12 +136,14 @@ export async function syncListingsIfStale(maxAgeMs = 60 * 60_000) {
 }
 
 export const ATTRIBUTION = {
+  mlsgrid: "Listing data provided by Stellar MLS through MLS Grid. Information is deemed reliable but not guaranteed. Listings marked with a brokerage name are listed by that brokerage, not necessarily by Bridges Global / LPT Realty.",
   "stellar-mls": "Listing data provided by Stellar MLS through Bridge Interactive. Information is deemed reliable but not guaranteed. Listings marked with a brokerage name are listed by that brokerage, not necessarily by Bridges Global / LPT Realty.",
   realtyapi: "Listing information from public listing sources. Deemed reliable but not guaranteed — verify with the listing brokerage. Listings may be listed by other brokerages.",
 };
 
 export async function publicListings({ limit = 12, city } = {}) {
-  let rows = await db.select("mls_listings", { status: "active" }).catch(() => []);
+  const allowed = new Set(["mlsgrid", "stellar-mls", ...(L().allowNonMls ? ["realtyapi"] : [])]);
+  let rows = (await db.select("mls_listings", { status: "active" }).catch(() => [])).filter((r) => allowed.has(r.source));
   if (city) rows = rows.filter((r) => r.city?.toLowerCase() === String(city).toLowerCase());
   rows = rows.filter((r) => r.price && r.address && (r.photos || []).length)
     .sort((a, b) => String(b.modified_at || b.synced_at || "").localeCompare(String(a.modified_at || a.synced_at || "")));
