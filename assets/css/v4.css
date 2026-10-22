@@ -612,3 +612,39 @@ body.rx .bx-foot{--serif:Fraunces,'Fraunces Fallback',Georgia,serif}
 body.rx .bx-foot .bx-btn{background:#2E6B4F}
 body.rx .bx-foot .bx-btn:hover{background:#F4F1EA;color:#1A1A1A!important}
 body.rx .bx-foot .bx-btn--glass{background:rgba(244,241,234,.14)}
+
+/* ================================================================== colour versions (compare via ?theme=v1|v2|v3) */
+html.theme-v1{--accent:#1A1A1A;--accent-d:#000;--accent-l:#D9D2C3;--accent-t:#ECE7DC;--green-9:#161616;--green-8:#242424;--live:#1A1A1A}
+html.theme-v2{--accent:#1B3A2F;--accent-d:#122A21;--accent-l:#A9C4B5;--accent-t:#E1EAE4;--green-9:#13291F;--green-8:#1B3A2F;--live:#1B3A2F}
+html.theme-v3{--accent:#2D6A9F;--accent-d:#22547F;--accent-l:#A8C8E4;--accent-t:#E3EDF6;--green-9:#14324D;--green-8:#1D4466;--live:#2D6A9F}
+html.theme-v1 .v4-band{background:#1A1A1A}
+html.theme-v1 .bx-tile--accent{background:#fff;border-color:var(--line);color:var(--ink)}
+html.theme-v1 .bx-tile--accent h3,html.theme-v1 .bx-tile--accent .n{color:var(--ink)}
+html.theme-v1 .bx-tile--accent p{color:var(--mute)}
+html.theme-v1 .hx h1 em{color:#fff}
+html.theme-v1 .bx-display em,html.theme-v1 .bx-h2 em{color:var(--mute)}
+
+/* real photography in tiles and sections */
+.ph-tile{position:relative;isolation:isolate;overflow:hidden}
+.ph-tile>img.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:transform 1.2s var(--ease)}
+.ph-tile:hover>img.ph{transform:scale(1.04)}
+.ph-tile::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(15,15,14,.15) 25%,rgba(15,15,14,.78))}
+.ph-tile,.ph-tile h3,.ph-tile .n{color:#fff!important}
+.ph-tile p{color:rgba(255,255,255,.82)!important}
+.ph-tile.bx-tile{border:0}
+.bx-ed-img img{background:var(--bone-2)}
+
+/* every headline in Fraunces — real-estate pages included (body/UI stays Hanken Grotesk) */
+body.rx .rx-h1,body.rx .rx-row h2,body.rx .rx-guide h2,body.rx .bx-faq h2,body.rx .bx-h2,body.rx .bx-search b,body.rx .bx-home-p,body.rx .bx-empty h3{font-family:Fraunces,'Fraunces Fallback',Georgia,serif!important;font-variation-settings:'opsz' 144,'SOFT' 0,'WONK' 0!important;font-weight:380!important;letter-spacing:-.025em!important}
+body.rx .rx-h1 em{font-style:italic;font-variation-settings:'opsz' 144,'SOFT' 0,'WONK' 1!important;color:var(--mute)}
+body.rx .rx-row h2{font-size:clamp(32px,3.8vw,56px)}
+.rx-fig{position:relative;border-radius:var(--r-lg);overflow:hidden;aspect-ratio:4/5;background:#F4F1EA}
+.rx-fig img{width:100%;height:100%;object-fit:cover}
+.rx-fig figcaption{position:absolute;left:14px;bottom:12px;font:500 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+
+/* license line (footer) */
+.bx-lic{margin:24px 0 0!important;font:500 12.5px/1.6 var(--sans);letter-spacing:.02em;color:rgba(244,241,234,.86)}
+/* buttons on the dark footer stay legible in every colour version */
+.bx-foot .bx-btn,.bx-foot .bx-btn--gold,body.rx .bx-foot .bx-btn{background:var(--bone);color:#1A1A1A!important}
+.bx-foot .bx-btn:hover,body.rx .bx-foot .bx-btn:hover{background:#fff;color:#1A1A1A!important}
+.bx-foot .bx-btn--glass{background:transparent;color:#fff!important;border-color:rgba(244,241,234,.5)}
