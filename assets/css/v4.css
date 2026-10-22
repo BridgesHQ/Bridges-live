@@ -781,3 +781,14 @@ body.rx .wb{background:#F4F1EA}
 .rx-tiles--grid{grid-template-columns:repeat(var(--cols,5),minmax(0,1fr))!important}
 @media (max-width:760px){.rx-tiles--grid{grid-template-columns:1fr 1fr!important}.rx-tiles--grid>.rx-tile:last-child:nth-child(odd){grid-column:span 2;aspect-ratio:16/10}}
 .rx-tiles--grid>.bx-empty{grid-column:1/-1}
+
+/* homepage: area cards and the apartments tile are typographic (no stock photo pretending to be a place) */
+.rx-area--type{background:#1A1A1A;aspect-ratio:4/5}
+.rx-area--type:nth-child(2),.rx-area--type:nth-child(3){background:#1B3A2F}
+.rx-area--type::after{background:url(/assets/overlay.svg) center/160% no-repeat;opacity:.08}
+.rx-area--type:hover::after{opacity:.14}
+.rx-area--type b{font-size:clamp(28px,2.6vw,44px)!important}
+.bx-tile.v5-type{background:#1B3A2F;border-color:#1B3A2F;position:relative;overflow:hidden;isolation:isolate}
+.bx-tile.v5-type::before{content:"";position:absolute;inset:-10%;z-index:-1;background:url(/assets/overlay.svg) center/cover no-repeat;opacity:.1}
+.bx-tile.v5-type h3,.bx-tile.v5-type .n{color:#F4F1EA!important}
+.bx-tile.v5-type p{color:rgba(244,241,234,.78)!important}
