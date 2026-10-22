@@ -67,6 +67,7 @@ export const config = {
     allowNonMls: String(env.LISTINGS_ALLOW_NON_MLS || "").toLowerCase() === "true",
     realtyKey: key(env.REALTYAPI_KEY),
     realtyBase: env.REALTYAPI_BASE || "https://zillow.realtyapi.io",
+    apartmentsBase: env.REALTYAPI_APARTMENTS_BASE || "https://apartments.realtyapi.io", // rental communities (Apartments.com data)
     cities: (env.LISTING_CITIES || "Tampa;Riverview;Brandon;Apollo Beach;Wesley Chapel;Parrish;Lithia;Ruskin").split(/[;,]/).map((c) => c.trim()).filter(Boolean),
     max: Number(env.LISTING_MAX || 60),
     searchUrl: env.LOFTY_SEARCH_URL || "https://bridgesglobal.co",

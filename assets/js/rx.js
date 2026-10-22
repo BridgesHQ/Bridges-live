@@ -20,7 +20,7 @@
     return '<div class="rx-tile rx-tile--off' + (wide ? " rx-tile--wide" : "") + '"><span><small>Off air</small><b style="display:block">' + esc(label || "The next live tour is being scheduled.") + '</b></span><span class="ask" data-rx-notify>Notify me when we go live</span></div>';
   }
 
-  /** Fill `el` with live tiles. opts: { cats: ["new","apt"] (stream categories), max, source, offLabel, hideEmpty (element to hide when nothing has aired) } */
+  /** Fill `el` with live tiles. opts: { cats: ["new","apt"] (stream categories), max, source, offLabel, streamsOnly (no recorded/social videos), hideEmpty (element to hide when nothing has aired) } */
   RX.tile = tile;
   RX.offTile = offTile;
   RX.liveStrip = function (el, opts) {
@@ -29,6 +29,7 @@
     el.innerHTML = new Array(Math.min(max, 4) + 1).join('<div class="rx-tile rx-tile--off bx-skel" aria-hidden="true"></div>');
     function want(x) {
       if (x.kind === "upcoming" && !x.stream) return false;
+      if (opts.streamsOnly && !x.stream) return false; // live/upcoming streams only — no recorded or social clips
       if (x.stream && opts.cats && opts.cats.length && opts.cats.indexOf(x.stream.category) < 0) return false;
       return true;
     }

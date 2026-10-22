@@ -13,6 +13,7 @@ import { runDueFollowups, unsubscribeToken } from "./leads/sequence.js";
 import { integrations } from "./leads/providers.js";
 import { scanReddit } from "./prospects/reddit.js";
 import { cloudflareEnabled, createLiveInput, getLiveInput, deleteLiveInput, hlsUrl as hlsUrlFor, listRecordings, getDownload, createDownload } from "./stream/cloudflare.js";
+import { apartmentsEnabled, searchApartments } from "./apartments/search.js";
 import { publicListings, syncListings, syncListingsIfStale, listingSource } from "./listings/sync.js";
 import { youtubeVideos, socialStatus, syncSocial, syncSocialIfStale, visibleVideos, videoFromUrl, tiktokConfigured, tiktokAuthUrl, tiktokStateOk, tiktokExchangeCode, instagramAppConfigured, instagramAuthUrl, instagramExchangeCode, stateOk } from "./social/sync.js";
 import { setSetting, missingTables } from "./db.js";
@@ -176,6 +177,15 @@ function shapeVideo(v) {
 }
 
 // ------------------------------------------------------------------ real listings
+// Apartment communities for /apartment-locating (server-side key; nothing shown when no key is set)
+api.get("/apartments", wrap(async (req, res) => {
+  if (!apartmentsEnabled()) return res.json({ enabled: false, apartments: [] });
+  const state = /austin/i.test(String(req.query.location || "")) ? "TX" : "FL";
+  const city = String(req.query.location || "Tampa").replace(/,.*$/, "").trim() || "Tampa";
+  try { res.set("Cache-Control", "public, max-age=600").json({ enabled: true, apartments: await searchApartments(`${city}, ${state}`) }); }
+  catch (e) { res.json({ enabled: true, apartments: [], error: "The apartment feed is not responding right now." }); }
+}));
+
 api.get("/listings", wrap(async (req, res) => {
   res.json(await publicListings({ limit: req.query.limit, city: clean(req.query.city, 60) }));
 }));
