@@ -48,4 +48,5 @@
   <url><loc>https://live.bridgesglobal.co/live-show</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
 <url><loc>https://live.bridgesglobal.co/privacy</loc><priority>0.2</priority></url>
 <url><loc>https://live.bridgesglobal.co/terms</loc><priority>0.2</priority></url>
+  <url><loc>https://live.bridgesglobal.co/neighborhoods</loc><priority>0.8</priority></url>
 </urlset>

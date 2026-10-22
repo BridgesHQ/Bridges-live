@@ -74,6 +74,13 @@ export const PAGES = {
       { q: "Which areas do you cover for apartments?", a: "Tampa Bay, Sarasota and Austin, Texas — including renters relocating from other states and countries." },
     ],
   },
+  "neighborhoods/index.html": {
+    answer: "Bridges Global covers neighborhoods across Tampa Bay, Sarasota and Austin, from Tampa, St. Petersburg and Clearwater to Lakewood Ranch, Parrish and Sarasota. Ask for a live video tour and a licensed broker with LPT Realty walks the streets, the commute and the homes with you, so you can choose before you fly in.",
+    faqs: [
+      { q: "Can you tour a neighborhood for me on live video?", a: "Yes. Tell us which neighborhoods you are considering and what matters to you — schools, commute, water, walkability — and we tour the streets and homes live, in your time zone." },
+      MARKETS, SHOWING,
+    ],
+  },
   "tampa/index.html": {
     answer: "Tampa is one of the most in-demand housing markets in the country, with options from walkable city neighborhoods to new-construction suburbs like Riverview, Wesley Chapel and Parrish. Bridges Global tours Tampa homes on live video, so buyers and renters moving from other states or countries can see a home before they visit.",
     faqs: [

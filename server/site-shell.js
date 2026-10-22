@@ -52,7 +52,7 @@ ${LOGO}
 <a href="/listings">Listings</a>
 ${dd("Buy", panel(BUY))}
 ${dd("Sell", panel(SELL))}
-${dd("Neighborhoods", `<div class="lbl">Tampa Bay &amp; beyond</div>${AREAS.map(([h, t]) => `<a href="${h}">${t}</a>`).join("")}`, " grid")}
+${dd("Neighborhoods", `<div class="lbl">Tampa Bay, Sarasota &amp; Austin</div><a href="/neighborhoods">All neighborhoods</a>${AREAS.map(([h, t]) => `<a href="${h}">${t}</a>`).join("")}`, " grid")}
 ${dd("About", panel(ABOUT))}
 </nav>
 <div class="bx-act"><a class="bx-tel" href="tel:+18137818888">${I.phone}<span>813-781-8888</span></a><a class="bx-btn" href="/listings" data-showing data-source="Website — Nav">Request a showing</a></div>
@@ -61,7 +61,7 @@ ${dd("About", panel(ABOUT))}
 </div></header>
 <div class="bx-sheet" id="bx-sheet">
 <a href="/live-marketplace">Watch live</a><a href="/listings">Homes for sale</a>
-${sheetGroup("Buy", BUY.slice(1))}${sheetGroup("Sell", SELL)}${sheetGroup("Neighborhoods", AREAS)}${sheetGroup("About", ABOUT)}
+${sheetGroup("Buy", BUY.slice(1))}${sheetGroup("Sell", SELL)}${sheetGroup("Neighborhoods", [["/neighborhoods", "All neighborhoods"], ...AREAS])}${sheetGroup("About", ABOUT)}
 <div class="bx-sheet-cta"><a class="bx-btn" href="/listings" data-showing data-source="Website — Mobile menu">Request a showing</a><a class="bx-btn bx-btn--line" href="tel:+18137818888">${I.phone}Call 813-781-8888</a>
 <small>Dorota Maslowska, Broker Associate · LPT Realty · FL BK3519799</small></div>
 </div><!--/bl:nav-->`;
@@ -73,7 +73,7 @@ export const FOOTER = `<!--bl:footer--><footer class="bx-foot bx-grain"><div cla
 <div class="bx-foot-contact"><a href="tel:+18137818888">${I.phone}813-781-8888</a><a href="mailto:dd@bridgesglobal.co">${I.mail}dd@bridgesglobal.co</a><a href="https://wa.me/13013796785" data-whatsapp data-label="Footer">${I.wa}WhatsApp</a></div></div>
 <div class="bx-foot-col"><h4>Buy &amp; rent</h4><a href="/buy">Buy a home</a><a href="/listings">Homes for sale</a><a href="/new-construction">New construction</a><a href="/apartment-locating">Apartments</a><a href="/relocation">Relocation</a><a href="/relocation-guide/">Relocation guide</a></div>
 <div class="bx-foot-col"><h4>Sell</h4><a href="/sell">Sell your home</a><a href="/home-value">Home value</a><a href="/list-with-us">List with us</a><a href="/housing-resources">Housing resources</a></div>
-<div class="bx-foot-col"><h4>Neighborhoods</h4><a href="/tampa">Tampa</a><a href="/brandon">Brandon</a><a href="/riverview">Riverview</a><a href="/wesley-chapel">Wesley Chapel</a><a href="/parrish">Parrish</a><a href="/sarasota">Sarasota</a></div>
+<div class="bx-foot-col"><h4>Neighborhoods</h4><a href="/neighborhoods">All neighborhoods</a><a href="/tampa">Tampa</a><a href="/brandon">Brandon</a><a href="/riverview">Riverview</a><a href="/wesley-chapel">Wesley Chapel</a><a href="/parrish">Parrish</a><a href="/sarasota">Sarasota</a></div>
 <div class="bx-foot-col"><h4>Bridges Live</h4><a href="/live-marketplace">Watch live</a><a href="/live-show">The live show</a><a href="/become-a-streamer">Stream with us</a><a href="/blog/">Insights</a><a href="/dorota-maslowska">About Dorota</a></div>
 </div>
 <div class="bx-legal"><div class="bx-eho">${I.eho}Equal Housing Opportunity</div>
@@ -89,8 +89,10 @@ export const FOOTER = `<!--bl:footer--><footer class="bx-foot bx-grain"><div cla
 
 // ---------------------------------------------------------------- v4 (cream / near-black / Bottega green)
 // Rolled out page by page: only the pages in V4 get it; everything else keeps the shell above.
-export const V4 = new Set(["index.html", "listings/index.html", "buy/index.html", "new-construction/index.html", "apartment-locating/index.html", "sell/index.html", "live-marketplace/index.html"]);
-const HEAD_V4 = '<!--bl:head--><link rel="icon" type="image/svg+xml" href="/assets/mark-v4.svg">'
+export const V4 = new Set(["index.html", "listings/index.html", "buy/index.html", "new-construction/index.html", "apartment-locating/index.html", "sell/index.html", "live-marketplace/index.html", "neighborhoods/index.html"]);
+// Colour-version preview (v1 green touch, v2 petrol blue): ?theme= sets it and it follows you across pages.
+const THEME_JS = "<script>(function(){var d=document.documentElement,t='v1';try{var m=location.search.match(/[?&]theme=(v[12])/);if(m)sessionStorage.setItem('bl-theme',m[1]);t=sessionStorage.getItem('bl-theme')||t}catch(e){}d.className=d.className.replace(/\\s*theme-v\\d/g,'')+' theme-'+t})();</script>";
+const HEAD_V4 = '<!--bl:head-->' + THEME_JS + '<link rel="icon" type="image/svg+xml" href="/assets/mark-v4.svg">'
   + '<link rel="preload" href="/assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>'
   + '<link rel="preload" href="/assets/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>'
   + '<link rel="stylesheet" href="/assets/css/v4.css"><!--/bl:head-->';

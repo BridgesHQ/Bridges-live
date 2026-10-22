@@ -7,6 +7,7 @@
 - [Bridges Live — live tours & recent walkthroughs](https://live.bridgesglobal.co/live-marketplace): every live stream and recent video tour.
 - [Buy a home](https://live.bridgesglobal.co/buy): shortlist on live video, visit only the one.
 - [Homes for sale](https://live.bridgesglobal.co/listings): active Stellar MLS listings (IDX) with listing-brokerage attribution, or a link to the full MLS search.
+- [Neighborhoods](https://live.bridgesglobal.co/neighborhoods): Tampa Bay, Sarasota and Austin neighborhoods, each toured live on video on request.
 - [Dorota Maslowska, Broker Associate](https://live.bridgesglobal.co/dorota-maslowska): licenses, languages, services.
 - [New construction](https://live.bridgesglobal.co/new-construction): buyer representation with builders across Tampa Bay.
 - [Relocation to Tampa Bay](https://live.bridgesglobal.co/relocation): moving from another state or country.
