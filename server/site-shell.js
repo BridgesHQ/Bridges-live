@@ -35,9 +35,9 @@ const AREAS = [
   ["/wesley-chapel", "Wesley Chapel"], ["/parrish", "Parrish"], ["/lakewood-ranch", "Lakewood Ranch"], ["/bradenton", "Bradenton"],
   ["/sarasota", "Sarasota"], ["/st-petersburg", "St. Petersburg"], ["/clearwater", "Clearwater"], ["/orlando", "Orlando"],
 ];
-const BUY = [["/listings", "Homes for sale", "Active MLS listings across Tampa Bay"], ["/new-construction", "New construction", "Builder incentives, buyer-represented"],
-  ["/apartment-locating", "Apartments", "Free apartment locating"], ["/relocation", "Relocation", "Moving to Tampa Bay"], ["/watch-before-you-fly", "Watch before you fly", "Live video tours from anywhere"]];
-const SELL = [["/sell", "Sell your home", "Showings streamed live to buyers"], ["/home-value", "What's my home worth?", "A broker's opinion, free"], ["/list-with-us", "List with us", "Builders &amp; communities"]];
+const BUY = [["/buy", "Buy a home", "Shortlist on live video"], ["/listings", "Homes for sale", "Active MLS listings"], ["/new-construction", "New construction", "Builder incentives, buyer-represented"],
+  ["/apartment-locating", "Apartments", "Live unit tours"], ["/relocation", "Relocation", "Moving from anywhere"], ["/watch-before-you-fly", "Watch before you fly", "Live video tours from anywhere"]];
+const SELL = [["/sell", "Sell your home", "Showings streamed live to buyers"], ["/home-value", "What's my home worth?", "A broker's opinion of value"], ["/list-with-us", "List with us", "Builders &amp; communities"]];
 const ABOUT = [["/dorota-maslowska", "Dorota Maslowska", "Broker Associate · LPT Realty"], ["/become-a-streamer", "Stream on Bridges Live", "For licensed agents &amp; builders"],
   ["/blog/", "Insights", "Guides to the Tampa Bay market"], ["/advertise", "Advertise", "Reach buyers while they watch"]];
 
@@ -71,13 +71,13 @@ export const FOOTER = `<!--bl:footer--><footer class="bx-foot bx-grain"><div cla
 <div class="bx-foot-grid">
 <div class="bx-foot-brand">${LOGO}<p>Tampa Bay real estate, streamed live — with a licensed broker on the other side of every request.</p>
 <div class="bx-foot-contact"><a href="tel:+18137818888">${I.phone}813-781-8888</a><a href="mailto:dd@bridgesglobal.co">${I.mail}dd@bridgesglobal.co</a><a href="https://wa.me/13013796785" data-whatsapp data-label="Footer">${I.wa}WhatsApp</a></div></div>
-<div class="bx-foot-col"><h4>Buy &amp; rent</h4><a href="/listings">Homes for sale</a><a href="/new-construction">New construction</a><a href="/apartment-locating">Apartments</a><a href="/relocation">Relocation</a><a href="/relocation-guide/">Relocation guide</a></div>
+<div class="bx-foot-col"><h4>Buy &amp; rent</h4><a href="/buy">Buy a home</a><a href="/listings">Homes for sale</a><a href="/new-construction">New construction</a><a href="/apartment-locating">Apartments</a><a href="/relocation">Relocation</a><a href="/relocation-guide/">Relocation guide</a></div>
 <div class="bx-foot-col"><h4>Sell</h4><a href="/sell">Sell your home</a><a href="/home-value">Home value</a><a href="/list-with-us">List with us</a><a href="/housing-resources">Housing resources</a></div>
 <div class="bx-foot-col"><h4>Neighborhoods</h4><a href="/tampa">Tampa</a><a href="/brandon">Brandon</a><a href="/riverview">Riverview</a><a href="/wesley-chapel">Wesley Chapel</a><a href="/parrish">Parrish</a><a href="/sarasota">Sarasota</a></div>
 <div class="bx-foot-col"><h4>Bridges Live</h4><a href="/live-marketplace">Watch live</a><a href="/live-show">The live show</a><a href="/become-a-streamer">Stream with us</a><a href="/blog/">Insights</a><a href="/dorota-maslowska">About Dorota</a></div>
 </div>
 <div class="bx-legal"><div class="bx-eho">${I.eho}Equal Housing Opportunity</div>
-<p><b>Dorota Maslowska, Broker Associate · LPT Realty.</b> Florida License BK3519799 · Texas License 829789-SA. All real estate services are provided through LPT Realty. Bridges Global and Bridges Live are marketing and technology services, not a brokerage. Listing information is deemed reliable but not guaranteed; prices, incentives and market figures change frequently — verify before making decisions. Listings may be held by other brokerages. No fees to renters or buyers; compensation is paid by property owners and builders per applicable state law. Earnest money is never collected through this website.</p></div>
+<p><b>Dorota Maslowska, Broker Associate · LPT Realty.</b> Florida License BK3519799 · Texas License 829789-SA. All real estate services are provided through LPT Realty. Bridges Global and Bridges Live are marketing and technology services, not a brokerage. Listing information is deemed reliable but not guaranteed; prices, incentives and market figures change frequently — verify before making decisions. Listings may be held by other brokerages. Earnest money is never collected through this website.</p></div>
 <aside class="bx-min" aria-label="Giving back — Gift of God Ministries"><div><span class="k">Giving Back</span><h3>Gift of God Ministries</h3>
 <p class="v">&ldquo;By wisdom a house is built, and through understanding it is established.&rdquo; &mdash; Proverbs 24:3</p>
 <p>A portion of every Bridges transaction supports Gift of God Ministries &mdash; a 501(c)(3) nonprofit providing housing education, relocation resources, and support to families in need across our communities. Wisdom builds. Bridges connect.</p></div>
@@ -88,10 +88,10 @@ export const FOOTER = `<!--bl:footer--><footer class="bx-foot bx-grain"><div cla
 
 // ---------------------------------------------------------------- v4 (cream / near-black / Bottega green)
 // Rolled out page by page: only the pages in V4 get it; everything else keeps the shell above.
-export const V4 = new Set(["index.html"]);
+export const V4 = new Set(["index.html", "listings/index.html", "buy/index.html", "new-construction/index.html", "apartment-locating/index.html", "sell/index.html", "live-marketplace/index.html"]);
 const HEAD_V4 = '<!--bl:head--><link rel="icon" type="image/svg+xml" href="/assets/mark-v4.svg">'
   + '<link rel="preload" href="/assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>'
-  + '<link rel="preload" href="/assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>'
+  + '<link rel="preload" href="/assets/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>'
   + '<link rel="stylesheet" href="/assets/css/v4.css"><!--/bl:head-->';
 // The brand mark: two faceted gems meeting at a point (from the Bridges Global card).
 const GEM = '<path d="M2 17 20 5 46 3 70 17 46 31 20 29Z"/><path d="M2 17h68M20 5l14 12-14 12M46 3 38 17l8 14M20 5l26 26M46 3 20 29"/>';
@@ -99,6 +99,8 @@ export const MARK_V4 = `<svg viewBox="0 0 140 34" aria-hidden="true" fill="none"
 export const LOGO_V4 = `<a class="bx-logo" href="/" aria-label="Bridges Global — home">${MARK_V4}<b>Bridges<i>Global</i></b></a>`;
 const NAV_V4 = NAV.replace(LOGO, LOGO_V4);
 const FOOTER_V4 = FOOTER.replace(LOGO, LOGO_V4).replace('<footer class="bx-foot bx-grain">', '<footer class="bx-foot v4-ov">')
+  .replace("<h2>See it live. <em>Then see it in person.</em></h2>", "<h2>See it live. <em>Then walk in.</em></h2>")
+  .replace(/<a class="bx-btn bx-btn--glass" href="\/live-marketplace">[\s\S]*?<\/a>/, "")
   .replace("</div></footer>", '</div><span class="bx-giant" aria-hidden="true">Bridges</span></footer>');
 
 function block(html, name, value, fallback) {
@@ -115,10 +117,11 @@ const faqBlock = (c) => `<!--bl:faq--><section class="bx-faq" aria-labelledby="f
 /** Answer-engine blocks for the key pages: "In short" lead, visible FAQ, FAQPage (+ Person/RealEstateAgent) JSON-LD. */
 function seo(html, rel) {
   const c = PAGES[rel];
-  if (!c) return html;
-  const graph = [faqJsonLd(c.faqs), ...(rel === "index.html" || rel === "dorota-maslowska/index.html" ? [PERSON] : [])];
+  // every page carries the broker / RealEstateAgent graph; key pages add their FAQPage
+  const graph = [...(c ? [faqJsonLd(c.faqs)] : []), PERSON];
   const schema = `<!--bl:schema-->${graph.map(ld).join("")}<!--/bl:schema-->`;
   html = block(html, "schema", schema, (h) => h.replace("</head>", () => schema + "\n</head>"));
+  if (!c) return html;
   html = block(html, "answer", answerBlock(c), (h) => h.replace(/(<header class="hero[^"]*"[\s\S]*?<\/header>)/, (m) => m + answerBlock(c)));
   html = block(html, "faq", faqBlock(c), (h) => h.replace("<!--bl:footer-->", () => faqBlock(c) + "<!--bl:footer-->"));
   return html;
