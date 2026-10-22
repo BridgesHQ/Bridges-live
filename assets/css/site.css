@@ -2,11 +2,10 @@
  * Shared by every public page: tokens, type, buttons, cards, the nav (.bx-nav), the footer (.bx-foot)
  * and an editorial skin for the older content pages (body.bx-content).
  * Navy #0E1E52 + gold #C9A84C + warm neutrals + a Gulf sea-glass accent.
- * Type: Fraunces (self-hosted, OFL — soft, slightly wonky optical serif) for headlines;
- * General Sans (Fontshare, loaded in <head>) for body. */
-@font-face{font-family:Fraunces;font-style:normal;font-weight:100 900;font-display:swap;src:url(/assets/fonts/fraunces.woff2) format('woff2-variations'),url(/assets/fonts/fraunces.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:Fraunces;font-style:italic;font-weight:100 900;font-display:swap;src:url(/assets/fonts/fraunces-italic.woff2) format('woff2-variations'),url(/assets/fonts/fraunces-italic.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+ * Type: Hanken Grotesk (self-hosted, OFL) for headlines and body. */
 /* metric-matched fallbacks so the swap to web fonts doesn't shift layout */
+@font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:100 900;font-display:swap;src:url(/assets/fonts/hanken-grotesk.woff2) format('woff2-variations'),url(/assets/fonts/hanken-grotesk.woff2) format('woff2')}
+@font-face{font-family:'Hanken Fallback';src:local('Arial'),local('Helvetica');size-adjust:93%;ascent-override:98%;descent-override:25%;line-gap-override:0%}
 @font-face{font-family:'Fraunces Fallback';src:local('Georgia'),local('Times New Roman');size-adjust:101%;ascent-override:95%;descent-override:25%;line-gap-override:0%}
 @font-face{font-family:'General Sans Fallback';src:local('Arial'),local('Helvetica');size-adjust:101%;ascent-override:93%;descent-override:22%;line-gap-override:0%}
 :root{
@@ -22,8 +21,8 @@
   --sh-3:0 30px 80px rgba(8,19,58,.22);
   --ease:cubic-bezier(.2,.75,.2,1);
   --gut:clamp(16px,4.4vw,56px);--max:1320px;
-  --serif:Fraunces,'Fraunces Fallback',Georgia,'Times New Roman',serif;
-  --sans:'General Sans','General Sans Fallback',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --serif:'Hanken Grotesk','Hanken Fallback',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --sans:'Hanken Grotesk','Hanken Fallback',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --nav-h:76px;
 }
 @media(max-width:899px){:root{--nav-h:64px}}
@@ -410,3 +409,9 @@ body.bx-content .bx-answer .bx-wrap{max-width:880px}
 .bx-faq details[open] summary::after{transform:rotate(45deg);background:var(--sea-t)}
 .bx-faq details p{margin:0 0 22px!important;max-width:68ch;font-size:16px!important;line-height:1.7!important;color:var(--mute)!important}
 body.bx-dark .bx-faq,body.bx-dark .bx-answer{background:var(--navy-9);border-color:rgba(255,255,255,.08)}
+
+/* one face: headlines in Hanken Grotesk, bold and tight; no italics */
+h1,h2,h3,.bx-display,.bx-h2,.bx-h3{font-style:normal!important;font-variation-settings:normal!important}
+.bx-display,.bx-h2,h1,h2{font-weight:640!important;letter-spacing:-.04em!important}
+h1 em,h2 em,h3 em,.bx-display em,.bx-h2 em{font-style:normal!important;font-weight:300!important}
+.bx-foot .bx-foot-cta h2{color:#fff!important}

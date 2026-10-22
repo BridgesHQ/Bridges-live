@@ -10,10 +10,8 @@ import { PAGES, PERSON, faqJsonLd } from "./seo-content.js";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SKIP = new Set(["live/index.html", "admin/index.html"]); // redirect stub, own app shell
 
-// Fraunces is self-hosted (OFL); General Sans comes from Fontshare's CDN (free licence; not on npm).
-const HEAD = '<!--bl:head--><link rel="preload" href="/assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>'
-  + '<link rel="preconnect" href="https://api.fontshare.com" crossorigin><link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>'
-  + '<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap">'
+// Hanken Grotesk is self-hosted (OFL) and is the only typeface on the site.
+const HEAD = '<!--bl:head--><link rel="preload" href="/assets/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>'
   + '<link rel="stylesheet" href="/assets/css/site.css"><!--/bl:head-->';
 
 // Bespoke mark: a long span and a short span over the Gulf, with the sun just above the water.
@@ -49,19 +47,19 @@ export const NAV = `<!--bl:nav--><header class="bx-nav" id="bx-nav"><div class="
 ${LOGO}
 <nav class="bx-menu" aria-label="Main">
 <a href="/live-marketplace"><span class="bx-dot"></span>Live</a>
-<a href="/listings">Listings</a>
-${dd("Buy", panel(BUY))}
-${dd("Sell", panel(SELL))}
+<a href="/new-construction">New Construction</a>
+<a href="/apartment-locating">Apartments</a>
 ${dd("Neighborhoods", `<div class="lbl">Tampa Bay, Sarasota &amp; Austin</div><a href="/neighborhoods">All neighborhoods</a>${AREAS.map(([h, t]) => `<a href="${h}">${t}</a>`).join("")}`, " grid")}
-${dd("About", panel(ABOUT))}
+<a href="/relocation">Relocation</a>
+<a href="/listings">Listings</a>
 </nav>
 <div class="bx-act"><a class="bx-tel" href="tel:+18137818888">${I.phone}<span>813-781-8888</span></a><a class="bx-btn" href="/listings" data-showing data-source="Website — Nav">Request a showing</a></div>
 <a class="bx-mlive" href="/live-marketplace"><span class="bx-dot"></span>Live</a>
 <button class="bx-burger" id="bx-burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="bx-sheet"><span></span></button>
 </div></header>
 <div class="bx-sheet" id="bx-sheet">
-<a href="/live-marketplace">Watch live</a><a href="/listings">Homes for sale</a>
-${sheetGroup("Buy", BUY.slice(1))}${sheetGroup("Sell", SELL)}${sheetGroup("Neighborhoods", [["/neighborhoods", "All neighborhoods"], ...AREAS])}${sheetGroup("About", ABOUT)}
+<a href="/live-marketplace">Live</a><a href="/new-construction">New Construction</a><a href="/apartment-locating">Apartments</a>
+${sheetGroup("Neighborhoods", [["/neighborhoods", "All neighborhoods"], ...AREAS])}<a href="/relocation">Relocation</a><a href="/listings">Listings</a>${sheetGroup("More", [["/buy", "Buy a home"], ["/sell", "Sell your home"], ...ABOUT.map(([h, t]) => [h, t])])}
 <div class="bx-sheet-cta"><a class="bx-btn" href="/listings" data-showing data-source="Website — Mobile menu">Request a showing</a><a class="bx-btn bx-btn--line" href="tel:+18137818888">${I.phone}Call 813-781-8888</a>
 <small>Dorota Maslowska, Broker Associate · LPT Realty · FL BK3519799</small></div>
 </div><!--/bl:nav-->`;
@@ -83,7 +81,7 @@ export const FOOTER = `<!--bl:footer--><footer class="bx-foot bx-grain"><div cla
 <p>A portion of every Bridges transaction supports Gift of God Ministries &mdash; a 501(c)(3) nonprofit providing housing education, relocation resources, and support to families in need across our communities. Wisdom builds. Bridges connect.</p></div>
 <div class="bx-btns"><a class="bx-btn bx-btn--gold bx-btn--sm" href="https://giftofgodministries.org/housing-ministry/" target="_blank" rel="noopener">Visit Gift of God Ministries</a><a class="bx-btn bx-btn--glass bx-btn--sm" href="/housing-resources">Housing resources</a></div>
 <p class="note">Gift of God Ministries is a separate 501(c)(3) nonprofit organization, not a real estate brokerage. Real estate services are provided only through LPT Realty.</p></aside>
-<p class="bx-lic">Dorota Maslowska, Broker Associate · LPT Realty · License BK3519799 · Equal Housing Opportunity</p>
+<p class="bx-lic">Dorota Maslowska, Broker Associate · LPT Realty · FL License BK3519799 · TX 829789-SA · Equal Housing Opportunity</p>
 <div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/sitemap.xml">Sitemap</a><a href="/admin" rel="nofollow">Owner login</a></nav></div>
 </div></footer><script src="/assets/js/site.js" defer></script><!--/bl:footer-->`;
 
@@ -93,7 +91,6 @@ export const V4 = new Set(["index.html", "listings/index.html", "buy/index.html"
 // Colour-version preview (v1 green touch, v2 petrol blue): ?theme= sets it and it follows you across pages.
 const THEME_JS = "<script>(function(){var d=document.documentElement,t='v1';try{var m=location.search.match(/[?&]theme=(v[12])/);if(m)sessionStorage.setItem('bl-theme',m[1]);t=sessionStorage.getItem('bl-theme')||t}catch(e){}d.className=d.className.replace(/\\s*theme-v\\d/g,'')+' theme-'+t})();</script>";
 const HEAD_V4 = '<!--bl:head-->' + THEME_JS + '<link rel="icon" type="image/svg+xml" href="/assets/mark-v4.svg">'
-  + '<link rel="preload" href="/assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>'
   + '<link rel="preload" href="/assets/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>'
   + '<link rel="stylesheet" href="/assets/css/v4.css"><!--/bl:head-->';
 // The brand mark: two faceted gems meeting at a point (from the Bridges Global card).
@@ -101,10 +98,40 @@ const GEM = '<path d="M2 17 20 5 46 3 70 17 46 31 20 29Z"/><path d="M2 17h68M20 
 export const MARK_V4 = `<svg viewBox="0 0 140 34" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><g class="gem l">${GEM}</g><g class="gem r"><g transform="translate(140 0) scale(-1 1)">${GEM}</g></g></svg>`;
 export const LOGO_V4 = `<a class="bx-logo" href="/" aria-label="Bridges Global — home">${MARK_V4}<b>Bridges<i>Global</i></b></a>`;
 const NAV_V4 = NAV.replace(LOGO, LOGO_V4);
-const FOOTER_V4 = FOOTER.replace(LOGO, LOGO_V4).replace('<footer class="bx-foot bx-grain">', '<footer class="bx-foot v4-ov">')
-  .replace("<h2>See it live. <em>Then see it in person.</em></h2>", "<h2>See it live. <em>Then walk in.</em></h2>")
-  .replace(/<a class="bx-btn bx-btn--glass" href="\/live-marketplace">[\s\S]*?<\/a>/, "")
-  .replace("</div></footer>", '</div><span class="bx-giant" aria-hidden="true">Bridges</span></footer>');
+// The branded footer for the redesigned pages: the real logo (two gems), the Proverbs 24:3 tagline, Gift of God
+// Ministries, the LPT compliance line. A faint texture sits behind it — no oversized wordmark.
+const FOOTER_V4 = `<!--bl:footer--><footer class="bx-foot v5-foot"><div class="bx-wrap">
+<div class="bx-foot-cta"><h2>See it live. <em>Then walk in.</em></h2><div class="bx-btns"><a class="bx-btn bx-btn--gold" href="/listings" data-showing data-source="Website — Footer">Request a showing</a></div></div>
+<div class="v5-brand">${LOGO_V4}<div><p class="v5-tag">Wisdom builds. Bridges connect.</p><p class="v5-verse">&ldquo;By wisdom a house is built, and through understanding it is established.&rdquo; &mdash; Proverbs 24:3</p></div></div>
+<div class="bx-foot-grid">
+<div class="bx-foot-brand"><p>Real estate, streamed live — Tampa Bay, Sarasota, Austin and relocation from anywhere, with a licensed broker on the other side of every request.</p>
+<div class="bx-foot-contact"><a href="tel:+18137818888">${I.phone}813-781-8888</a><a href="mailto:dd@bridgesglobal.co">${I.mail}dd@bridgesglobal.co</a><a href="https://wa.me/13013796785" data-whatsapp data-label="Footer">${I.wa}WhatsApp</a></div></div>
+<div class="bx-foot-col"><h4>Live &amp; new builds</h4><a href="/live-marketplace">Watch live</a><a href="/new-construction">New construction</a><a href="/listings">Homes for sale</a><a href="/list-with-us">For builders</a><a href="/become-a-streamer">Stream with us</a></div>
+<div class="bx-foot-col"><h4>Rent &amp; move</h4><a href="/apartment-locating">Apartments</a><a href="/relocation">Relocation</a><a href="/relocation-guide/">Relocation guide</a><a href="/buy">Buy a home</a><a href="/sell">Sell your home</a></div>
+<div class="bx-foot-col"><h4>Neighborhoods</h4><a href="/neighborhoods">All neighborhoods</a><a href="/tampa">Tampa</a><a href="/st-petersburg">St. Petersburg</a><a href="/sarasota">Sarasota</a><a href="/lakewood-ranch">Lakewood Ranch</a><a href="/parrish">Parrish</a></div>
+<div class="bx-foot-col"><h4>Bridges</h4><a href="/dorota-maslowska">About Dorota</a><a href="/live-show">The live show</a><a href="/blog/">Insights</a><a href="/housing-resources">Housing resources</a></div>
+</div>
+<aside class="bx-min" aria-label="Giving back — Gift of God Ministries"><div><span class="k">Giving Back</span><h3>Gift of God Ministries</h3>
+<p>A portion of every Bridges transaction supports Gift of God Ministries &mdash; a 501(c)(3) nonprofit providing housing education, relocation resources, and support to families in need across our communities. Wisdom builds. Bridges connect.</p></div>
+<div class="bx-btns"><a class="bx-btn bx-btn--gold bx-btn--sm" href="https://giftofgodministries.org/housing-ministry/" target="_blank" rel="noopener">Visit Gift of God Ministries</a><a class="bx-btn bx-btn--glass bx-btn--sm" href="/housing-resources">Housing resources</a></div>
+<p class="note">Gift of God Ministries is a separate 501(c)(3) nonprofit organization, not a real estate brokerage. Real estate services are provided only through LPT Realty.</p></aside>
+<div class="bx-legal"><div class="bx-eho">${I.eho}Equal Housing Opportunity</div>
+<p><b>Dorota Maslowska, Broker Associate · LPT Realty.</b> Florida License BK3519799 · Texas License 829789-SA. All real estate services are provided through LPT Realty. Bridges Global and Bridges Live are marketing and technology services, not a brokerage. Listing information is deemed reliable but not guaranteed; prices, incentives and market figures change frequently — verify before making decisions. Listings may be held by other brokerages. Earnest money is never collected through this website.</p></div>
+<p class="bx-lic">Dorota Maslowska, Broker Associate · LPT Realty · FL License BK3519799 · TX 829789-SA · Equal Housing Opportunity</p>
+<div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/sitemap.xml">Sitemap</a><a href="/admin" rel="nofollow">Owner login</a></nav></div>
+</div></footer><script src="/assets/js/site.js" defer></script><!--/bl:footer-->`;
+
+// "Why Bridges" — the trust panel stamped into <!--bl:trust--> on the key pages. Every line is a verifiable fact.
+const TICK = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6z"/><path d="m8.6 12.2 2.4 2.4 4.4-4.8"/></svg>';
+export const TRUST = `<!--bl:trust--><section class="wb" aria-labelledby="wb-h"><div class="bx-wrap">
+<div class="wb-head"><span class="bx-eyebrow">Why Bridges</span><h2 id="wb-h">Real broker. Real homes. <em>Real tours.</em></h2>
+<p>Live shopping has a trust problem: fake listings, paid actors, numbers that don't add up. Bridges is built the other way round.</p></div>
+<div class="wb-g">
+<div class="wb-i">${TICK}<h3>A licensed broker on every request</h3><p>Dorota Maslowska, Broker Associate with LPT Realty. Florida BK3519799 · Texas 829789-SA. <a href="https://www.myfloridalicense.com/" target="_blank" rel="noopener">Verify the license</a></p></div>
+<div class="wb-i">${TICK}<h3>Real MLS listings</h3><p>Homes come from the MLS with the listing brokerage and MLS number shown. No placeholder or sample homes, ever.</p></div>
+<div class="wb-i">${TICK}<h3>Verified live tours</h3><p>Only approved, licensed agents and builders can stream. The LIVE badge and viewer count appear only while a camera is really on air.</p></div>
+<div class="wb-i">${I.eho}<h3>Fair Housing</h3><p>Equal Housing Opportunity. Every buyer and renter gets the same homes, the same information and the same service.</p></div>
+</div></div></section><!--/bl:trust-->`;
 
 function block(html, name, value, fallback) {
   const re = new RegExp(`<!--bl:${name}-->[\\s\\S]*?<!--/bl:${name}-->`);
@@ -138,6 +165,7 @@ export function stamp(html, rel = "") {
     .replace(/<link href="https:\/\/fonts\.googleapis\.com\/css2[^>]*>\s*/g, "")
     .replace("</head>", () => head + "\n</head>"));
   html = block(html, "nav", nav, (h) => h.replace(/<nav class="bgnav">[\s\S]*?<\/nav>/, () => nav + '<div class="bx-nav-sp"></div>'));
+  html = block(html, "trust", TRUST, (h) => h);
   html = block(html, "footer", footer, (h) => h.replace(/<footer>[\s\S]*?<\/footer>/, () => footer));
   // retire the old nav overflow patch and the "representative imagery" captions
   html = html.replace(/<style>\.bgmenu>\.bgdrop:last-child \.bgpanel\{left:auto;right:0\}[^<]*<\/style>\s*/g, "")

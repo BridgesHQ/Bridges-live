@@ -113,7 +113,7 @@ export const config = {
   showSeedStreams: bool(env.SHOW_SEED_STREAMS, false),
   // Demo mode: grid shows the seeded audience size on top of real sockets (off = real viewers only).
   demoMode: bool(env.DEMO_MODE, false),
-  autoApproveStreams: bool(env.AUTO_APPROVE_STREAMS, true),
+  autoApproveStreams: bool(env.AUTO_APPROVE_STREAMS, false), // public applications wait for admin approval unless explicitly turned on
 };
 
 // WhatsApp number: one place to set it — assets/js/site-config.js (whatsappNumber) — or WHATSAPP_NUMBER.

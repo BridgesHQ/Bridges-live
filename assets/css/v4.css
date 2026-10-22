@@ -1,15 +1,12 @@
 /* Bridges Global — v4 system (homepage first; other pages move over once approved).
  * Cream #F4F1EA + near-black #1A1A1A + Bottega green #2E6B4F, lots of negative space. No navy, no gold.
- * Type: Fraunces at high optical contrast (brand headlines) + Hanken Grotesk (body/UI), both self-hosted, OFL.
- * Two looks: brand (homepage) = green/cream/near-black + Fraunces; real estate (body.rx) = black/white/cream,
+ * Type: Hanken Grotesk only (self-hosted, OFL): large, tight, bold headlines; regular-weight body.
+ * Two looks: brand (homepage) = green/cream/near-black + Hanken Grotesk headlines; real estate (body.rx) = black/white/cream,
  * clean sans headlines. Logo, nav and footer are the same in both. */
-@font-face{font-family:Fraunces;font-style:normal;font-weight:100 900;font-display:swap;src:url(/assets/fonts/fraunces.woff2) format('woff2-variations'),url(/assets/fonts/fraunces.woff2) format('woff2')}
-@font-face{font-family:Fraunces;font-style:italic;font-weight:100 900;font-display:swap;src:url(/assets/fonts/fraunces-italic.woff2) format('woff2-variations'),url(/assets/fonts/fraunces-italic.woff2) format('woff2')}
 @font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:100 900;font-display:swap;src:url(/assets/fonts/hanken-grotesk.woff2) format('woff2-variations'),url(/assets/fonts/hanken-grotesk.woff2) format('woff2')}
-@font-face{font-family:'Fraunces Fallback';src:local('Georgia'),local('Times New Roman');size-adjust:98%;ascent-override:96%;descent-override:25%;line-gap-override:0%}
 @font-face{font-family:'Hanken Fallback';src:local('Arial'),local('Helvetica');size-adjust:93%;ascent-override:100%;descent-override:26%;line-gap-override:0%}
 
-:root{--fvs:'opsz' 60,'SOFT' 0,'WONK' 0;
+:root{--fvs:normal;
   --bone:#F4F1EA;--bone-2:#ECE7DC;--paper:#FAF8F3;--ink:#1A1A1A;--ink-2:#2B2A28;--ink-3:#121211;
   --text:#2B2A28;--mute:#6E6A62;--faint:#A39E93;--line:#DCD6C9;--line-2:#E8E3D8;
   --accent:#2E6B4F;--accent-d:#22543D;--accent-l:#9CC3AE;--accent-t:#E2ECE5;--green-9:#1C3F2F;--green-8:#24513C;
@@ -23,7 +20,7 @@
   --sh-3:0 30px 80px rgba(18,18,17,.25);
   --ease:cubic-bezier(.2,.75,.2,1);
   --gut:clamp(16px,4vw,56px);--max:1440px;
-  --serif:Fraunces,'Fraunces Fallback',Georgia,'Times New Roman',serif;
+  --serif:'Hanken Grotesk','Hanken Fallback',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --sans:'Hanken Grotesk','Hanken Fallback',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --mono:'Hanken Grotesk','Hanken Fallback',system-ui,sans-serif;
   --nav-h:72px;
@@ -608,7 +605,6 @@ body.rx .bx-chip{font:500 14px/1 var(--sans);letter-spacing:0;text-transform:non
 body.rx .bx-search .bx-btn{background:#fff;color:#000!important}
 body.rx .bx-search .bx-btn:hover{background:#2E6B4F;color:#fff!important}
 /* the footer stays in the brand look on every page */
-body.rx .bx-foot{--serif:Fraunces,'Fraunces Fallback',Georgia,serif}
 body.rx .bx-foot .bx-btn{background:#2E6B4F}
 body.rx .bx-foot .bx-btn:hover{background:#F4F1EA;color:#1A1A1A!important}
 body.rx .bx-foot .bx-btn--glass{background:rgba(244,241,234,.14)}
@@ -631,9 +627,6 @@ html .hx h1 em{color:#fff}
 .ph-tile.bx-tile{border:0}
 .bx-ed-img img{background:var(--bone-2)}
 
-/* every headline in Fraunces — real-estate pages included (body/UI stays Hanken Grotesk) */
-body.rx .rx-h1,body.rx .rx-row h2,body.rx .rx-guide h2,body.rx .bx-faq h2,body.rx .bx-h2,body.rx .bx-search b,body.rx .bx-home-p,body.rx .bx-empty h3{font-family:Fraunces,'Fraunces Fallback',Georgia,serif!important;font-variation-settings:var(--fvs)!important;font-weight:360!important;letter-spacing:-.025em!important}
-body.rx .rx-h1 em{font-style:italic;font-variation-settings:var(--fvs)!important;color:var(--mute);font-weight:340!important}
 body.rx .rx-row h2{font-size:clamp(32px,3.8vw,56px)}
 .rx-fig{position:relative;border-radius:var(--r-lg);overflow:hidden;aspect-ratio:4/5;background:#F4F1EA}
 .rx-fig img{width:100%;height:100%;object-fit:cover}
@@ -687,3 +680,104 @@ body.rx .rx-row h2{font-size:clamp(32px,3.8vw,56px)}
   .rx-areas--2{grid-template-columns:1fr}
   .rx-area--big{aspect-ratio:4/3}
 }
+
+/* ================================================================== HEADLINES: Hanken Grotesk only — large, tight, bold
+   One face for everything; the editorial character comes from scale, a heavy weight, very tight tracking and a
+   lighter-weight second line (em) instead of an italic serif. */
+.bx-display,.bx-h2,.bx-h3,.rx-h1,.rx-row h2,.rx-guide h2,.bx-faq h2,.bx-foot-cta h2,.bx-tile h3,.bx-tile--media .cap b,.bx-home-p,.bx-search b,.bx-empty h3,
+.rx-area b,.rx-areas-g h3,.v4-rv .big,.bx-min h3,.bx-tour-t,.wb h2,.wb h3,.nc h2,.nc h3,body.bx-content h1,body.bx-content h2,body.bx-content h3,body.bx-content .fact .n,
+body.rx .bx-display,body.rx .bx-h2,body.rx .bx-h3,body.rx .bx-faq h2,body.rx .bx-tile h3,body.rx .bx-empty h3,body.rx .bx-search b,body.rx .bx-home-p{
+  font-family:var(--sans)!important;font-style:normal!important;font-variation-settings:normal!important;font-weight:640!important;letter-spacing:-.045em!important;text-wrap:balance}
+.bx-display,.rx-h1{font-weight:660!important;letter-spacing:-.055em!important;line-height:.9!important}
+.bx-display{font-size:clamp(52px,11vw,184px)!important}
+.rx-h1{font-size:clamp(46px,7vw,116px)!important}
+.bx-h2,.rx-row h2,.rx-guide h2,.bx-faq h2,.bx-foot-cta h2{line-height:.95!important}
+.bx-h3,.bx-tile h3,.bx-tour-t,.rx-area b,.rx-areas-g h3,.bx-min h3{letter-spacing:-.03em!important;font-weight:600!important}
+.bx-display em,.bx-h2 em,.bx-h3 em,.rx-h1 em,.rx-row h2 em,.bx-foot-cta h2 em,.bx-tile h3 em,.wb h2 em,.nc h2 em,body.rx .bx-h2 em,body.rx .rx-h1 em{
+  font-style:normal!important;font-variation-settings:normal!important;font-weight:300!important;letter-spacing:-.045em;color:var(--accent)}
+.hx h1 em,.bx-foot-cta h2 em,.bx-tile--ink h3 em,.bx-tile--accent h3 em,.ph-tile h3 em,.bx-search b em,.nc-hero h1 em{color:rgba(255,255,255,.72)!important}
+.bx-answer p{font-family:var(--sans)!important;font-variation-settings:normal!important;font-weight:400!important;letter-spacing:-.012em!important}
+.bx-logo b{font-family:var(--sans)!important;font-variation-settings:normal!important;font-weight:400!important}
+.bx-kin:hover{font-variation-settings:normal;letter-spacing:inherit}
+
+/* ================================================================== branded footer (v5): real logo, tagline, subtle texture */
+.v5-foot{position:relative;isolation:isolate;background:#1A1A1A!important}
+.v5-foot::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+  background:radial-gradient(120% 70% at 85% 0%,rgba(27,58,47,.55),transparent 60%),
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.v5-foot::after{content:"";position:absolute;right:-8%;bottom:-10%;width:min(900px,90vw);aspect-ratio:1;z-index:-1;pointer-events:none;background:url(/assets/overlay.svg) center/contain no-repeat;opacity:.05}
+.v5-brand{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:28px 56px;padding:0 0 clamp(44px,5vw,64px);margin-bottom:clamp(44px,5vw,64px);border-bottom:1px solid rgba(244,241,234,.12)}
+.v5-brand .bx-logo svg{width:116px!important;height:28px!important}
+.v5-brand .bx-logo b{font-size:19px!important;letter-spacing:.38em}
+.v5-brand>div{max-width:46ch;text-align:right}
+.v5-tag{margin:0;font:640 clamp(26px,2.8vw,40px)/1.05 var(--sans);letter-spacing:-.04em;color:var(--bone)}
+.v5-verse{margin:12px 0 0;font:400 14px/1.6 var(--sans);color:rgba(244,241,234,.55)}
+.v5-foot .bx-foot-brand p{margin-top:0}
+.v5-foot .bx-min{margin-top:clamp(48px,6vw,72px)}
+.v5-foot .bx-lic{color:rgba(244,241,234,.75)}
+@media (max-width:760px){.v5-brand>div{text-align:left}}
+
+/* ================================================================== Why Bridges (trust) */
+.wb{padding:clamp(80px,10vw,152px) 0;background:var(--bone);border-top:1px solid var(--line)}
+body.rx .wb{background:#F4F1EA}
+.wb-head{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:24px clamp(32px,6vw,96px);align-items:end;margin-bottom:clamp(48px,6vw,80px)}
+.wb-head .bx-eyebrow{grid-column:1/-1}
+.wb h2{margin:0;font-size:clamp(40px,5.6vw,88px)!important;line-height:.94!important;color:var(--ink)}
+.wb-head p{margin:0;max-width:40ch;font:400 17px/1.6 var(--sans);color:var(--mute)}
+.wb-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:1px solid var(--ink)}
+.wb-i{padding:30px clamp(18px,2vw,32px) 8px 0}
+.wb-i+.wb-i{padding-left:clamp(18px,2vw,32px);border-left:1px solid var(--line)}
+.wb-i svg{width:30px;height:30px;color:var(--accent)}
+.wb h3{margin:22px 0 10px;font-size:21px!important;line-height:1.15!important;letter-spacing:-.02em!important;color:var(--ink)}
+.wb-i p{margin:0;font:400 15px/1.6 var(--sans);color:var(--mute)}
+.wb-i a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+@media (max-width:900px){.wb-head{grid-template-columns:1fr}.wb-g{grid-template-columns:1fr 1fr}.wb-i:nth-child(3){padding-left:0;border-left:0}.wb-i:nth-child(n+3){border-top:1px solid var(--line);margin-top:24px}}
+@media (max-width:520px){.wb-g{grid-template-columns:1fr}.wb-i,.wb-i+.wb-i{padding-left:0;border-left:0}.wb-i+.wb-i{border-top:1px solid var(--line);margin-top:20px}}
+
+/* ================================================================== New Construction (builder-facing flagship) */
+.nc-hero{position:relative;isolation:isolate;min-height:min(92svh,940px);display:flex;align-items:flex-end;color:#fff;background:#1A1A1A;overflow:hidden}
+.nc-bg{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover}
+.nc-hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(26,26,26,.35) 0%,rgba(26,26,26,0) 30%,rgba(26,26,26,.15) 55%,rgba(26,26,26,.82) 100%)}
+.nc-hero .bx-wrap{width:100%;padding-top:140px;padding-bottom:clamp(36px,5vw,64px)}
+.nc-hero .bx-eyebrow{color:rgba(255,255,255,.8)}
+.nc-hero h1{margin:22px 0 0;max-width:12ch;font:660 clamp(54px,9.4vw,164px)/.88 var(--sans);letter-spacing:-.058em;color:#fff;text-wrap:balance}
+.nc-hero h1 em{font-style:normal;font-weight:300;color:rgba(255,255,255,.72)}
+.nc-foot{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px 40px;margin-top:clamp(28px,4vw,48px);padding-top:clamp(20px,2.4vw,28px);border-top:1px solid rgba(255,255,255,.28)}
+.nc-foot p{margin:0;max-width:48ch;font:400 clamp(16px,1.4vw,19px)/1.55 var(--sans);color:rgba(255,255,255,.88)}
+.nc-hero .bx-btn,.nc-inc .bx-btn{background:#F4F1EA!important;color:#1A1A1A!important;min-height:58px;padding:0 32px;font-size:16px}
+.nc-hero .bx-btn:hover,.nc-inc .bx-btn:hover{background:#fff!important}
+.nc-models{padding:clamp(72px,9vw,136px) 0 clamp(56px,7vw,96px)}
+.nc-models .rx-row h2,.nc-comm .rx-row h2{font-size:clamp(40px,5.4vw,84px)!important}
+.nc-tiles{height:clamp(400px,42vw,560px);grid-auto-columns:clamp(240px,27vw,330px)}
+.nc-inc{padding:clamp(80px,10vw,144px) 0;background:#1B3A2F;color:rgba(244,241,234,.78)}
+.nc-inc-h{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:22px clamp(32px,6vw,96px);align-items:end}
+.nc-inc-h .bx-eyebrow{grid-column:1/-1;color:rgba(244,241,234,.7)}
+.nc-inc-h h2{grid-row:2/4;margin:0;font:640 clamp(40px,5.6vw,88px)/.94 var(--sans);letter-spacing:-.05em;color:#F4F1EA;text-wrap:balance}
+.nc-inc-h h2 em{font-style:normal;font-weight:300;color:rgba(244,241,234,.66)}
+.nc-inc-h p{margin:0;font:400 17px/1.6 var(--sans)}
+.nc-inc-h .bx-btn{justify-self:start}
+.nc-inc-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:clamp(56px,7vw,96px);border-top:1px solid rgba(244,241,234,.35)}
+.nc-inc-g>div{padding:28px clamp(18px,2vw,32px) 0 0}
+.nc-inc-g>div+div{padding-left:clamp(18px,2vw,32px);border-left:1px solid rgba(244,241,234,.16)}
+.nc-inc-g .n{font:500 12px/1 var(--sans);letter-spacing:.16em;color:rgba(244,241,234,.55)}
+.nc-inc-g h3{margin:40px 0 12px;font:620 clamp(22px,1.9vw,28px)/1.1 var(--sans)!important;letter-spacing:-.03em!important;color:#F4F1EA}
+.nc-inc-g p{margin:0;font:400 15px/1.6 var(--sans)}
+.nc-note{margin:48px 0 0;font:400 13px/1.5 var(--sans);color:rgba(244,241,234,.5)}
+.rx-areas--3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.rx-areas--3 .rx-area{aspect-ratio:4/3}
+.nc-comm .rx-row{margin-bottom:32px}
+.nc-bld{padding:clamp(72px,9vw,128px) 0;border-top:1px solid var(--line)}
+.nc-bld .bx-wrap{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:24px clamp(32px,6vw,96px);align-items:end}
+.nc-bld h2{margin:18px 0 0;font:640 clamp(36px,4.6vw,72px)/.95 var(--sans);letter-spacing:-.05em;color:#000}
+.nc-bld h2 em{font-style:normal;font-weight:300;color:var(--accent)}
+.nc-bld p{margin:0;font:400 17px/1.6 var(--sans);color:var(--mute)}
+.nc-bld .bx-link{display:inline-flex;margin-top:18px;color:#000}
+.rx-row h2 em{font-style:normal;font-weight:300;color:var(--accent)}
+@media (max-width:900px){.nc-inc-h,.nc-bld .bx-wrap{grid-template-columns:1fr}.nc-inc-h h2{grid-row:auto}
+  .nc-inc-g{grid-template-columns:1fr 1fr}.nc-inc-g>div:nth-child(3){padding-left:0;border-left:0}.nc-inc-g>div:nth-child(n+3){border-top:1px solid rgba(244,241,234,.16);margin-top:28px}
+  .rx-areas--3{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.nc-inc-g{grid-template-columns:1fr}.nc-inc-g>div,.nc-inc-g>div+div{padding-left:0;border-left:0}.nc-inc-g>div+div{border-top:1px solid rgba(244,241,234,.16);margin-top:24px}.nc-inc-g h3{margin-top:18px}}
+/* marketplace grid: JS sets --cols so every row is full */
+.rx-tiles--grid{grid-template-columns:repeat(var(--cols,5),minmax(0,1fr))!important}
+@media (max-width:760px){.rx-tiles--grid{grid-template-columns:1fr 1fr!important}.rx-tiles--grid>.rx-tile:last-child:nth-child(odd){grid-column:span 2;aspect-ratio:16/10}}
+.rx-tiles--grid>.bx-empty{grid-column:1/-1}
