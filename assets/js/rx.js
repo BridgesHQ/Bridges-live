@@ -20,7 +20,7 @@
     return '<div class="rx-tile rx-tile--off' + (wide ? " rx-tile--wide" : "") + '"><span><small>Off air</small><b style="display:block">' + esc(label || "The next live tour is being scheduled.") + '</b></span><span class="ask" data-rx-notify>Notify me when we go live</span></div>';
   }
 
-  /** Fill `el` with live tiles. opts: { cats: ["new","apt"] (stream categories), max, source, offLabel } */
+  /** Fill `el` with live tiles. opts: { cats: ["new","apt"] (stream categories), max, source, offLabel, hideEmpty (element to hide when nothing has aired) } */
   RX.tile = tile;
   RX.offTile = offTile;
   RX.liveStrip = function (el, opts) {
@@ -34,6 +34,7 @@
     }
     function render() {
       var list = slots.filter(want).slice(0, max);
+      if (opts.hideEmpty && !list.length) { (opts.hideEmpty === true ? el : opts.hideEmpty).hidden = true; return; }
       el.innerHTML = (list.some(function (x) { return x.kind === "live"; }) ? "" : offTile(opts.offLabel, !list.length)) + list.map(function (x) { return tile(x, slots.indexOf(x)); }).join("");
     }
     el.addEventListener("click", function (e) {

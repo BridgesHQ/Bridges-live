@@ -57,7 +57,7 @@
   };
   C.searchCard = function (url, wide) {
     return '<a class="bx-search bx-rv' + (wide ? " bx-search--wide" : "") + '" href="' + esc(url || "https://bridgesglobal.co") + '" target="_blank" rel="noopener"><span class="bx-eyebrow">Stellar MLS search</span>'
-      + "<b>Every home for sale in Tampa Bay.</b><span>Live MLS data, updated throughout the day — save searches and get new listings first.</span>"
+      + "<b>Every home for sale on the MLS.</b><span>Live MLS data, updated throughout the day — save searches and get new listings first.</span>"
       + '<span class="bx-btn bx-btn--gold">Search every MLS home ' + ARROW + "</span></a>";
   };
 

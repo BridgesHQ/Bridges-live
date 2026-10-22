@@ -600,3 +600,15 @@ body.rx .bx-chip{font:500 14px/1 var(--sans);letter-spacing:0;text-transform:non
 .rx-tiles--grid{grid-auto-flow:row;grid-template-columns:repeat(auto-fill,minmax(min(46%,210px),1fr));grid-auto-columns:auto;height:auto;min-height:clamp(320px,34vw,380px);overflow:visible}
 .rx-tiles--grid>.rx-tile{aspect-ratio:9/14;height:auto}
 .rx-tiles--grid>.bx-empty{min-height:clamp(320px,34vw,380px);justify-content:center}
+.rx-tile--wide{align-items:flex-end;background:#F4F1EA url(/assets/overlay.svg) center/cover no-repeat;background-blend-mode:normal;position:relative}
+.rx-tile--wide::before{content:"";position:absolute;inset:0;background:url(/assets/overlay.svg) center/cover no-repeat;opacity:.06;filter:invert(1);pointer-events:none}
+.rx-tile--wide{background-image:none}
+.rx-tile--wide .ask{align-self:flex-end;position:relative}
+.rx-tile--wide>span:first-child{position:relative}
+body.rx .bx-search .bx-btn{background:#fff;color:#000!important}
+body.rx .bx-search .bx-btn:hover{background:#2E6B4F;color:#fff!important}
+/* the footer stays in the brand look on every page */
+body.rx .bx-foot{--serif:Fraunces,'Fraunces Fallback',Georgia,serif}
+body.rx .bx-foot .bx-btn{background:#2E6B4F}
+body.rx .bx-foot .bx-btn:hover{background:#F4F1EA;color:#1A1A1A!important}
+body.rx .bx-foot .bx-btn--glass{background:rgba(244,241,234,.14)}
