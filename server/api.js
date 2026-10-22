@@ -152,18 +152,15 @@ api.get("/streams", wrap(async (req, res) => {
 
 // ------------------------------------------------------------------ stream slots
 // The grid: real live streams first (only these get LIVE + a real viewer count), then streams
-// that start soon, then recent videos from the connected social accounts, then clean
-// "upcoming" placeholders so the grid always has its shape. Nothing here is invented.
+// that start soon, then clean "upcoming" placeholders so the grid always has its shape. Nothing here is invented.
 const PLATFORM = { youtube: "YouTube", instagram: "Instagram", tiktok: "TikTok", bridges: "Bridges Live" };
 api.get("/slots", wrap(async (req, res) => {
   const n = Math.min(Math.max(parseInt(req.query.n, 10) || 12, 1), 48);
   const streams = (await listStreams()).filter((s) => config.showSeedStreams || s.applicant || s.owner).map(withViewers);
-  const videos = await visibleVideos(48);
+  // Bridges Live (Cloudflare) streams only: live first, then scheduled. Social/YouTube clips are never shown on the site.
   const slots = [];
   for (const s of streams.filter((x) => x.liveNow)) slots.push({ kind: "live", source: "bridges", stream: s, viewers: s.viewers });
-  for (const v of videos.filter((x) => x.is_live)) slots.push({ kind: "live", source: v.platform, video: shapeVideo(v), viewers: v.viewers ?? null });
   for (const s of streams.filter((x) => !x.liveNow)) slots.push({ kind: "upcoming", source: "bridges", stream: s });
-  for (const v of videos.filter((x) => !x.is_live)) slots.push({ kind: "video", source: v.platform, video: shapeVideo(v) });
   const minimum = Math.min(n, 6);
   while (slots.length < minimum) slots.push({ kind: "upcoming", source: null });
   res.json({ slots: slots.slice(0, n), liveCount: slots.filter((x) => x.kind === "live").length });

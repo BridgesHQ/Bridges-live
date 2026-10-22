@@ -16,9 +16,9 @@ export const PAGES = {
     ],
   },
   "live-marketplace/index.html": {
-    answer: "Bridges Live shows every home tour streaming right now across Tampa Bay, Sarasota and Austin, plus recent walkthroughs between broadcasts. Licensed agents and builders go live from their phones; viewers join the chat, ask questions on camera and tap “Request a showing.” A LIVE badge appears only while a stream is actually on air.",
+    answer: "Bridges Live shows every home tour streaming right now across Tampa Bay, Sarasota and Austin, and the tours scheduled next. Licensed agents and builders go live from their phones; viewers join the chat, ask questions on camera and tap “Request a showing.” A LIVE badge appears only while a stream is actually on air.",
     faqs: [
-      { q: "When are tours live?", a: "Agents and builders stream throughout the week. A LIVE badge and real viewer count appear only while a stream is on air; between broadcasts you can play recent video tours or ask to be notified when the next one starts." },
+      { q: "When are tours live?", a: "Agents and builders stream throughout the week. A LIVE badge and real viewer count appear only while a stream is on air; when no one is on air you can ask to be notified the moment the next tour starts." },
       { q: "Can I ask questions during a live tour?", a: "Yes. Join the live chat on any Bridges Live stream to ask about the home, the HOA, schools or the commute, and request a private showing without leaving the stream." },
       { q: "How do agents stream on Bridges Live?", a: "Licensed agents and builders apply on the Stream on Bridges Live page. Once approved they go live from a phone using the Larix app, or paste a YouTube, TikTok or Facebook live link." },
     ],
@@ -79,6 +79,13 @@ export const PAGES = {
     faqs: [
       { q: "Can you tour a neighborhood for me on live video?", a: "Yes. Tell us which neighborhoods you are considering and what matters to you — schools, commute, water, walkability — and we tour the streets and homes live, in your time zone." },
       MARKETS, SHOWING,
+    ],
+  },
+  "home-value/index.html": {
+    answer: "A home valuation from Bridges Global is a licensed broker's opinion of what your home will sell for, not an automated estimate. Dorota Maslowska, Broker Associate with LPT Realty, studies recent comparable sales and active competition in Tampa Bay, Sarasota or Austin, adjusts for condition and upgrades, and explains the range she recommends.",
+    faqs: [
+      { q: "How is a broker's valuation different from an online estimate?", a: "Online estimates use public records and cannot see your home's condition, upgrades or the street it sits on. A broker compares recent nearby sales in person and explains the reasoning behind the range." },
+      { q: "Do I have to list my home after a valuation?", a: "No. A valuation carries no obligation to list or sell." },
     ],
   },
   "tampa/index.html": {

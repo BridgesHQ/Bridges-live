@@ -126,18 +126,10 @@ test("social sync: YouTube live counts as LIVE with real viewers; Instagram reel
   const ch = calls.find((x) => x.path === "/yt/channels");
   assert.equal(ch.q.forHandle, "@realtordorota"); assert.equal(ch.q.key, "YT-KEY");
   assert.ok(calls.some((x) => x.path === "/ig/me/media" && x.q.access_token === "IGLONG"), "uses the long-lived token from Connect");
+  // synced social videos stay in the admin library; the site's live tiles show Bridges Live streams only
   const s = (await get("/api/slots", {})).body;
-  assert.equal(s.liveCount, 1);
-  assert.equal(s.slots[0].kind, "live");
-  assert.equal(s.slots[0].source, "youtube");
-  assert.equal(s.slots[0].viewers, 17, "real YouTube concurrent viewers");
-  assert.match(s.slots[0].video.embedUrl, /youtube\.com\/embed\/vidLIVE0001/);
-  const ig = s.slots.find((x) => x.video?.platform === "instagram");
-  assert.equal(ig.kind, "video"); assert.equal(ig.video.mediaUrl, "https://cdn.ig/ig1.mp4"); assert.equal(ig.video.playable, true);
-  assert.ok(s.slots.every((x) => x.kind !== "live" || x.viewers != null), "no LIVE tile without a real count");
-  // when YouTube says it's over, the LIVE badge goes away on the next sync
-  ytLive = false; await post("/api/admin/social/sync", {});
-  assert.equal((await get("/api/slots", {})).body.liveCount, 0);
+  assert.ok(s.slots.every((x) => !x.video), "no YouTube/Instagram clips on the site");
+  assert.equal(s.liveCount, 0, "a YouTube live is not a Bridges Live stream");
 });
 
 test("TikTok: OAuth connect (signed state), token exchange, cover + Watch (not playable)", async () => {
@@ -152,9 +144,7 @@ test("TikTok: OAuth connect (signed state), token exchange, cover + Watch (not p
   await post("/api/admin/social/sync", {});
   const tok = calls.find((x) => x.path === "/tt/v2/oauth/token/");
   assert.match(tok.raw, /grant_type=authorization_code/); assert.match(tok.raw, /client_secret=tt-secret/);
-  const tt = (await get("/api/slots?n=24", {})).body.slots.find((x) => x.video?.platform === "tiktok");
-  assert.equal(tt.video.playable, false, "TikTok blocks embedding → cover + Watch");
-  assert.match(tt.video.permalink, /tiktok\.com\/@realtor_dorota\/video\/7300001/);
+  assert.ok(!(await get("/api/slots?n=24", {})).body.slots.some((x) => x.video?.platform === "tiktok"), "TikTok clips never reach the site");
 });
 
 test("admin: add a video by link, hide a video, bad links rejected", async () => {
@@ -166,7 +156,7 @@ test("admin: add a video by link, hide a video, bad links rejected", async () =>
   await post(`/api/admin/social/${encodeURIComponent("instagram:ig1")}`, { hidden: true });
   const slots = (await get("/api/slots?n=24", {})).body.slots;
   assert.ok(!slots.some((x) => x.video?.id === "instagram:ig1"), "hidden video is off the site");
-  assert.ok(slots.some((x) => x.video?.id === "youtube:dQw4w9WgXcQ"));
+  assert.ok(!slots.some((x) => x.video), "pasted videos stay off the live tiles");
   assert.equal((await get("/api/admin/social", {})).status, 401);
 });
 
@@ -180,8 +170,7 @@ test("recordings: list, prepare MP4 download, publish replay to the grid", async
   const d = (await post("/api/admin/recordings/rec1/download", {})).body;
   assert.equal(d.status, "inprogress");
   await post("/api/admin/recordings/rec1/publish", { title: "Replay: Saturday tour" });
-  const v = (await get("/api/slots?n=24", {})).body.slots.find((x) => x.video?.id === "bridges:rec1");
-  assert.equal(v.kind, "video"); assert.match(v.video.embedUrl, /rec1\/iframe$/);
+  assert.ok(!(await get("/api/slots?n=24", {})).body.slots.some((x) => x.video), "replays are not shown as live tiles");
   // the owner's stream is on the grid as "starts soon" (not LIVE) until the phone actually streams
   const own = (await get("/api/slots?n=24", {})).body.slots.find((x) => x.stream?.owner);
   assert.equal(own.kind, "upcoming");

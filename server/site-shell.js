@@ -163,7 +163,7 @@ function seo(html, rel) {
 
 export function stamp(html, rel = "") {
   html = seo(html, rel);
-  const v4 = V4.has(rel), head = v4 ? HEAD_V4 : HEAD, nav = v4 ? NAV_V4 : NAV, footer = v4 ? FOOTER_V4 : FOOTER;
+  const v4 = true, head = v4 ? HEAD_V4 : HEAD, nav = v4 ? NAV_V4 : NAV, footer = v4 ? FOOTER_V4 : FOOTER;
   html = block(html, "head", head, (h) => h
     .replace(/<link rel="preconnect" href="https:\/\/fonts\.(googleapis|gstatic)\.com"[^>]*>\s*/g, "")
     .replace(/<link href="https:\/\/fonts\.googleapis\.com\/css2[^>]*>\s*/g, "")
