@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Bridges Global — Watch Tampa Bay Real Estate Live</title>
+<title>Bridges Global — Watch Real Estate, Live · Tampa Bay</title>
 <meta name="description" content="Watch Tampa Bay homes on live video tours, ask a licensed broker anything in real time, and request a private showing in one tap. Homes for sale, new construction and relocation across Tampa Bay.">
 <link rel="canonical" href="https://live.bridgesglobal.co/">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#08133A">
-<link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
-<meta property="og:title" content="Bridges Global — Watch Tampa Bay Real Estate Live">
+<meta name="theme-color" content="#2E6B4F">
+<meta property="og:title" content="Bridges — Watch Tampa Bay Real Estate Live">
 <meta property="og:description" content="Live video home tours across Tampa Bay with a licensed broker. Request a showing in one tap.">
 <meta property="og:image" content="https://live.bridgesglobal.co/assets/hero-luxury.jpg">
 <meta property="og:type" content="website">
@@ -17,126 +16,54 @@
 <link rel="preload" href="/assets/hero-luxury.jpg" as="image" fetchpriority="high">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NN5K59SYSJ"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-NN5K59SYSJ');</script>
-<!--bl:head--><link rel="preload" href="/assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin><link rel="preconnect" href="https://api.fontshare.com" crossorigin><link rel="preconnect" href="https://cdn.fontshare.com" crossorigin><link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap"><link rel="stylesheet" href="/assets/css/site.css"><!--/bl:head-->
+<!--bl:rating--><!--/bl:rating-->
+<!--bl:head--><link rel="icon" type="image/svg+xml" href="/assets/mark-v4.svg"><link rel="preload" href="/assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/assets/css/v4.css"><!--/bl:head-->
 <style>
-/* ---------- hero */
-.hx{position:relative;isolation:isolate;min-height:max(100svh,680px);display:flex;flex-direction:column;justify-content:flex-end;color:#fff;overflow:hidden;background:var(--navy-9)}
-.hx-bg{position:absolute;inset:0;z-index:-1}
-.hx-bg img{width:100%;height:100%;object-fit:cover;object-position:50% 60%;animation:hxKen 26s ease-in-out infinite alternate;transform-origin:50% 70%}
-@keyframes hxKen{from{transform:scale(1.02)}to{transform:scale(1.12)}}
-.hx-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,19,58,.5) 0%,rgba(8,19,58,.08) 30%,rgba(8,19,58,.35) 58%,rgba(8,19,58,.9) 100%),linear-gradient(90deg,rgba(8,19,58,.55),rgba(8,19,58,0) 62%)}
-.hx-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,400px);align-items:end;gap:48px;padding-top:calc(var(--nav-h) + 48px);padding-bottom:clamp(36px,5vw,64px)}
-.hx-copy .bx-eyebrow{color:var(--gold-l)}
-.hx-copy .bx-eyebrow .bx-dot{margin-right:-2px}
-.hx h1{margin-top:22px;color:#fff;max-width:11.5ch;text-wrap:balance;font-size:clamp(46px,7.4vw,100px)}
-.hx h1 em{color:var(--gold-l)}
-.hx-lede{margin-top:34px;max-width:44ch;font-size:clamp(17px,1.5vw,19.5px);line-height:1.6;color:rgba(255,255,255,.84)}
-.hx-btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
-.hx-cred{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 28px;padding-top:20px;padding-bottom:calc(22px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.16);font-size:12.5px;letter-spacing:.04em;color:rgba(255,255,255,.66)}
-.hx-cred b{color:#fff;font-weight:500}
-/* stage: off-air card or the live player */
-.hx-stage{position:relative}
-.hx-card{border-radius:var(--r-lg);padding:26px;background:rgba(10,22,66,.42);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);box-shadow:0 30px 70px rgba(4,10,30,.35)}
-.hx-card .st{display:flex;align-items:center;gap:9px;font:600 11px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.7)}
-.hx-card .st i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.45)}
-.hx-card h2{margin-top:16px;font:400 26px/1.2 var(--serif);color:#fff}
-.hx-card p{margin-top:8px;font-size:14.5px;color:rgba(255,255,255,.72)}
-.hx-card .bx-btn{width:100%;margin-top:20px}
-.hx-vid{display:flex;gap:14px;align-items:center;margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,.14);width:100%;background:none;border-left:0;border-right:0;border-bottom:0;color:#fff;text-align:left;cursor:pointer;font:inherit}
-.hx-vid[hidden]{display:none}
-.hx-vid .bx-media{flex:none;width:112px;border-radius:12px;aspect-ratio:16/10}
-.hx-vid .bx-media .bx-play{width:36px;height:36px;margin:-18px 0 0 -18px}.hx-vid .bx-media .bx-play svg{width:14px;height:14px}
-.hx-vid small{display:block;font:600 10.5px/1.3 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-l)}
-.hx-vid b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:5px;font:400 16px/1.3 var(--serif)}
-.hx-player{display:none}
-.hx.is-live .hx-in{grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr)}
-.hx.is-live .hx-card{display:none}
-.hx.is-live .hx-player{display:block}
-.hx.is-live h1{font-size:clamp(42px,6vw,82px)}
-.hx-frame{position:relative;aspect-ratio:16/9;border-radius:var(--r-lg);overflow:hidden;background:#000;box-shadow:0 40px 90px rgba(4,10,30,.55);border:1px solid rgba(255,255,255,.16)}
-.hx-frame #hpVideo{position:absolute;inset:0}
-.hx-frame .bx-over--tl,.hx-frame .bx-over--tr{z-index:3}
-.hx-meta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin-top:16px}
-.hx-meta small{display:block;font:600 10.5px/1.3 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-l)}
-.hx-meta b{display:block;margin-top:4px;font:400 22px/1.2 var(--serif)}
-.hx-chat[hidden]{display:none}
-.hx-chat{margin-top:14px;border-radius:var(--r);background:rgba(10,22,66,.45);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow:hidden}
-#wnchat{height:118px;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:7px;font-size:13.5px;line-height:1.45;color:rgba(255,255,255,.9)}
-#wnchat b{color:var(--gold-l);font-weight:600;margin-right:6px}
-#wnchat .sys{color:rgba(255,255,255,.62);font-style:italic}
-.hx-chat form{display:flex;gap:8px;padding:10px;border-top:1px solid rgba(255,255,255,.1)}
-.hx-chat input{flex:1;min-width:0;height:44px;padding:0 16px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font:400 15px var(--sans)}
-.hx-chat input::placeholder{color:rgba(255,255,255,.55)}
-.hx-chat button{height:44px;padding:0 18px;border-radius:999px;border:0;background:#fff;color:var(--navy);font:600 14px var(--sans);cursor:pointer}
-@media(max-width:1023px){
-  .hx{min-height:auto}
-  .hx-in,.hx.is-live .hx-in{grid-template-columns:minmax(0,1fr);gap:32px;padding-top:calc(var(--nav-h) + clamp(120px,30vw,240px))}
-  .hx.is-live .hx-in{padding-top:calc(var(--nav-h) + 28px)}
-  .hx.is-live .hx-stage{order:-1}
-  .hx-card{padding:22px}
-}
-@media(max-width:560px){.hx-btns .bx-btn{flex:1 1 100%}.hx h1{font-size:clamp(44px,12.4vw,60px)}.hx.is-live h1{font-size:40px}.hx-cred{flex-direction:column}}
+/* ---------- hero: one huge headline over a full-bleed real photo (or the live stream when on air) */
+.hx{position:relative;isolation:isolate;height:100svh;min-height:620px;max-height:1100px;color:#fff;overflow:hidden;background:var(--ink)}
+.hx-bg{position:absolute;inset:0;z-index:-2}
+.hx-bg img{width:100%;height:100%;object-fit:cover;object-position:50% 62%;animation:hxKen 30s ease-in-out infinite alternate;transform-origin:50% 70%}
+@keyframes hxKen{from{transform:scale(1.02)}to{transform:scale(1.1)}}
+#hxLive{position:absolute;inset:0;z-index:-1;pointer-events:none}
+#hxLive iframe,#hxLive video{position:absolute;top:50%;left:50%;width:max(100%,177.78svh);height:max(100%,56.25vw);transform:translate(-50%,-50%);border:0;object-fit:cover}
+.hx::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(18,18,17,.45) 0%,rgba(18,18,17,0) 26%,rgba(18,18,17,0) 46%,rgba(18,18,17,.72) 100%)}
+.hx-in{position:relative;height:100%;max-width:var(--max);margin:0 auto;padding:calc(var(--nav-h) + 22px) var(--gut) clamp(24px,3.4vw,44px);display:flex;flex-direction:column}
+.hx-top{display:flex;justify-content:space-between;gap:16px;color:rgba(255,255,255,.82)}
+.hx-top .bx-mono{color:inherit}
+.hx-st{display:inline-flex;align-items:center;gap:9px}
+.hx-st i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.6)}
+.hx h1{margin-top:auto;color:#fff;font-size:clamp(64px,13.6vw,236px);line-height:.86;letter-spacing:-.032em}
+.hx h1 em{color:var(--accent-l);font-weight:400}
+.hx-foot{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px 32px;margin-top:clamp(20px,3vw,40px);padding-top:clamp(18px,2.4vw,28px);border-top:1px solid rgba(255,255,255,.28)}
+.hx-foot p{max-width:46ch;font-size:clamp(16px,1.4vw,19px);line-height:1.5;color:rgba(255,255,255,.88)}
+.hx-act{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+.hx-act .bx-btn{background:var(--bone);color:var(--ink)!important}
+.hx-act .bx-btn:hover{background:var(--accent);color:#fff!important}
+.hx.is-live .hx-act .bx-btn{background:var(--accent);color:#fff!important}
+.hx-act .bx-btn{min-height:58px;padding:0 34px;font-size:16px}
+@media(max-width:700px){.hx{max-height:none}.hx h1{font-size:clamp(60px,19vw,120px)}.hx-act,.hx-act .bx-btn{width:100%}.hx-top .r{display:none}}
 @media(prefers-reduced-motion:reduce){.hx-bg img{animation:none}}
 
-/* ---------- trust bar */
-.tb{border-bottom:1px solid var(--line-2)}
-.tb .bx-wrap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
-.tb div div{padding:30px 24px;border-left:1px solid var(--line-2)}
-.tb div div:first-child{border-left:0;padding-left:0}
-.tb b{display:block;font:400 21px/1.2 var(--serif);color:var(--ink)}
-.tb span{display:block;margin-top:6px;font-size:13.5px;color:var(--mute)}
-@media(max-width:899px){.tb .bx-wrap{grid-template-columns:1fr 1fr}.tb div div{padding:22px 16px}.tb div div:nth-child(odd){border-left:0;padding-left:0}.tb div div:nth-child(n+3){border-top:1px solid var(--line-2)}}
+/* ---------- bento */
+.bt-live{min-height:clamp(420px,46vw,620px)}
+.bt-live.off{background:var(--ink);padding:clamp(24px,3vw,40px);justify-content:flex-end}
+.bt-live.off h3{color:var(--bone);font-size:clamp(36px,4.4vw,68px);max-width:12ch}
+.bt-live.off p{color:rgba(244,241,234,.66)}
+.bt-live .bx-play{top:44%}
+.bt-step .n{display:flex;justify-content:space-between;align-items:center}
+.bt-step svg{width:22px;height:22px;color:var(--accent)}
+.bx-tile--accent .bt-step svg,.bx-tile--accent svg{color:#fff}
+.bt-homes b{font:420 clamp(56px,6vw,96px)/.9 var(--serif);letter-spacing:-.04em;color:var(--bone)}
 
-/* ---------- how it works */
-.hw-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,3vw,40px);counter-reset:s}
-.hw-s{position:relative;padding:clamp(28px,3vw,40px);background:#fff;border-radius:var(--r-lg);box-shadow:var(--sh-1)}
-.hw-s .n{font:400 64px/1 var(--serif);color:var(--gold);letter-spacing:-.02em}
-.hw-s .ic{position:absolute;top:clamp(28px,3vw,40px);right:clamp(28px,3vw,40px);width:46px;height:46px;border-radius:50%;background:var(--gold-t);color:var(--gold-d);display:flex;align-items:center;justify-content:center}
-.hw-s .ic svg{width:22px;height:22px}
-.hw-s h3{margin-top:28px}
-.hw-s p{margin-top:12px;color:var(--mute);font-size:15.5px}
-@media(max-width:899px){.hw-g{grid-template-columns:1fr}}
-
-/* ---------- areas */
-.ar-g{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(40px,7vw,120px);align-items:start}
-.ar-h{position:sticky;top:calc(var(--nav-h) + 40px)}
-.ar-h .bx-h2{margin-top:18px}
-.ar-h .bx-lede{margin-top:20px}
-.ar-h .bx-link{margin-top:30px}
-.ar-l a{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 24px;padding:24px 0;border-bottom:1px solid var(--line);transition:padding .35s var(--ease)}
-.ar-l a:first-child{border-top:1px solid var(--line)}
-.ar-l b{font:400 clamp(26px,3vw,36px)/1.1 var(--serif);color:var(--ink);letter-spacing:-.01em;transition:color .2s}
-.ar-l span{grid-column:1;font-size:14.5px;color:var(--mute)}
-.ar-l svg{grid-row:1/span 2;grid-column:2;width:22px;height:22px;color:var(--gold-d);transition:transform .35s var(--ease)}
-.ar-l a:hover{padding-left:12px}
-.ar-l a:hover b{color:var(--gold-d)}
-.ar-l a:hover svg{transform:translateX(4px)}
-@media(max-width:899px){.ar-g{grid-template-columns:1fr}.ar-h{position:static}}
-
-/* ---------- meet dorota */
-.dm-g{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(40px,7vw,110px);align-items:center}
-.dm-ph{position:relative;border-radius:var(--r-lg);overflow:hidden;aspect-ratio:4/5;background:var(--mist);box-shadow:var(--sh-2)}
-.dm-ph img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}
-.dm-q{margin-top:22px;font:400 clamp(26px,3.2vw,40px)/1.22 var(--serif);color:var(--ink);letter-spacing:-.012em}
-.dm-q em{color:var(--gold-d)}
-.dm p.bx-lede{margin-top:22px}
-.dm-sig{margin-top:28px;font:500 15px var(--sans);color:var(--ink)}
-.dm-sig span{display:block;font-weight:400;font-size:13.5px;color:var(--mute)}
-.dm-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
-.dm-chips span{padding:9px 14px;border-radius:999px;background:var(--ivory);border:1px solid var(--line-2);font-size:13px;color:var(--text)}
-.dm-give{margin-top:26px;font-size:13.5px;color:var(--mute)}
-.dm-give a{color:var(--ink);border-bottom:1px solid var(--gold)}
-@media(max-width:899px){.dm-g{grid-template-columns:1fr}.dm-ph{max-width:460px;aspect-ratio:1/1}}
-
-/* ---------- closing */
-.cl{position:relative;isolation:isolate;overflow:hidden;color:#fff;text-align:center;padding:clamp(110px,16vw,220px) 0}
-.cl img{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:50% 85%}
-.cl::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(8,19,58,.72),rgba(8,19,58,.86))}
-.cl .bx-h2{color:#fff;max-width:15ch;margin:22px auto 0}
-.cl .bx-h2 em{color:var(--gold-l)}
-.cl p{max-width:48ch;margin:22px auto 0;color:rgba(255,255,255,.8);font-size:clamp(16px,1.5vw,19px)}
-.cl .hx-btns{justify-content:center}
-.cl .bx-eyebrow{color:var(--gold-l)}
+/* ---------- areas index */
+.ix a{display:grid;grid-template-columns:70px minmax(0,1fr) auto;align-items:center;gap:8px 24px;padding:clamp(18px,2vw,26px) 0;border-top:1px solid var(--line);transition:padding .45s var(--ease),color .3s}
+.ix a:last-child{border-bottom:1px solid var(--line)}
+.ix .n{font:400 12px/1 var(--mono);color:var(--mute)}
+.ix b{font:420 clamp(34px,5vw,80px)/1 var(--serif);font-variation-settings:'opsz' 144;letter-spacing:-.035em;color:var(--ink);transition:color .3s,font-variation-settings .6s var(--ease)}
+.ix span{font:400 12px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--mute);text-align:right}
+.ix a:hover{padding-left:14px}
+.ix a:hover b{color:var(--accent);font-style:italic;font-variation-settings:'opsz' 144,'SOFT' 100,'WONK' 1}
+@media(max-width:700px){.ix a{grid-template-columns:44px minmax(0,1fr)}.ix span{grid-column:2;text-align:left}}
 body[data-nocta] .bx-foot-cta{display:none}
 </style>
 <script src="/assets/js/site-config.js"></script>
@@ -145,7 +72,7 @@ body[data-nocta] .bx-foot-cta{display:none}
 </head>
 <body class="bx-page" data-nav="over" data-nocta>
 <!--bl:nav--><header class="bx-nav" id="bx-nav"><div class="bx-nav-in">
-<a class="bx-logo" href="/" aria-label="Bridges Global — home"><svg viewBox="0 0 48 32" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle class="sun" cx="40" cy="8" r="3" fill="#1FA595"/><g stroke="#C9A84C" stroke-width="2.2"><path d="M3 26C9 7 27 7 33 26"/><path d="M31 26c2.4-7 9.6-7 12 0"/><path d="M1 26h46"/></g><path d="M12 26v-8M18 26V13M24 26v-8" stroke="#C9A84C" stroke-width="1.4"/><path d="M7 30h10M24 30h16" stroke="#1FA595" stroke-width="1.4" opacity=".7"/></svg><b>Bridges<i>Global</i></b></a>
+<a class="bx-logo" href="/" aria-label="Bridges Global — home"><svg viewBox="0 0 140 34" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><g class="gem l"><path d="M2 17 20 5 46 3 70 17 46 31 20 29Z"/><path d="M2 17h68M20 5l14 12-14 12M46 3 38 17l8 14M20 5l26 26M46 3 20 29"/></g><g class="gem r"><g transform="translate(140 0) scale(-1 1)"><path d="M2 17 20 5 46 3 70 17 46 31 20 29Z"/><path d="M2 17h68M20 5l14 12-14 12M46 3 38 17l8 14M20 5l26 26M46 3 20 29"/></g></g></svg><b>Bridges<i>Global</i></b></a>
 <nav class="bx-menu" aria-label="Main">
 <a href="/live-marketplace"><span class="bx-dot"></span>Live</a>
 <a href="/listings">Listings</a>
@@ -167,95 +94,83 @@ body[data-nocta] .bx-foot-cta{display:none}
 <main>
 <section class="hx" id="hx">
   <div class="hx-bg"><img src="/assets/hero-luxury.jpg" alt="A Tampa Bay home at dusk, framed by palms" width="1200" height="800" fetchpriority="high"></div>
-  <div class="hx-in bx-wrap">
-    <div class="hx-copy">
-      <span class="bx-eyebrow" id="hxKick">Tampa Bay · Live home tours</span>
-      <h1 class="bx-display">Watch Tampa Bay real estate — <em>live.</em></h1>
-      <p class="hx-lede">Tour homes on camera with a licensed broker, ask anything in real time, and request a private showing in one tap.</p>
-      <div class="hx-btns"><a class="bx-btn bx-btn--gold" href="/listings" id="hxAsk" data-showing data-source="Homepage — hero">Request a showing</a><a class="bx-btn bx-btn--glass" href="/live-marketplace"><span class="bx-dot"></span>Watch live tours</a></div>
+  <div id="hxLive" aria-hidden="true"></div>
+  <div class="hx-in">
+    <div class="hx-top"><span class="bx-mono hx-st" id="hxSt"><i></i>Off air · Tampa Bay</span><span class="bx-mono r">Tampa Bay · Austin · World</span></div>
+    <h1 class="bx-display"><span class="bx-kin">Watch real</span><br><span class="bx-kin">estate, <em>live.</em></span></h1>
+    <div class="hx-foot">
+      <p id="hxLede">Tampa Bay homes on camera, a licensed broker in the chat, and a private showing one tap away.</p>
+      <div class="hx-act"><a id="yelp" class="bx-yelp" href="https://www.yelp.com/biz/dorota-maslowska-lpt-realty-riverview-3" target="_blank" rel="noopener" hidden></a>
+        <a class="bx-btn" id="hxCta" href="/listings" data-showing data-source="Homepage — hero">Request a showing <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     </div>
-    <aside class="hx-stage" aria-live="polite">
-      <div class="hx-card" id="hxCard">
-        <div class="st"><i></i><span id="hxState">Off air right now</span></div>
-        <h2 id="hxNext">The next live tour</h2>
-        <p>We stream new construction, resale homes and neighborhoods across Tampa Bay. Get one message when the camera goes on.</p>
-        <button type="button" class="bx-btn bx-btn--glass" id="hxNotify">Notify me when we're live</button>
-        <a class="hx-vid" id="hxVid" href="/listings"><span class="bx-media"><img src="/assets/hero-luxury.jpg" alt="" loading="lazy"></span><span><small>Meanwhile</small><b>Browse homes for sale across Tampa Bay</b></span></a>
-      </div>
-      <div class="hx-player" id="hxPlayer">
-        <div class="hx-frame"><div id="hpVideo"></div>
-          <span class="bx-over bx-over--tl"><span class="bx-live">Live <span id="hpView" class="bx-vw"></span></span></span></div>
-        <div class="hx-meta"><div><small id="hpCat">Live tour</small><b id="hpTitle"></b></div><button type="button" class="bx-btn bx-btn--gold bx-btn--sm" id="hpAsk">Request a showing</button></div>
-        <div class="hx-chat" id="hxChat"><div id="wnchat" aria-label="Live chat"></div>
-          <form id="wnform" autocomplete="off"><input id="wninput" maxlength="280" placeholder="Ask the agent a question…" aria-label="Chat message"><button type="submit">Send</button></form></div>
-      </div>
-    </aside>
   </div>
-  <div class="bx-wrap"><div class="hx-cred"><span><b>Dorota Maslowska</b> · Broker Associate · LPT Realty · FL BK3519799</span><span>English &amp; Polish · Florida &amp; Texas licensed</span></div></div>
 </section>
-
 <!--bl:answer--><section class="bx-answer" aria-label="In short"><div class="bx-wrap"><span class="bx-eyebrow">In short</span><p>Bridges Live lets you watch Tampa Bay homes on live video, ask questions in real time and request a private showing in one tap. Tours cover new construction, resale homes and neighborhoods from Tampa to Sarasota. Every request goes to Dorota Maslowska, a licensed Broker Associate with LPT Realty, who speaks English and Polish.</p></div></section><!--/bl:answer-->
-<section class="tb" aria-label="Why Bridges Global"><div class="bx-wrap">
-  <div><b>Licensed broker</b><span>Florida &amp; Texas, through LPT Realty</span></div>
-  <div><b>Live, not staged</b><span>Real homes, real light, real time</span></div>
-  <div><b>English &amp; Polish</b><span>Relocation from anywhere</span></div>
-  <div><b>No fee to buyers</b><span>Or to renters — ever</span></div>
-</div></section>
 
-<nav class="bx-marq" aria-label="Areas we tour"><div id="marq"></div></nav>
-
-<section class="bx-sec bx-ivory bx-grain" id="how"><div class="bx-wrap">
-  <div class="bx-head bx-rv"><div><span class="bx-eyebrow">How it works</span><h2 class="bx-h2">From your screen to the <em>front door</em>.</h2></div>
-    <p class="bx-lede">The way people already shop everything else — live, on camera, with someone who can answer — applied to the biggest purchase of your life.</p></div>
-  <div class="hw-g">
-    <div class="hw-s bx-rv"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="5" width="14" height="14" rx="3"/><path d="m16.5 10 5-3v10l-5-3"/></svg></span><div class="n">01</div><h3 class="bx-h3">Watch</h3><p>Join a live tour from anywhere. See the real finishes, the real street and the light at the time of day you care about.</p></div>
-    <div class="hw-s bx-rv d1"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.5 8.5 0 0 1-11.5 8L4 21l1.5-5.5A8.5 8.5 0 1 1 21 11.5z"/></svg></span><div class="n">02</div><h3 class="bx-h3">Ask</h3><p>Ask on camera or in chat — HOA, schools, the commute, what's behind that door. Answers in the moment, not days later.</p></div>
-    <div class="hw-s bx-rv d2"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="m9.5 15 2 2 3.5-4"/></svg></span><div class="n">03</div><h3 class="bx-h3">Request a showing</h3><p>One tap sends your request to Dorota, a licensed broker, who confirms a private showing — in person or on video.</p></div>
+<section class="bx-sec" id="how"><div class="bx-wrap">
+  <div class="bx-head bx-rv"><div><span class="bx-eyebrow">How it works</span><h2 class="bx-h2">Skip the photos. <em>Watch the house.</em></h2></div>
+    <p class="bx-lede">The real light, the real street, the real finishes — with someone on camera who can answer.</p></div>
+  <div class="bx-bento">
+    <div class="bx-tile bx-tile--media bx-span-2 bx-row-2 bt-live off bx-rv" id="btLive"><span class="bx-mono" style="color:rgba(244,241,234,.6)">Off air right now</span><h3>The next tour is being scheduled.</h3><p>Get one message the moment the camera goes on.</p><span><button type="button" class="bx-btn bx-btn--accent bx-btn--sm" data-notify-live>Notify me</button></span></div>
+    <div class="bx-tile bt-step bx-rv d1"><div class="n">01<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="5" width="14" height="14" rx="3"/><path d="m16.5 10 5-3v10l-5-3"/></svg></div><div><h3>Watch</h3><p>Join a live tour from anywhere — no app, no sign-up.</p></div></div>
+    <div class="bx-tile bt-step bx-rv d2"><div class="n">02<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.5 8.5 0 0 1-11.5 8L4 21l1.5-5.5A8.5 8.5 0 1 1 21 11.5z"/></svg></div><div><h3>Ask</h3><p>HOA, schools, the commute — answered on camera, in the moment.</p></div></div>
+    <a class="bx-tile bx-tile--accent bt-step bx-rv d1" href="/listings" data-showing data-source="Homepage — bento"><div class="n">03<svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h3>Request a showing</h3><p>One tap. A licensed broker confirms it with you.</p></div></a>
+    <a class="bx-tile bx-tile--ink bt-homes bx-rv d2" href="/listings" id="btHomes"><div class="n">For sale now</div><div><b id="btCount">MLS</b><p id="btHomesTxt">Every active home in Tampa Bay, from the MLS.</p></div></a>
   </div>
 </div></section>
 
-<section class="bx-sec" id="tours"><div class="bx-wrap">
-  <div class="bx-head bx-rv"><div><span class="bx-eyebrow" id="toursKick">Bridges Live</span><h2 class="bx-h2">On air &amp; <em>recently toured</em>.</h2></div>
-    <a class="bx-link" href="/live-marketplace">See every tour <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
-  <div class="bx-grid bx-g3" id="tourGrid"><div class="bx-tour bx-skel" aria-hidden="true"><div class="bx-media bx-r-169"></div><div class="bx-tour-b"><i style="width:36%"></i><i style="width:88%;height:20px"></i><i style="width:62%;height:20px"></i><i style="width:24%"></i></div></div><div class="bx-tour bx-skel" aria-hidden="true"><div class="bx-media bx-r-169"></div><div class="bx-tour-b"><i style="width:36%"></i><i style="width:88%;height:20px"></i><i style="width:62%;height:20px"></i><i style="width:24%"></i></div></div><div class="bx-tour bx-skel" aria-hidden="true"><div class="bx-media bx-r-169"></div><div class="bx-tour-b"><i style="width:36%"></i><i style="width:88%;height:20px"></i><i style="width:62%;height:20px"></i><i style="width:24%"></i></div></div></div>
-</div></section>
+<section class="bx-sec bx-ivory"><div class="bx-wrap"><div class="bx-ed bx-rv">
+  <div class="bx-ed-img"><img src="/assets/hero-luxury.jpg" alt="Front entry of a Tampa Bay home at dusk" loading="lazy" width="1200" height="800" style="object-position:58% 70%;transform-origin:58% 70%"><span class="bx-mono">Live tour · Tampa Bay</span></div>
+  <div class="bx-ed-copy"><span class="bx-eyebrow">Moving to Tampa Bay</span><h2 class="bx-h2">The house looks different at 6 p.m. <em>Watch it at 6 p.m.</em></h2>
+    <p class="bx-lede">Relocating from another state or country? We tour homes and neighborhoods on live video in your time zone, so you choose before you fly in.</p>
+    <a class="bx-link" href="/relocation">How relocation works <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+</div></div></section>
 
-<section class="bx-sec bx-ivory bx-grain" id="homes"><div class="bx-wrap">
-  <div class="bx-head bx-rv"><div><span class="bx-eyebrow">For sale now</span><h2 class="bx-h2">Featured <em>homes</em>.</h2></div>
+<section class="bx-sec"><div class="bx-wrap"><div class="bx-ed bx-ed--flip bx-rv">
+  <div class="bx-ed-img" style="aspect-ratio:4/5"><img src="/assets/dorota.webp" alt="Dorota Maslowska, Broker Associate, LPT Realty" loading="lazy" width="800" height="1000" style="object-position:50% 22%"><span class="bx-mono">Dorota Maslowska · FL BK3519799</span></div>
+  <div class="bx-ed-copy"><span class="bx-eyebrow">Your broker</span><h2 class="bx-h2">A real broker on the other end of <em>every tap.</em></h2>
+    <p class="bx-lede">Dorota Maslowska is a Broker Associate with LPT Realty, licensed in Florida and Texas, working in English and Polish with buyers, sellers and renters across Tampa Bay.</p>
+    <a class="bx-link" href="/dorota-maslowska">Meet Dorota <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+</div></div></section>
+
+<section class="bx-sec bx-ivory" id="homes"><div class="bx-wrap">
+  <div class="bx-head bx-rv"><div><span class="bx-eyebrow">For sale now</span><h2 class="bx-h2">Homes worth a <em>closer look.</em></h2></div>
     <a class="bx-link" href="/listings">All listings <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
-  <div class="bx-grid bx-g3" id="homeGrid"><div class="bx-home bx-skel" aria-hidden="true"><div class="bx-media bx-r-43"></div><div class="bx-home-b"><i style="width:44%;height:26px"></i><i style="width:70%"></i><i style="width:52%"></i><i style="width:60%"></i><div class="bx-home-f"><i style="width:80%"></i><i style="height:42px;border-radius:999px"></i></div></div></div><div class="bx-home bx-skel" aria-hidden="true"><div class="bx-media bx-r-43"></div><div class="bx-home-b"><i style="width:44%;height:26px"></i><i style="width:70%"></i><i style="width:52%"></i><i style="width:60%"></i><div class="bx-home-f"><i style="width:80%"></i><i style="height:42px;border-radius:999px"></i></div></div></div><div class="bx-home bx-skel" aria-hidden="true"><div class="bx-media bx-r-43"></div><div class="bx-home-b"><i style="width:44%;height:26px"></i><i style="width:70%"></i><i style="width:52%"></i><i style="width:60%"></i><div class="bx-home-f"><i style="width:80%"></i><i style="height:42px;border-radius:999px"></i></div></div></div></div>
+  <div class="bx-grid bx-g3" id="homeGrid"></div>
   <p class="bx-attr" id="homeAttr"></p>
 </div></section>
 
-<section class="bx-sec" id="areas"><div class="bx-wrap"><div class="ar-g">
-  <div class="ar-h bx-rv"><span class="bx-eyebrow">Areas we cover</span><h2 class="bx-h2">Tampa Bay, <em>known street by street</em>.</h2>
-    <p class="bx-lede">From new-construction communities in Parrish to waterfront on the South Shore — we tour it, so you can see it before you fly in.</p>
-    <a class="bx-link" href="/tampa">The Tampa Bay guide <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
-  <div class="ar-l bx-rv d1" id="areaList"></div>
+<section class="bx-sec" id="tours" hidden><div class="bx-wrap">
+  <div class="bx-head bx-rv"><div><span class="bx-eyebrow">Between broadcasts</span><h2 class="bx-h2">Recently <em>toured.</em></h2></div>
+    <a class="bx-link" href="/live-marketplace">Every tour <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  <div class="bx-grid bx-g3" id="tourGrid"></div>
+</div></section>
+
+<section class="bx-sec" id="areas"><div class="bx-wrap">
+  <div class="bx-head bx-rv"><div><span class="bx-eyebrow">Areas we tour</span><h2 class="bx-h2">Tampa Bay, <em>street by street.</em></h2></div>
+    <p class="bx-lede">From new-construction communities in Parrish to waterfront on the South Shore.</p></div>
+  <nav class="ix bx-rv" id="areaList" aria-label="Areas"></nav>
+</div></section>
+
+<section class="bx-sec bx-ivory" id="reviews"><div class="bx-wrap"><div class="v4-rv bx-rv">
+  <div><span class="bx-eyebrow">What clients say</span>
+    <div id="rvBig"><h2 class="bx-h2" style="margin-top:18px">Read the reviews <em>on Yelp.</em></h2></div></div>
+  <div><p class="bx-lede">Every review is from a real client on Yelp — read them in full, unfiltered.</p>
+    <a class="bx-link" id="rvLink" href="https://www.yelp.com/biz/dorota-maslowska-lpt-realty-riverview-3" target="_blank" rel="noopener" style="margin-top:28px">See Dorota on Yelp <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
 </div></div></section>
 
-<section class="bx-sec bx-ivory bx-grain dm" id="dorota"><div class="bx-wrap"><div class="dm-g">
-  <div class="dm-ph bx-rv"><img src="/assets/dorota.webp" alt="Dorota Maslowska, Broker Associate, LPT Realty" loading="lazy" width="800" height="1000"></div>
-  <div class="bx-rv d1"><span class="bx-eyebrow">Your broker</span>
-    <p class="dm-q">Most buyers choose a home from still photos and a hope. <em>We'd rather show you the real thing</em> — live, with every question answered.</p>
-    <p class="bx-lede">Dorota Maslowska is a Broker Associate with LPT Realty, licensed in Florida and Texas. She works in English and Polish with buyers, sellers and renters relocating to Tampa Bay from across the country and around the world.</p>
-    <div class="dm-sig">Dorota Maslowska<span>Founder, Bridges Live · Broker Associate, LPT Realty</span></div>
-    <div class="dm-chips"><span>FL BK3519799</span><span>TX 829789-SA</span><span>English &amp; Polish</span><span>New construction</span><span>Relocation</span></div>
-    <div class="hx-btns"><a class="bx-btn" href="/dorota-maslowska" data-showing data-source="Homepage — Meet Dorota" data-heading="Talk to Dorota" data-title="Tell Dorota what you're looking for" data-button="Send to Dorota">Talk to Dorota</a><a class="bx-btn bx-btn--line" href="/dorota-maslowska">About Dorota</a></div>
-  </div>
-</div></div></section>
-
-<section class="cl"><img src="/assets/hero-luxury.jpg" alt="" loading="lazy" width="1200" height="800"><div class="bx-wrap bx-rv">
-  <span class="bx-eyebrow">Bridges Global</span>
-  <h2 class="bx-h2">Your next home is worth <em>seeing first</em>.</h2>
-  <p>Watch it live, ask anything, and walk through the door when you're ready. A licensed broker handles the rest.</p>
-  <div class="hx-btns"><a class="bx-btn bx-btn--gold" href="/listings" data-showing data-source="Homepage — closing">Request a showing</a><a class="bx-btn bx-btn--glass" href="tel:+18137818888">Call 813-781-8888</a></div>
+<section class="v4-band v4-ov" aria-label="Bridges Global"><div class="bx-wrap">
+  <svg class="mk" viewBox="0 0 140 34" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><g><path d="M2 17 20 5 46 3 70 17 46 31 20 29Z"/><path d="M2 17h68M20 5l14 12-14 12M46 3 38 17l8 14M20 5l26 26M46 3 20 29"/></g><g transform="translate(140 0) scale(-1 1)"><path d="M2 17 20 5 46 3 70 17 46 31 20 29Z"/><path d="M2 17h68M20 5l14 12-14 12M46 3 38 17l8 14M20 5l26 26M46 3 20 29"/></g></svg>
+  <div class="r"><div class="loc">Tampa Bay · Austin · World</div>
+    <div class="wm">Bridges<span>Global</span></div><hr>
+    <p class="tag">Wisdom builds. Bridges connect.</p>
+    <p class="vs">&ldquo;By wisdom a house is built.&rdquo; &mdash; Proverbs 24:3</p></div>
 </div></section>
 </main>
-<!--bl:faq--><section class="bx-faq" aria-labelledby="faq-h"><div class="bx-wrap"><span class="bx-eyebrow">Questions</span><h2 id="faq-h">Good to know</h2><details><summary>What is Bridges Live?</summary><p>Bridges Live is a live video platform for Tampa Bay real estate. Licensed agents and builders stream homes, model homes and neighborhoods; viewers chat, ask questions and request a private showing in one tap. Bridges Global is a marketing and technology service, not a brokerage.</p></details><details><summary>How do I request a showing?</summary><p>Tap “Request a showing” on any home, live tour or video, or call 813-781-8888. Dorota Maslowska, a licensed broker with LPT Realty, follows up to confirm a private showing in person or on live video. There is no fee to buyers or renters.</p></details><details><summary>Who is the broker behind Bridges Global?</summary><p>Dorota Maslowska, Broker Associate with LPT Realty, licensed in Florida (BK3519799) and Texas (829789-SA). She works in English and Polish with buyers, sellers and renters relocating to Tampa Bay.</p></details><details><summary>Does it cost anything to use?</summary><p>No. There are no fees to buyers or renters. Compensation is paid by property owners and builders as allowed by state law, and earnest money is never collected through the website.</p></details></div></section><!--/bl:faq--><!--bl:footer--><footer class="bx-foot bx-grain"><div class="bx-wrap">
+<!--bl:faq--><section class="bx-faq" aria-labelledby="faq-h"><div class="bx-wrap"><span class="bx-eyebrow">Questions</span><h2 id="faq-h">Good to know</h2><details><summary>What is Bridges Live?</summary><p>Bridges Live is a live video platform for Tampa Bay real estate. Licensed agents and builders stream homes, model homes and neighborhoods; viewers chat, ask questions and request a private showing in one tap. Bridges Global is a marketing and technology service, not a brokerage.</p></details><details><summary>How do I request a showing?</summary><p>Tap “Request a showing” on any home, live tour or video, or call 813-781-8888. Dorota Maslowska, a licensed broker with LPT Realty, follows up to confirm a private showing in person or on live video. There is no fee to buyers or renters.</p></details><details><summary>Who is the broker behind Bridges Global?</summary><p>Dorota Maslowska, Broker Associate with LPT Realty, licensed in Florida (BK3519799) and Texas (829789-SA). She works in English and Polish with buyers, sellers and renters relocating to Tampa Bay.</p></details><details><summary>Does it cost anything to use?</summary><p>No. There are no fees to buyers or renters. Compensation is paid by property owners and builders as allowed by state law, and earnest money is never collected through the website.</p></details></div></section><!--/bl:faq--><!--bl:footer--><footer class="bx-foot v4-ov"><div class="bx-wrap">
 <div class="bx-foot-cta"><h2>See it live. <em>Then see it in person.</em></h2><div class="bx-btns"><a class="bx-btn bx-btn--gold" href="/listings" data-showing data-source="Website — Footer">Request a showing</a><a class="bx-btn bx-btn--glass" href="/live-marketplace"><span class="bx-dot"></span>Watch live tours</a></div></div>
 <div class="bx-foot-grid">
-<div class="bx-foot-brand"><a class="bx-logo" href="/" aria-label="Bridges Global — home"><svg viewBox="0 0 48 32" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle class="sun" cx="40" cy="8" r="3" fill="#1FA595"/><g stroke="#C9A84C" stroke-width="2.2"><path d="M3 26C9 7 27 7 33 26"/><path d="M31 26c2.4-7 9.6-7 12 0"/><path d="M1 26h46"/></g><path d="M12 26v-8M18 26V13M24 26v-8" stroke="#C9A84C" stroke-width="1.4"/><path d="M7 30h10M24 30h16" stroke="#1FA595" stroke-width="1.4" opacity=".7"/></svg><b>Bridges<i>Global</i></b></a><p>Tampa Bay real estate, streamed live — with a licensed broker on the other side of every request.</p>
+<div class="bx-foot-brand"><a class="bx-logo" href="/" aria-label="Bridges Global — home"><svg viewBox="0 0 140 34" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><g class="gem l"><path d="M2 17 20 5 46 3 70 17 46 31 20 29Z"/><path d="M2 17h68M20 5l14 12-14 12M46 3 38 17l8 14M20 5l26 26M46 3 20 29"/></g><g class="gem r"><g transform="translate(140 0) scale(-1 1)"><path d="M2 17 20 5 46 3 70 17 46 31 20 29Z"/><path d="M2 17h68M20 5l14 12-14 12M46 3 38 17l8 14M20 5l26 26M46 3 20 29"/></g></g></svg><b>Bridges<i>Global</i></b></a><p>Tampa Bay real estate, streamed live — with a licensed broker on the other side of every request.</p>
 <div class="bx-foot-contact"><a href="tel:+18137818888"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>813-781-8888</a><a href="mailto:dd@bridgesglobal.co"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>dd@bridgesglobal.co</a><a href="https://wa.me/13013796785" data-whatsapp data-label="Footer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.4-3c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>WhatsApp</a></div></div>
 <div class="bx-foot-col"><h4>Buy &amp; rent</h4><a href="/listings">Homes for sale</a><a href="/new-construction">New construction</a><a href="/apartment-locating">Apartments</a><a href="/relocation">Relocation</a><a href="/relocation-guide/">Relocation guide</a></div>
 <div class="bx-foot-col"><h4>Sell</h4><a href="/sell">Sell your home</a><a href="/home-value">Home value</a><a href="/list-with-us">List with us</a><a href="/housing-resources">Housing resources</a></div>
@@ -270,19 +185,19 @@ body[data-nocta] .bx-foot-cta{display:none}
 <div class="bx-btns"><a class="bx-btn bx-btn--gold bx-btn--sm" href="https://giftofgodministries.org/housing-ministry/" target="_blank" rel="noopener">Visit Gift of God Ministries</a><a class="bx-btn bx-btn--glass bx-btn--sm" href="/housing-resources">Housing resources</a></div>
 <p class="note">Gift of God Ministries is a separate 501(c)(3) nonprofit organization, not a real estate brokerage. Real estate services are provided only through LPT Realty.</p></aside>
 <div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/sitemap.xml">Sitemap</a><a href="/admin" rel="nofollow">Owner login</a></nav></div>
-</div></footer><script src="/assets/js/site.js" defer></script><!--/bl:footer-->
-<div id="bgchat-btn" onclick="bgChatToggle()" style="position:fixed;bottom:24px;right:24px;z-index:1500;background:#0E1E52;color:#fff;border-radius:50px;padding:14px 22px;box-shadow:0 8px 30px rgba(14,30,82,.35);cursor:pointer;font-family:Inter,sans-serif;font-weight:600;font-size:14px;display:flex;align-items:center;gap:9px">
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D8BC6A" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 01-11.5 8L4 21l1.5-5.5A8.5 8.5 0 1121 11.5z"/></svg>
+</div><span class="bx-giant" aria-hidden="true">Bridges</span></footer><script src="/assets/js/site.js" defer></script><!--/bl:footer-->
+<div id="bgchat-btn" onclick="bgChatToggle()" style="position:fixed;bottom:24px;right:24px;z-index:1500;background:#1A1A1A;color:#fff;border-radius:50px;padding:14px 22px;box-shadow:0 8px 30px rgba(26,26,26,.35);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;display:flex;align-items:center;gap:9px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9CC3AE" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 01-11.5 8L4 21l1.5-5.5A8.5 8.5 0 1121 11.5z"/></svg>
 Ask Dorota</div>
-<div id="bgchat" style="position:fixed;bottom:24px;right:24px;z-index:1600;width:min(380px,calc(100vw - 32px));height:min(560px,calc(100vh - 48px));background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(14,30,82,.3);display:none;flex-direction:column;overflow:hidden;font-family:Inter,sans-serif">
-<div style="background:#0E1E52;color:#fff;padding:16px 18px;display:flex;align-items:center;justify-content:space-between">
-<div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:50%;overflow:hidden;background:#fff"><img src="/assets/dorota.webp" onerror="this.style.display='none'" style="width:100%;height:100%;object-fit:cover"></div><div><div style="font-weight:600;font-size:14px">Bridges Concierge</div><div style="font-size:11px;color:#D8BC6A">Dorota's AI assistant · replies instantly</div></div></div>
+<div id="bgchat" style="position:fixed;bottom:24px;right:24px;z-index:1600;width:min(380px,calc(100vw - 32px));height:min(560px,calc(100vh - 48px));background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(26,26,26,.3);display:none;flex-direction:column;overflow:hidden;font-family:'DM Sans',sans-serif">
+<div style="background:#1A1A1A;color:#fff;padding:16px 18px;display:flex;align-items:center;justify-content:space-between">
+<div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:50%;overflow:hidden;background:#fff"><img src="/assets/dorota.webp" onerror="this.style.display='none'" style="width:100%;height:100%;object-fit:cover"></div><div><div style="font-weight:600;font-size:14px">Bridges Concierge</div><div style="font-size:11px;color:#9CC3AE">Dorota's AI assistant · replies instantly</div></div></div>
 <button onclick="bgChatToggle()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer">&times;</button>
 </div>
 <div id="bgchat-feed" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#F7F8FB"></div>
 <div id="bgchat-in" style="padding:12px;border-top:1px solid #eee;display:flex;gap:8px;background:#fff">
 <input id="bgchat-input" placeholder="Type your question…" style="flex:1;padding:11px 14px;border:1px solid #ddd;border-radius:9px;font-size:14px;font-family:inherit" onkeydown="if(event.key==='Enter')bgChatSend()">
-<button onclick="bgChatSend()" style="background:#1A5C3A;color:#fff;border:none;border-radius:9px;padding:0 16px;font-weight:600;cursor:pointer">Send</button>
+<button onclick="bgChatSend()" style="background:#2E6B4F;color:#fff;border:none;border-radius:9px;padding:0 16px;font-weight:600;cursor:pointer">Send</button>
 </div>
 </div><script>
 const CHAT_SB_URL="https://suwphgvhhohvvudkbiii.supabase.co",CHAT_SB_KEY="sb_publishable_D9YQPfVnBjRokyHlfNeuBA_TR7npJbb";
@@ -298,7 +213,7 @@ function bgChatToggle(){
 function bgMsg(text,who){
   const f=document.getElementById('bgchat-feed');
   const d=document.createElement('div');
-  d.style.cssText=who==='you'?'align-self:flex-end;background:#0E1E52;color:#fff;padding:10px 14px;border-radius:14px 14px 2px 14px;max-width:80%;font-size:14px':'align-self:flex-start;background:#fff;border:1px solid #eee;padding:10px 14px;border-radius:14px 14px 14px 2px;max-width:82%;font-size:14px';
+  d.style.cssText=who==='you'?'align-self:flex-end;background:#1A1A1A;color:#fff;padding:10px 14px;border-radius:14px 14px 2px 14px;max-width:80%;font-size:14px':'align-self:flex-start;background:#fff;border:1px solid #eee;padding:10px 14px;border-radius:14px 14px 14px 2px;max-width:82%;font-size:14px';
   d.textContent=text;f.appendChild(d);f.scrollTop=f.scrollHeight;
 }
 function bgBot(t){setTimeout(()=>bgMsg(t,'bot'),350);}
@@ -339,95 +254,76 @@ async function bgSaveLead(update){
 <script src="/assets/js/bridges-live.js"></script>
 <script src="/assets/js/cards.js"></script>
 <script>
-// Homepage on real data only. Hero: the live player when someone is on air (real LIVE badge, real
-// viewer count, live chat); otherwise an off-air card with "notify me" and the latest real video.
+// Homepage, real data only. On air → the hero becomes the live stream (real LIVE badge, "Watch live").
+// Off air → the real home photo, and the bento's big tile shows the latest real video (filler between lives).
 (function(){
-var $=function(id){return document.getElementById(id);},esc=BXC.esc;
-var AREAS=[["/tampa","Tampa","Urban energy to suburban value · Hillsborough"],["/brandon","Brandon","Established neighborhoods, central to everything · Hillsborough"],
- ["/riverview","Riverview","New homes, minutes to downtown · Hillsborough"],["/apollo-beach","Apollo Beach","Waterfront living on the South Shore · Hillsborough"],
- ["/wesley-chapel","Wesley Chapel","Master-planned growth to the north · Pasco"],["/parrish","Parrish","New-construction capital of the region · Manatee"],
- ["/lakewood-ranch","Lakewood Ranch","Master-planned community living · Manatee &amp; Sarasota"],["/sarasota","Sarasota","Downtown luxury and the bay · Sarasota"],
- ["/st-petersburg","St. Petersburg","Downtown waterfront and the arts · Pinellas"],["/clearwater","Clearwater","Gulf beaches and coastal living · Pinellas"]];
-var mq=AREAS.map(function(a){return '<a href="'+a[0]+'">'+a[1]+'</a>';}).join('');$('marq').innerHTML=mq+mq.replace(/<a /g,'<a tabindex="-1" aria-hidden="true" ');
-$('areaList').innerHTML=AREAS.map(function(a){return '<a href="'+a[0]+'"><b>'+a[1]+'</b><span>'+a[2]+'</span>'+BXC.ARROW+'</a>';}).join('');
+var $=function(id){return document.getElementById(id);},esc=BXC.esc,A=BXC.ARROW;
+var AREAS=[["/tampa","Tampa","Hillsborough"],["/brandon","Brandon","Hillsborough"],["/riverview","Riverview","Hillsborough"],["/apollo-beach","Apollo Beach","Hillsborough"],
+ ["/wesley-chapel","Wesley Chapel","Pasco"],["/parrish","Parrish","Manatee"],["/lakewood-ranch","Lakewood Ranch","Manatee · Sarasota"],["/sarasota","Sarasota","Sarasota"],
+ ["/st-petersburg","St. Petersburg","Pinellas"],["/clearwater","Clearwater","Pinellas"]];
+$('areaList').innerHTML=AREAS.map(function(a,i){return '<a href="'+a[0]+'"><span class="n">'+String(i+1).padStart(2,'0')+'</span><b>'+a[1]+'</b><span>'+a[2]+' County</span></a>';}).join('');
 
-var S={slots:[],cur:null,slot:null,listings:[]};
-function line(name,body,sys){var c=$('wnchat'),d=document.createElement('div');if(sys)d.className='sys';
-  if(name){var b=document.createElement('b');b.textContent=name;d.appendChild(b);}d.appendChild(document.createTextNode(body));c.appendChild(d);
-  while(c.children.length>60)c.removeChild(c.firstChild);c.scrollTop=c.scrollHeight;}
-$('wnform').addEventListener('submit',function(e){e.preventDefault();var i=$('wninput'),v=i.value.trim();if(!v||!S.cur)return;i.value='';
-  if(!BL.name()){var n=prompt('Your first name for the chat?','');if(n)BL.setName(n.trim().slice(0,40));}BL.chat(v);});
-$('hxNotify').onclick=function(){BXC.notifyLive('Homepage — notify me when live');};
-$('hpAsk').onclick=function(){var x=S.slot||{};if(x.stream)BL.requestShowing(x.stream);else BL.requestShowingFor({title:BXC.slotTitle(x),meta:x.video?x.video.platformLabel+' live':'',link:x.video&&x.video.permalink,source:'Homepage — live hero'});};
-
-function mountLiveVideo(v){var box=$('hpVideo');box.innerHTML='';var n=document.createElement('iframe');
-  n.src=v.embedUrl+(v.embedUrl.indexOf('?')>0?'&':'?')+'autoplay=1&mute=1&playsinline=1&rel=0';n.allow='autoplay; fullscreen; picture-in-picture';n.allowFullscreen=true;n.className='bl-player';box.appendChild(n);}
-function setHero(x){
-  var live=x&&x.kind==='live';
-  if(S.cur&&(!live||!x.stream||x.stream.id!==S.cur.id)){BL.leave();S.cur=null;}
-  $('hx').classList.toggle('is-live',!!live);
-  $('hxKick').innerHTML=live?'<span class="bx-dot"></span> On air now':'Tampa Bay · Live home tours';
-  if(live){
-    S.slot=x;var s=x.stream,v=x.video;
-    $('hpCat').textContent=s?[s.categoryLabel||'Live tour',s.location].filter(Boolean).join(' · '):v.platformLabel+' live';
-    $('hpTitle').textContent=BXC.slotTitle(x);
-    $('hpView').textContent=x.viewers!=null?'· '+x.viewers+' watching':'';
-    $('wnchat').innerHTML='';$('hxChat').hidden=!s;
-    if(s){if(!S.cur){BL.mountPlayer($('hpVideo'),s);S.cur=s;BL.join(s.id);line('','You\'re in the live chat — say hello.',true);}}
-    else if(v&&v.embedUrl){mountLiveVideo(v);line('','This tour is streaming on '+v.platformLabel+'. Ask in their chat, or request a showing here.',true);}
-    return;
-  }
-  $('hpVideo').innerHTML='';
-  var up=S.slots.find(function(y){return y.kind==='upcoming'&&y.stream;});
-  $('hxState').textContent=up?'Starting soon':'Off air right now';
-  $('hxNext').textContent=up?up.stream.title:'The next live tour';
-  var vid=S.slots.find(function(y){return y.kind==='video';}),b=$('hxVid');
-  if(vid){var v=vid.video;b.removeAttribute('href');b.setAttribute('role','button');b.innerHTML='<span class="bx-media">'+(v.thumbnail?'<img src="'+esc(v.thumbnail)+'" alt="" onerror="this.remove()">':'')+'<span class="bx-play"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span></span><span><small>Latest tour · '+esc(v.platformLabel)+'</small><b>'+esc(v.title)+'</b></span>';
-    b.onclick=function(e){e.preventDefault();BXC.play(v);};}
+var S={slots:[],listings:[],shown:[],cur:null};
+function liveHero(x){
+  var s=x.stream,v=x.video,box=$('hxLive');box.innerHTML='';
+  $('hx').classList.add('is-live');
+  $('hxSt').innerHTML='<span class="bx-live">Live'+(x.viewers>0?' · '+x.viewers:'')+'</span>&nbsp; '+esc(BXC.slotTitle(x));
+  var c=$('hxCta');c.removeAttribute('data-showing');c.href='/live-marketplace?stream='+encodeURIComponent(s?s.id:v.id);c.firstChild.nodeValue='Watch Live Now ';
+  $('hxLede').textContent=s?[s.location,s.host].filter(Boolean).join(' · ')+' — join the chat and ask anything.':'Streaming now on '+v.platformLabel+'. Tap to watch, then request a showing.';
+  if(s&&s.playbackUrl&&!/tiktok\.com/.test(s.playbackUrl))BL.mountPlayer(box,s);
+  else if(v&&v.embedUrl){var n=document.createElement('iframe');n.src=v.embedUrl+(v.embedUrl.indexOf('?')>0?'&':'?')+'autoplay=1&mute=1&controls=0&playsinline=1&loop=1&rel=0';n.allow='autoplay';n.tabIndex=-1;box.appendChild(n);}
 }
-
-function renderTours(){
-  var real=S.slots.filter(function(x){return x.kind==='live'||x.kind==='video'||(x.kind==='upcoming'&&x.stream);}).slice(0,6);
-  var n=S.slots.filter(function(x){return x.kind==='live';}).length;
-  $('toursKick').innerHTML=n?'<span class="bx-dot"></span> '+n+' live now':'Bridges Live';
-  var g=$('tourGrid');
-  if(!S.loaded){g.innerHTML=BXC.skeleton('tour',3);return;}
-  if(!real.length){g.innerHTML='<div class="bx-empty bx-rv"><span class="bx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="5" width="14" height="14" rx="3"/><path d="m16.5 10 5-3v10l-5-3"/></svg></span><h3>The next live tour is being scheduled.</h3><p>Tours of new construction, resale homes and neighborhoods stream here. Get one message the moment the camera goes on.</p><div class="bx-btns"><button type="button" class="bx-btn" data-notify-live>Notify me</button><a class="bx-btn bx-btn--line" href="/listings">Browse homes for sale</a></div></div>';}
-  else{S.shown=real;g.innerHTML=real.map(BXC.slotCard).join('');}
-  window.bxReveal&&bxReveal(g);
+function bigTile(x,i){
+  var t=$('btLive'),live=x.kind==='live',v=x.video,s=x.stream;
+  t.classList.remove('off');t.setAttribute('role','button');t.setAttribute('tabindex','0');t.setAttribute('data-slot',i);
+  t.innerHTML='<span class="bx-media">'+(BXC.slotImage(x)?'<img src="'+esc(BXC.slotImage(x))+'" alt="" loading="lazy" onerror="this.remove()">':'')+'</span>'
+    +'<span class="bx-over bx-over--tl">'+(live?'<span class="bx-live">Live'+(x.viewers>0?' <span class="bx-vw" data-id="'+esc(s?s.id:'')+'">· '+x.viewers+'</span>':'')+'</span>':'<span class="bx-tag">'+esc(v?v.platformLabel:'Starts soon')+'</span>')+'</span>'
+    +'<span class="bx-play"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span>'
+    +'<span class="cap"><span class="bx-mono">'+(live?'On air now':'Latest tour'+(v&&v.publishedAt?' · '+BXC.date(v.publishedAt):''))+'</span><b>'+esc(BXC.slotTitle(x))+'</b></span>';
+}
+function render(){
+  var live=S.slots.find(function(x){return x.kind==='live';});
+  var vids=S.slots.filter(function(x){return x.kind==='video';});
+  S.shown=S.slots;
+  if(live){liveHero(live);bigTile(live,S.slots.indexOf(live));}
+  else if(vids[0])bigTile(vids[0],S.slots.indexOf(vids[0]));
+  var rail=S.slots.filter(function(x){return (x.kind==='video'||(x.kind==='upcoming'&&x.stream))&&x!==vids[0]&&x!==live;}).slice(0,3);
+  $('tours').hidden=!rail.length;
+  $('tourGrid').innerHTML=rail.map(function(x){return BXC.slotCard(x,S.slots.indexOf(x));}).join('');
+  window.bxReveal&&bxReveal($('tours'));
 }
 function renderHomes(j){
   var g=$('homeGrid'),L=(j&&j.listings)||[];S.listings=L;
   if(j===null){g.innerHTML=BXC.skeleton('home',3);return;}
-  var cards=L.slice(0,L.length>=6?6:5).map(BXC.homeCard);
-  if(!L.length)cards=[BXC.searchCard(j&&j.searchUrl,true)];
-  else if(cards.length<6)cards.push(BXC.searchCard(j&&j.searchUrl));
-  g.innerHTML=cards.join('');$('homeAttr').textContent=(L.length&&j.attribution)||'';
+  $('btCount').textContent=L.length?String(L.length):'MLS';
+  $('btHomesTxt').textContent=L.length?'Active homes from Stellar MLS, ready to tour.':'Every active home in Tampa Bay, from the MLS.';
+  g.innerHTML=L.length?L.slice(0,6).map(BXC.homeCard).join('')+(L.length<6?BXC.searchCard(j.searchUrl):''):BXC.searchCard(j&&j.searchUrl,true);
+  $('homeAttr').textContent=(L.length&&j.attribution)||'';
   window.bxReveal&&bxReveal(g);
 }
+function yelp(y){if(!y||!y.rating)return;
+  $('rvBig').innerHTML='<div class="big" style="margin-top:18px">'+Number(y.rating).toFixed(1)+'<small> / 5</small></div><div class="stars" aria-hidden="true">'+'★★★★★'.slice(0,Math.round(y.rating))+'</div><p class="bx-mono who">'+Number(y.count).toLocaleString('en-US')+' reviews on Yelp</p>';
+  $('rvLink').href=y.url;
+  var a=$('yelp');a.href=y.url;a.hidden=false;
+  a.innerHTML='<span class="y" aria-hidden="true">y</span><span><span class="st" aria-hidden="true">★</span> <b>'+Number(y.rating).toFixed(1)+'</b> · '+Number(y.count).toLocaleString('en-US')+' reviews<small>on Yelp</small></span>';
+  a.setAttribute('aria-label','Rated '+y.rating+' out of 5 from '+y.count+' reviews on Yelp');}
+function open(x){if(!x)return;if(x.kind==='live')location.href='/live-marketplace?stream='+encodeURIComponent(x.stream?x.stream.id:x.video.id);else if(x.video)BXC.play(x.video);else BXC.notifyLive('Homepage — upcoming tour');}
 document.addEventListener('click',function(e){
   var t=e.target.closest&&e.target.closest('[data-slot],[data-home],[data-notify-live]');if(!t)return;
   if(t.hasAttribute('data-notify-live'))return BXC.notifyLive('Homepage — notify me when live');
   if(t.hasAttribute('data-home'))return BXC.askHome(S.listings[+t.getAttribute('data-home')]);
-  var x=S.shown[+t.getAttribute('data-slot')];
-  if(x.kind==='live'){setHero(x);window.scrollTo({top:0,behavior:'smooth'});}
-  else if(x.video)BXC.play(x.video);
-  else BXC.notifyLive('Homepage — upcoming tour');
+  open(S.shown[+t.getAttribute('data-slot')]);
 });
-
-function loadSlots(){return BL.api('/slots?n=8').then(function(j){S.slots=j.slots||[];S.loaded=true;renderTours();
-  setHero(S.slots.find(function(x){return x.kind==='live';})||null);});}
-BL.on('history',function(m){if(S.cur&&m.streamId===S.cur.id){$('wnchat').innerHTML='';m.events.forEach(function(e){if(e.type==='chat_message'&&!e.held)line(e.name,e.body);});}});
-BL.on('chat_message',function(m){if(S.cur&&m.streamId===S.cur.id)line(m.name,m.held?m.body+' (waiting for approval)':m.body);});
-BL.on('showing_requested',function(m){var d=BL.describe(m);if(!d)return;if(S.cur&&m.streamId===S.cur.id)line('',d,true);BL.toast(d);});
-BL.on('viewer_count',function(m){if(S.cur&&m.streamId===S.cur.id)$('hpView').textContent='· '+m.count+' watching';});
+document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.id==='btLive'&&e.target.hasAttribute('data-slot'))open(S.shown[+e.target.getAttribute('data-slot')]);});
+function load(){return BL.api('/slots?n=8').then(function(j){S.slots=j.slots||[];wasLive=S.slots.some(function(x){return x.kind==='live';});render();});}
 BL.on('counts',function(m){[].forEach.call(document.querySelectorAll('.bx-vw[data-id]'),function(el){var n=m.counts[el.dataset.id];if(n!=null)el.textContent='· '+n;});});
-var t=null;BL.on('stream_status',function(){clearTimeout(t);t=setTimeout(loadSlots,700);});
-BL.on('error',function(m){if(S.cur)line('',m.error,true);});
-
-renderTours();renderHomes(null);
-BL.available.then(function(ok){if(!ok){S.loaded=true;renderTours();renderHomes({});return;}
-  loadSlots().catch(function(){S.loaded=true;renderTours();});BL.api('/listings?limit=6').then(renderHomes).catch(function(){renderHomes({});});BL.lobby();});
+// a stream started/ended: refresh the tiles; swap the hero only if the visitor is still at the top
+var t=null,wasLive=false;BL.on('stream_status',function(){clearTimeout(t);t=setTimeout(function(){BL.api('/slots?n=8').then(function(j){var nowLive=(j.slots||[]).some(function(x){return x.kind==='live';});
+  if(nowLive!==wasLive&&window.scrollY<300)return location.reload();S.slots=j.slots||[];render();});},900);});
+renderHomes(null);
+BL.available.then(function(ok){if(!ok){renderHomes({});return;}
+  load().catch(function(){});BL.api('/listings?limit=6').then(renderHomes).catch(function(){renderHomes({});});
+  BL.api('/reviews').then(function(j){yelp(j.yelp);}).catch(function(){});BL.lobby();});
 })();
 </script>
 </body>

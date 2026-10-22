@@ -72,6 +72,15 @@ export const config = {
     searchUrl: env.LOFTY_SEARCH_URL || "https://bridgesglobal.co",
   },
   // Social videos that fill the stream grid. Each platform turns on when its keys are present.
+  // Yelp trust badge + AggregateRating schema. Real numbers only: from the Yelp Fusion API
+  // (YELP_API_KEY), or the owner's own current Yelp figures (YELP_RATING + YELP_REVIEW_COUNT).
+  reviews: {
+    yelpKey: key(env.YELP_API_KEY),
+    yelpBusiness: env.YELP_BUSINESS_ID || "dorota-maslowska-lpt-realty-riverview-3",
+    yelpBase: env.YELP_API_BASE || "https://api.yelp.com/v3",
+    rating: Number(env.YELP_RATING) || null,
+    count: Number(env.YELP_REVIEW_COUNT) || null,
+  },
   social: {
     youtubeKey: key(env.YOUTUBE_API_KEY),
     youtubeChannel: key(env.YOUTUBE_CHANNEL_ID),        // UC… id, or

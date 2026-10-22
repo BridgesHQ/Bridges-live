@@ -12,6 +12,7 @@ import { startFollowupScheduler } from "./leads/sequence.js";
 import { integrations } from "./leads/providers.js";
 import { startStreamMonitor } from "./stream/monitor.js";
 import { cloudflareEnabled } from "./stream/cloudflare.js";
+import { ratingJsonLd } from "./reviews.js";
 
 const app = express();
 app.disable("x-powered-by");
@@ -49,6 +50,16 @@ app.use((req, res, next) => {
 const PRIVATE = /^\/(server|backend|data|node_modules|functions|docs|listingreel)(\/|$)|^\/\.|\/\.|\.(txt|md|json|sql|ts|tsx|lock)$/i;
 const PUBLIC_FILES = new Set(["/robots.txt", "/llms.txt", "/sitemap.xml"]);
 app.use((req, res, next) => (PRIVATE.test(req.path) && !PUBLIC_FILES.has(req.path) ? res.status(404).end() : next()));
+
+// Pages with a <!--bl:rating--> slot get the Yelp AggregateRating schema filled in server-side (real figures only).
+const RATED = { "/": "index.html", "/index.html": "index.html", "/dorota-maslowska": "dorota-maslowska/index.html", "/dorota-maslowska/": "dorota-maslowska/index.html" };
+app.get(Object.keys(RATED), async (req, res, next) => {
+  try {
+    const html = fs.readFileSync(path.join(config.root, RATED[req.path]), "utf8");
+    if (!html.includes("<!--bl:rating-->")) return next();
+    res.type("html").set("Cache-Control", "public, max-age=300").send(html.replace("<!--bl:rating--><!--/bl:rating-->", await ratingJsonLd()));
+  } catch { next(); }
+});
 
 app.use(express.static(config.root, { extensions: ["html"], index: "index.html", dotfiles: "deny", maxAge: "5m" }));
 app.use((req, res) => {

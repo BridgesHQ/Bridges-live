@@ -86,6 +86,21 @@ export const FOOTER = `<!--bl:footer--><footer class="bx-foot bx-grain"><div cla
 <div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/sitemap.xml">Sitemap</a><a href="/admin" rel="nofollow">Owner login</a></nav></div>
 </div></footer><script src="/assets/js/site.js" defer></script><!--/bl:footer-->`;
 
+// ---------------------------------------------------------------- v4 (cream / near-black / Bottega green)
+// Rolled out page by page: only the pages in V4 get it; everything else keeps the shell above.
+export const V4 = new Set(["index.html"]);
+const HEAD_V4 = '<!--bl:head--><link rel="icon" type="image/svg+xml" href="/assets/mark-v4.svg">'
+  + '<link rel="preload" href="/assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>'
+  + '<link rel="preload" href="/assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>'
+  + '<link rel="stylesheet" href="/assets/css/v4.css"><!--/bl:head-->';
+// The brand mark: two faceted gems meeting at a point (from the Bridges Global card).
+const GEM = '<path d="M2 17 20 5 46 3 70 17 46 31 20 29Z"/><path d="M2 17h68M20 5l14 12-14 12M46 3 38 17l8 14M20 5l26 26M46 3 20 29"/>';
+export const MARK_V4 = `<svg viewBox="0 0 140 34" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><g class="gem l">${GEM}</g><g class="gem r"><g transform="translate(140 0) scale(-1 1)">${GEM}</g></g></svg>`;
+export const LOGO_V4 = `<a class="bx-logo" href="/" aria-label="Bridges Global — home">${MARK_V4}<b>Bridges<i>Global</i></b></a>`;
+const NAV_V4 = NAV.replace(LOGO, LOGO_V4);
+const FOOTER_V4 = FOOTER.replace(LOGO, LOGO_V4).replace('<footer class="bx-foot bx-grain">', '<footer class="bx-foot v4-ov">')
+  .replace("</div></footer>", '</div><span class="bx-giant" aria-hidden="true">Bridges</span></footer>');
+
 function block(html, name, value, fallback) {
   const re = new RegExp(`<!--bl:${name}-->[\\s\\S]*?<!--/bl:${name}-->`);
   return re.test(html) ? html.replace(re, () => value) : fallback(html);
@@ -111,12 +126,13 @@ function seo(html, rel) {
 
 export function stamp(html, rel = "") {
   html = seo(html, rel);
-  html = block(html, "head", HEAD, (h) => h
+  const v4 = V4.has(rel), head = v4 ? HEAD_V4 : HEAD, nav = v4 ? NAV_V4 : NAV, footer = v4 ? FOOTER_V4 : FOOTER;
+  html = block(html, "head", head, (h) => h
     .replace(/<link rel="preconnect" href="https:\/\/fonts\.(googleapis|gstatic)\.com"[^>]*>\s*/g, "")
     .replace(/<link href="https:\/\/fonts\.googleapis\.com\/css2[^>]*>\s*/g, "")
-    .replace("</head>", () => HEAD + "\n</head>"));
-  html = block(html, "nav", NAV, (h) => h.replace(/<nav class="bgnav">[\s\S]*?<\/nav>/, () => NAV + '<div class="bx-nav-sp"></div>'));
-  html = block(html, "footer", FOOTER, (h) => h.replace(/<footer>[\s\S]*?<\/footer>/, () => FOOTER));
+    .replace("</head>", () => head + "\n</head>"));
+  html = block(html, "nav", nav, (h) => h.replace(/<nav class="bgnav">[\s\S]*?<\/nav>/, () => nav + '<div class="bx-nav-sp"></div>'));
+  html = block(html, "footer", footer, (h) => h.replace(/<footer>[\s\S]*?<\/footer>/, () => footer));
   // retire the old nav overflow patch and the "representative imagery" captions
   html = html.replace(/<style>\.bgmenu>\.bgdrop:last-child \.bgpanel\{left:auto;right:0\}[^<]*<\/style>\s*/g, "")
     .replace(/<span class="cap">Representative imagery[^<]*<\/span>/g, "");

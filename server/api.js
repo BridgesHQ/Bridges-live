@@ -7,6 +7,7 @@ import { db, dbDiagnostics, listStreams, getStream, audit, invalidateStreams } f
 import * as paypal from "./paypal.js";
 import { broadcast, broadcastAll, broadcastCommerce, roomSize } from "./realtime.js";
 import { sid } from "./seed-data.js";
+import { yelpRating } from "./reviews.js";
 import { routeLead, logWhatsAppClick, isEmail as validEmail } from "./leads/router.js";
 import { runDueFollowups, unsubscribeToken } from "./leads/sequence.js";
 import { integrations } from "./leads/providers.js";
@@ -125,6 +126,8 @@ api.get("/config", (req, res) => {
     database: db.kind,
   });
 });
+
+api.get("/reviews", wrap(async (req, res) => { res.set("Cache-Control", "public, max-age=600"); const y = await yelpRating(); res.json({ yelp: { rating: y.rating, count: y.count, url: y.url } }); }));
 
 api.get("/health", (req, res) => res.json({
   ok: true, database: db.kind, paypal: config.paypal.mode,
@@ -526,6 +529,7 @@ admin.get("/setup", wrap(async (req, res) => {
       item("instagram", "Instagram Reels in the grid", st.instagram.configured, st.instagram.configured ? "Connected" : "Not connected", st.instagram.appSet ? "🎥 Videos → Connect Instagram." : `Render → Environment: ${st.instagram.need}.`),
       item("tiktok", "TikTok videos in the grid", st.tiktok.configured, st.tiktok.configured ? "Connected" : "Not connected", st.tiktok.appSet ? "🎥 Videos → Connect TikTok." : `Render → Environment: ${st.tiktok.need}.`),
     ]; })(),
+    item("yelp", "Yelp rating badge + review schema", !!(config.reviews.yelpKey || (config.reviews.rating && config.reviews.count)), config.reviews.yelpKey ? "Live from the Yelp API" : config.reviews.rating ? `Showing ${config.reviews.rating} ★ · ${config.reviews.count} reviews (entered by you)` : "Hidden — no real rating connected", "Render → Environment: YELP_API_KEY (Yelp Fusion), or YELP_RATING + YELP_REVIEW_COUNT copied from your Yelp page."),
     item("demo", "No demo data on the site", !config.showSeedStreams && !config.demoMode, config.showSeedStreams || config.demoMode ? "Demo streams or demo viewer counts are on" : "Only real streams and real viewer counts", "Set SHOW_SEED_STREAMS=false and DEMO_MODE=false in Render."),
   ] });
 }));
