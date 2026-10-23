@@ -56,11 +56,21 @@ function rateLimit(max, windowMs = 60_000) {
 }
 setInterval(() => hits.clear(), 10 * 60_000).unref();
 
+// One admin: whoever holds ADMIN_TOKEN (server-side env only). Repeated wrong guesses from one address
+// are locked out for 15 minutes so the password cannot be brute-forced.
+const adminFails = new Map(); // ip -> { n, until }
 function requireAdmin(req, res, next) {
   const tok = (req.get("authorization") || "").replace(/^Bearer\s+/i, "");
   if (!config.adminToken) return fail(res, 503, "Set ADMIN_TOKEN in .env to enable admin endpoints.");
+  const ip = req.ip || "?", f = adminFails.get(ip);
+  if (f && f.until > Date.now()) return fail(res, 429, "Too many wrong passwords. Try again in 15 minutes.");
   const a = Buffer.from(tok), b = Buffer.from(config.adminToken);
-  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return fail(res, 401, "Unauthorized");
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+    const n = (f && f.until > Date.now() - 15 * 60_000 ? f.n : 0) + 1;
+    adminFails.set(ip, { n, until: n >= 10 ? Date.now() + 15 * 60_000 : 0 });
+    return fail(res, 401, "Unauthorized");
+  }
+  adminFails.delete(ip);
   next();
 }
 
@@ -130,13 +140,8 @@ api.get("/config", (req, res) => {
 
 api.get("/reviews", wrap(async (req, res) => { res.set("Cache-Control", "public, max-age=600"); const y = await yelpRating(); res.json({ yelp: { rating: y.rating, count: y.count, url: y.url } }); }));
 
-api.get("/health", (req, res) => res.json({
-  ok: true, database: db.kind, paypal: config.paypal.mode,
-  video: cloudflareEnabled() ? "cloudflare" : `off — missing ${[!config.cloudflare.accountId && "CF_ACCOUNT_ID", !config.cloudflare.token && "CF_STREAM_TOKEN", !config.cloudflare.customerCode && "CF_SUBDOMAIN"].filter(Boolean).join(", ")}`,
-  database_detail: dbDiagnostics.reason,
-  supabase_project: config.supabase.url ? new URL(config.supabase.url).hostname.split(".")[0] : null,
-  supabase_key_type: !config.supabase.serviceKey ? null : config.supabase.serviceKey.startsWith("sb_secret_") ? "secret" : config.supabase.serviceKey.startsWith("sb_publishable_") ? "publishable (WRONG — use the secret key)" : config.supabase.serviceKey.startsWith("eyJ") ? "legacy JWT" : "unknown",
-}));
+// Public health check: up/down only. Setup details (which keys are missing, database diagnostics) live in /admin → Setup.
+api.get("/health", (req, res) => res.json({ ok: true, database: db.kind === "supabase" ? "supabase" : "local", video: cloudflareEnabled() ? "cloudflare" : "off" }));
 
 // ------------------------------------------------------------------ streams
 api.get("/streams", wrap(async (req, res) => {
@@ -224,6 +229,7 @@ function playbackProvider(url) {
   if (!url) return null;
   if (/^https:\/\/([\w-]+\.)*(youtube\.com|youtu\.be)\//.test(url)) return "youtube";
   if (/^https:\/\/([\w-]+\.)*tiktok\.com\//.test(url)) return "tiktok";
+  if (/^https:\/\/([\w-]+\.)*instagram\.com\//.test(url)) return "instagram";
   if (/^https:\/\/([\w-]+\.)*(facebook\.com|fb\.watch)\//.test(url)) return "facebook";
   if (/\.m3u8(\?|$)/.test(url)) return "hls";
   if (/\.(mp4|webm)(\?|$)/.test(url)) return "file";
@@ -467,8 +473,8 @@ admin.post("/my-live", wrap(async (req, res) => {
   const category = CATEGORY_LABELS[b.category] ? b.category : "new";
   const url = clean(b.url, 500);
   const provider = mode === "link" ? playbackProvider(url) : "cloudflare";
-  if (mode === "link" && (!/^https:\/\//.test(url) || !provider)) return fail(res, 400, "Paste the https link of your YouTube, TikTok or Facebook live (or an .m3u8 stream).");
-  if (mode === "cloudflare" && !cloudflareEnabled()) return fail(res, 409, "Phone streaming needs Cloudflare Stream: add CF_ACCOUNT_ID, CF_STREAM_TOKEN and CF_SUBDOMAIN in Render. Meanwhile, paste a YouTube/TikTok live link instead.");
+  if (mode === "link" && (!/^https:\/\//.test(url) || !provider)) return fail(res, 400, "Paste the https link of your TikTok, Instagram, YouTube or Facebook live (or an .m3u8 stream).");
+  if (mode === "cloudflare" && !cloudflareEnabled()) return fail(res, 409, "Phone streaming needs Cloudflare Stream: add CF_ACCOUNT_ID, CF_STREAM_TOKEN and CF_SUBDOMAIN in Render. Meanwhile, paste your TikTok or Instagram live link instead.");
 
   const verticalId = (await db.select("verticals", { slug: "real-estate" }))[0]?.id || null;
   if (!(await db.select("organizations", { id: OWNER.org })).length) await db.insert("organizations", { id: OWNER.org, name: "Bridges Global", vertical_id: verticalId, plan: "brokerage", sponsoring_broker: "LPT Realty" });

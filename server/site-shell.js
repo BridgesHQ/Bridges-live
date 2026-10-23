@@ -55,12 +55,12 @@ ${LOGO}
 ${dd("More", panel(MORE))}
 </nav>
 <div class="bx-act"><a class="bx-login" href="/login">Log in</a><a class="bx-tel" href="tel:+18137818888">${I.phone}<span>813-781-8888</span></a><a class="bx-btn" href="/listings" data-showing data-source="Website — Nav">Request a showing</a></div>
-<a class="bx-mlive" href="/live-marketplace"><span class="bx-dot"></span>Live</a>
+<a class="bx-mlogin" href="/login">Log in</a><a class="bx-mlive" href="/live-marketplace"><span class="bx-dot"></span>Live</a>
 <button class="bx-burger" id="bx-burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="bx-sheet"><span></span></button>
 </div></header>
 <div class="bx-sheet" id="bx-sheet">
 <a href="/live-marketplace">Live</a><a href="/new-construction">New Construction</a><a href="/apartment-locating">Apartments</a><a href="/listings">Listings</a>
-${sheetGroup("More", MORE.map(([h, t]) => [h, t]).concat([["/dorota-maslowska", "About Dorota"], ["/blog/", "Insights"]]))}<a href="/login">Log in — clients &amp; agents</a>
+${sheetGroup("More", MORE.map(([h, t]) => [h, t]).concat([["/dorota-maslowska", "About Dorota"], ["/blog/", "Insights"]]))}<a href="/login">Log in</a>
 <div class="bx-sheet-cta"><a class="bx-btn" href="/listings" data-showing data-source="Website — Mobile menu">Request a showing</a><a class="bx-btn bx-btn--line" href="tel:+18137818888">${I.phone}Call 813-781-8888</a>
 <small>Dorota Maslowska, Broker Associate · LPT Realty · FL BK3519799</small></div>
 </div><!--/bl:nav-->`;
@@ -83,7 +83,7 @@ export const FOOTER = `<!--bl:footer--><footer class="bx-foot bx-grain"><div cla
 <div class="bx-btns"><a class="bx-btn bx-btn--gold bx-btn--sm" href="https://giftofgodministries.org/housing-ministry/" target="_blank" rel="noopener">Visit Gift of God Ministries</a><a class="bx-btn bx-btn--glass bx-btn--sm" href="/housing-resources">Housing resources</a></div>
 <p class="note">Gift of God Ministries is a separate 501(c)(3) nonprofit organization, not a real estate brokerage. Real estate services are provided only through LPT Realty.</p></aside>
 <p class="bx-lic">Dorota Maslowska, Broker Associate · LPT Realty · FL License BK3519799 · TX 829789-SA · Equal Housing Opportunity</p>
-<div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://www.trec.texas.gov/forms/consumer-protection-notice" target="_blank" rel="noopener">TREC Consumer Protection Notice</a><a href="/sitemap.xml">Sitemap</a><a href="/admin" rel="nofollow">Owner login</a></nav></div>
+<div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://www.trec.texas.gov/forms/consumer-protection-notice" target="_blank" rel="noopener">TREC Consumer Protection Notice</a><a href="/sitemap.xml">Sitemap</a><a href="/login">Log in</a></nav></div>
 </div></footer><script src="/assets/js/site.js" defer></script><!--/bl:footer-->`;
 
 // ---------------------------------------------------------------- v4 (cream / near-black / Bottega green)
@@ -122,7 +122,7 @@ const FOOTER_V4 = `<!--bl:footer--><footer class="bx-foot v5-foot"><div class="b
 <div class="bx-legal"><div class="bx-eho">${I.eho}Equal Housing Opportunity</div>
 <p><b>Dorota Maslowska, Broker Associate · LPT Realty.</b> Florida License BK3519799 · Texas License 829789-SA. All real estate services are provided through LPT Realty. Bridges Global and Bridges Live are marketing and technology services, not a brokerage. Listing information is deemed reliable but not guaranteed; prices, incentives and market figures change frequently — verify before making decisions. Listings may be held by other brokerages. Earnest money is never collected through this website.</p></div>
 <p class="bx-lic">Dorota Maslowska, Broker Associate · LPT Realty · FL License BK3519799 · TX 829789-SA · Equal Housing Opportunity</p>
-<div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://www.trec.texas.gov/forms/consumer-protection-notice" target="_blank" rel="noopener">TREC Consumer Protection Notice</a><a href="/sitemap.xml">Sitemap</a><a href="/admin" rel="nofollow">Owner login</a></nav></div>
+<div class="bx-bottom"><span>© <span class="bx-y">2026</span> Bridges Global · Tampa Bay, Florida</span><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://www.trec.texas.gov/forms/consumer-protection-notice" target="_blank" rel="noopener">TREC Consumer Protection Notice</a><a href="/sitemap.xml">Sitemap</a><a href="/login">Log in</a></nav></div>
 </div></footer><script src="/assets/js/site.js" defer></script><!--/bl:footer-->`;
 
 // "Why Bridges" — the trust panel stamped into <!--bl:trust--> on the key pages. Every line is a verifiable fact.

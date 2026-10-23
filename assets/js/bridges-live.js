@@ -124,19 +124,22 @@
   }
   function ytId(u) { var m = String(u).match(/(?:v=|youtu\.be\/|\/live\/|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : null; }
   BL.ytId = ytId;
+  /** "TikTok" / "Instagram" for a live link that has to be watched on that app, else null. */
+  BL.extPlatform = function (u) { return /tiktok\.com\//.test(u || "") ? "TikTok" : /instagram\.com\//.test(u || "") ? "Instagram" : null; };
 
   /** Mounts the stream's live video into `el` (position:relative container). Returns a destroy fn. */
   BL.mountPlayer = function (el, s, opts) {
     opts = opts || {};
     var url = s && s.playbackUrl, hls = null, node;
     el.innerHTML = "";
-    if (url && /tiktok\.com\//.test(url)) {
-      // TikTok has no embeddable live player: show the cover with a "watch on TikTok" button.
+    if (url && /(tiktok|instagram)\.com\//.test(url)) {
+      // TikTok and Instagram lives cannot be embedded: show the cover with a clear "watch on …" button.
+      var plat = BL.extPlatform(url);
       node = document.createElement("div"); node.className = "bl-poster";
       if (s.image) node.style.backgroundImage = "url('" + String(s.image).replace(/'/g, "%27") + "')";
       el.appendChild(node);
       var a = document.createElement("a"); a.className = "bl-ext"; a.href = url; a.target = "_blank"; a.rel = "noopener";
-      a.textContent = "▶ Watch live on TikTok"; el.appendChild(a);
+      a.textContent = "▶ Live on " + plat + " — watch"; el.appendChild(a);
     } else if (url && /(facebook\.com|fb\.watch)\//.test(url)) {
       node = document.createElement("iframe");
       node.src = "https://www.facebook.com/plugins/video.php?href=" + encodeURIComponent(url) + "&show_text=false&autoplay=true&mute=1";

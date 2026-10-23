@@ -5,11 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta name="theme-color" content="#0E1E52">
+<meta name="theme-color" content="#1A1A1A">
 <title>Bridges Admin</title>
-<link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Marcellus&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/assets/mark-v4.svg">
 <link rel="stylesheet" href="/assets/css/brand.css">
 <style>
 body{background:#F5F4EF;margin:0}
@@ -139,9 +137,20 @@ textarea.i{min-height:70px;resize:vertical}
 @media(max-width:600px){.top .pill,.top a.vs{display:none}.top img{height:26px}}
 @media(max-width:520px){.mode{grid-template-columns:1fr}.key{grid-template-columns:1fr auto}.key .b2{display:none}}
 </style>
+<style>
+/* brand: Hanken Grotesk, cream / near-black / deep green (same as the public site) */
+@font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:100 900;font-display:swap;src:url(/assets/fonts/hanken-grotesk.woff2) format('woff2')}
+:root{--navy:#1A1A1A;--navy-2:#232323;--navy-d:#111;--gold:#1B3A2F;--gold-d:#12291F;--gold-l:#A9C2B4;--forest:#1B3A2F;--cream:#F4F1EA;--ivory:#F4F1EA;--paper:#FAF8F3;
+  --sans:'Hanken Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--serif:'Hanken Grotesk',system-ui,sans-serif;--display:'Hanken Grotesk',system-ui,sans-serif;--live:#E5484D}
+body{background:#F4F1EA!important;font-family:var(--sans)}
+h1,h2,h3,.pt{font-family:var(--sans)!important;letter-spacing:-.03em}
+.b-gold,.btn.b-gold{background:#1B3A2F!important;color:#fff!important;border-color:#1B3A2F!important}
+.mode button.on{border-color:#1B3A2F!important;background:#EEF3EF!important;box-shadow:0 0 0 3px rgba(27,58,47,.14)!important}
+.login{border-top-color:#1B3A2F!important}
+</style>
 </head>
 <body>
-<div class="top"><div class="top-in"><a href="/" aria-label="Bridges Global"><img src="/assets/logo-nav.svg" alt="Bridges Global"></a><span class="pill gold" style="background:rgba(201,168,76,.18);color:var(--gold-l)">Admin</span><span class="sp"></span><a class="vs" href="/" target="_blank" rel="noopener">View site ↗</a><button class="lk" id="logout" style="display:none" onclick="logout()">Log out</button></div></div>
+<div class="top"><div class="top-in"><a href="/" aria-label="Bridges Global"><b style="font:500 13px/1 var(--sans);letter-spacing:.3em;text-transform:uppercase;color:#fff">Bridges Global</b></a><span class="pill gold" style="background:rgba(201,168,76,.18);color:var(--gold-l)">Admin</span><span class="sp"></span><a class="vs" href="/" target="_blank" rel="noopener">View site ↗</a><button class="lk" id="logout" style="display:none" onclick="logout()">Log out</button></div></div>
 
 <div id="login" class="login">
   <h1>Welcome back</h1>
@@ -203,12 +212,12 @@ textarea.i{min-height:70px;resize:vertical}
 <!-- ======================================================= GO LIVE -->
 <section class="panel" id="p-live">
   <h1 class="pt">Go Live</h1>
-  <p class="ps">Stream from your phone with your own stream key, or paste a YouTube / TikTok / Facebook live link. Either way your live appears first on the homepage and the Bridges Live grid, with chat and the Request-a-showing button.</p>
+  <p class="ps">Two ways to go live. <b>1 · From your phone</b>: Larix streams straight to this site (Cloudflare), and viewers watch here with the Request-a-showing button. <b>2 · Already live on TikTok or Instagram</b>: paste the link and the site shows “Live on TikTok — watch” with a button to the app.</p>
   <div id="live-state"></div>
   <div class="card" id="live-form">
     <div class="mode" id="mode">
-      <button type="button" data-m="cloudflare" class="on"><b>📱 Stream from my phone</b><span>Larix (free app) or OBS — your stream key, no extra gear</span></button>
-      <button type="button" data-m="link"><b>🔗 Paste a live link</b><span>Already live on YouTube, TikTok or Facebook</span></button>
+      <button type="button" data-m="cloudflare" class="on"><b>📱 1 · Stream from my phone</b><span>Plays ON the site · Larix app + your stream key</span></button>
+      <button type="button" data-m="link"><b>🔗 2 · I'm live on TikTok / Instagram</b><span>Paste the link · the site shows a “watch” button</span></button>
     </div>
     <label class="f" for="lv-title">What are you showing?</label>
     <input class="i" id="lv-title" maxlength="120" placeholder="e.g. Sunday model tour — Triple Creek, Riverview">
@@ -218,7 +227,7 @@ textarea.i{min-height:70px;resize:vertical}
     </div>
     <label class="f" for="lv-cat">Category</label>
     <select class="i" id="lv-cat"><option value="new">New construction</option><option value="lux">Luxury</option><option value="apt">Apartments</option><option value="reloc">Relocation</option><option value="tx">Texas</option></select>
-    <div id="lv-urlbox" style="display:none"><label class="f" for="lv-url">Your live link</label><input class="i" id="lv-url" maxlength="500" placeholder="https://www.youtube.com/live/…  or  https://www.tiktok.com/@realtor_dorota/live"></div>
+    <div id="lv-urlbox" style="display:none"><label class="f" for="lv-url">Your live link</label><input class="i" id="lv-url" maxlength="500" placeholder="https://www.tiktok.com/@realtor_dorota/live  or  https://www.instagram.com/…/live"></div>
     <div class="err" id="lv-err"></div>
     <div class="row" style="margin-top:12px"><button class="btn b-gold" id="lv-go" onclick="startLive()">Start My Live</button></div>
   </div>
@@ -228,7 +237,7 @@ textarea.i{min-height:70px;resize:vertical}
     <li><div><b>Tap "Start My Live" above</b><span>Choose "Stream from my phone", type what you're showing, and tap Start. Your stream URL and key appear here — they stay the same every time.</span></div></li>
     <li><div><b>Add the connection in Larix (one time only)</b><span>Larix → ⚙️ Settings → Connections → + → paste the <b>Full Larix URL</b> (tap "Copy full Larix URL") → Save. In OBS: Settings → Stream → Custom → paste Server and Stream key.</span></div></li>
     <li><div><b>Hold the phone vertical and press the red button</b><span>Within about 20 seconds your card flips to <b>LIVE</b> on the homepage and the grid. Viewers chat, and "Request a showing" sends leads to you.</span></div></li>
-    <li><div><b>Finish: stop in Larix, then tap "End live" here</b><span>Leads from the stream are already in 📥 Leads and in your email. No phone key yet? Go live on YouTube or TikTok and paste the link instead.</span></div></li>
+    <li><div><b>Finish: stop in Larix, then tap "End live" here</b><span>Leads from the stream are already in 📥 Leads and in your email. No phone key yet? Go live on TikTok or Instagram and paste the link instead (option 2).</span></div></li>
   </ol>
 </section>
 
@@ -268,7 +277,7 @@ textarea.i{min-height:70px;resize:vertical}
     <li>Password: your <b>ADMIN_TOKEN</b>. Find it in Render → <b>bridges-live</b> → <b>Environment</b> → ADMIN_TOKEN (click the eye icon).</li>
     <li>Leave "Keep me logged in on this device" ticked on your own phone. Use <b>Log out</b> (top right) on shared computers.</li></ol>
     <h3>2 · Go live</h3>
-    <ol><li><b>🔴 Go Live</b> → type what you're showing → choose <b>Stream from my phone</b> (or <b>Paste a live link</b> for YouTube / TikTok / Facebook) → <b>Start My Live</b>.</li>
+    <ol><li><b>🔴 Go Live</b> → type what you're showing → choose <b>Stream from my phone</b> (or <b>I'm live on TikTok / Instagram</b> to paste the link) → <b>Start My Live</b>.</li>
     <li>Phone: open <b>Larix Broadcaster</b> and press the red button (first time: follow the 5 steps on the Go Live tab).</li>
     <li>Within ~20 seconds you're first on the homepage and the grid with a red <b>LIVE</b> badge and the real number of viewers.</li>
     <li>Finish: stop in Larix, then <b>End live</b> on the Go Live tab.</li></ol>
@@ -513,7 +522,7 @@ function renderLive() {
   if (LIVE && !LIVE.cloudflare) $("mode").querySelector('[data-m="cloudflare"] span').textContent = "Needs Cloudflare Stream keys (see ⚙️ Setup) — use a link for now";
   if (st) { $("lv-title").value = $("lv-title").value || st.title; $("lv-loc").value = $("lv-loc").value || st.location; $("lv-price").value = $("lv-price").value || st.priceLabel; $("lv-cat").value = st.category || "new"; }
   var pill = $("h-livepill"), txt = $("h-livetxt");
-  if (!on) { pill.className = "pill"; pill.textContent = "Off air"; txt.textContent = "You're not on the site right now. Start a live from your phone or paste a YouTube/TikTok link."; }
+  if (!on) { pill.className = "pill"; pill.textContent = "Off air"; txt.textContent = "You're not on the site right now. Start a live from your phone or paste your TikTok or Instagram live link."; }
   else if (st.liveNow) { pill.className = "pill live"; pill.textContent = "● LIVE"; txt.textContent = "“" + st.title + "” is live on the homepage and the grid."; }
   else { pill.className = "pill gold"; pill.textContent = "Waiting for video"; txt.textContent = "“" + st.title + "” is on the grid as “Starts soon”. Press the red button in Larix to go live."; }
   if (!on) { el.innerHTML = ""; $("lv-go").textContent = "Start My Live"; return; }

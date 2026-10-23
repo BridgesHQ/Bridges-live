@@ -10,7 +10,8 @@
   function tile(x, i) {
     var s = x.stream, v = x.video, live = x.kind === "live";
     var img = (s && s.image) || (v && v.thumbnail) || "";
-    var top = live ? '<span class="bx-live">Live' + (x.viewers > 0 ? " · " + x.viewers : "") + "</span>" : '<span class="bx-tag">' + esc(v ? v.platformLabel : "Starts soon") + "</span>";
+    var ext = s && window.BL && BL.extPlatform ? BL.extPlatform(s.playbackUrl) : null;
+    var top = live ? '<span class="bx-live">Live' + (ext ? " on " + ext : x.viewers > 0 ? " · " + x.viewers : "") + "</span>" : '<span class="bx-tag">' + esc(v ? v.platformLabel : "Starts soon") + "</span>";
     var kicker = s ? [s.categoryLabel, s.location].filter(Boolean).join(" · ") : v && v.publishedAt && window.BXC ? BXC.date(v.publishedAt) : "Recent tour";
     return '<div class="rx-tile" role="button" tabindex="0" data-rx="' + i + '">' + (img ? '<img src="' + esc(img) + '" alt="" loading="lazy" onerror="this.remove()">' : "")
       + '<span class="t">' + top + "</span>" + (live || v ? PLAY : "")
