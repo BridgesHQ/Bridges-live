@@ -51,6 +51,10 @@ const PRIVATE = /^\/(server|backend|data|node_modules|functions|docs|listingreel
 const PUBLIC_FILES = new Set(["/robots.txt", "/llms.txt", "/sitemap.xml"]);
 app.use((req, res, next) => (PRIVATE.test(req.path) && !PUBLIC_FILES.has(req.path) ? res.status(404).end() : next()));
 
+// Private dashboards: never cached, never indexed. /admin needs ADMIN_TOKEN for every API call; /go-live
+// needs a host link and only ever shows that host's own stream.
+app.use(["/admin", "/go-live"], (req, res, next) => { res.set({ "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "no-referrer", "X-Frame-Options": "DENY" }); next(); });
+
 // Pages with a <!--bl:rating--> slot get the Yelp AggregateRating schema filled in server-side (real figures only).
 const RATED = { "/": "index.html", "/index.html": "index.html", "/dorota-maslowska": "dorota-maslowska/index.html", "/dorota-maslowska/": "dorota-maslowska/index.html" };
 app.get(Object.keys(RATED), async (req, res, next) => {

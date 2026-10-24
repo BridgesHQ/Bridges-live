@@ -40,7 +40,7 @@ before(async () => {
   }).listen(FAKE);
   proc = spawn(process.execPath, ["server/index.js"], {
     env: { ...process.env, PORT: String(PORT), NODE_ENV: "test", ADMIN_TOKEN: "own3r-token", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "", BL_LOCAL_DB: path.join(TMP, "db.json"), APP_URL: BASE,
-      PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", DEMO_MODE: "false", SHOW_SEED_STREAMS: "false",
+      PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", DEMO_MODE: "false", SHOW_SEED_STREAMS: "false", AUTO_APPROVE_STREAMS: "false",
       CF_ACCOUNT_ID: "acc1", CF_STREAM_TOKEN: "cf-tok", CF_SUBDOMAIN: "customer-abc.cloudflarestream.com", CF_API_BASE: `http://localhost:${FAKE}/cf`, CF_DELIVERY_BASE: `http://localhost:${FAKE}`, CF_POLL_MS: "200",
       RESEND_API_KEY: "re_test", RESEND_FROM: "Dorota <dd@bridgesglobal.co>", RESEND_API_BASE: `http://localhost:${FAKE}/resend`, LEAD_ALERT_EMAIL: "dd@bridgesglobal.co",
       HUBSPOT_TOKEN: "hs-tok", HUBSPOT_API_BASE: `http://localhost:${FAKE}/hubspot` },
@@ -98,4 +98,27 @@ test("fallback: a pasted TikTok or Instagram live shows as 'Live on …' with a 
     assert.equal(live.stream.provider, /tiktok/.test(url) ? "tiktok" : "instagram");
   }
   assert.equal((await post("/api/admin/my-live", { mode: "link", url: "https://evil.example/live", title: "x" }, admin)).status, 400);
+});
+
+test("roles: an approved builder gets ONLY their own host dashboard — never the admin", async () => {
+  const app = await post("/api/streams", { name: "Bea Builder", email: "bea@builder.example", title: "Model home — Parrish", category: "new", role: "builder", brokerage: "Example Homes" });
+  assert.equal(app.status, 201);
+  assert.equal(app.body.status, "pending_review", "public applications wait for approval");
+  assert.equal(app.body.hostUrl, null, "no host link before approval");
+  const ok = await post(`/api/admin/streams/${app.body.streamId}/approve`, {}, admin);
+  assert.equal(ok.status, 200);
+  const hostToken = new URL(ok.body.hostUrl).hash.replace("#t=", "");
+  const mine = await get("/api/host/stream", { "x-host-token": hostToken });
+  assert.equal(mine.status, 200);
+  assert.equal(mine.body.role, "builder");
+  assert.equal(mine.body.streamId, app.body.streamId, "only their own stream");
+  assert.ok(!("leads" in mine.body), "no leads in the host dashboard");
+  for (const path of ["/api/admin/leads", "/api/admin/my-live", "/api/admin/setup", "/api/admin/streams"]) {
+    assert.equal((await get(path, { "x-host-token": hostToken })).status, 401, `host link cannot open ${path}`);
+    assert.equal((await get(path, { Authorization: `Bearer ${hostToken}` })).status, 401, `host token is not an admin password (${path})`);
+  }
+  assert.equal((await get("/api/host/stream", { "x-host-token": "x".repeat(40) })).status, 401, "a made-up host link opens nothing");
+  const page = await fetch(BASE + "/admin");
+  assert.equal(page.headers.get("cache-control"), "no-store");
+  assert.match(page.headers.get("x-robots-tag") || "", /noindex/);
 });

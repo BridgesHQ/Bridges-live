@@ -176,8 +176,8 @@ test("recordings: list, prepare MP4 download, publish replay to the grid", async
   assert.equal(own.kind, "upcoming");
 });
 
-test("setup lists listing + social connections; no reserve hold", async () => {
+test("setup lists the listings feed, no social-video items (not shown on the site), no reserve hold", async () => {
   const items = Object.fromEntries((await get("/api/admin/setup")).body.items.map((i) => [i.key, i]));
-  assert.equal(items.listings.ok, true, JSON.stringify(items)); assert.equal(items.youtube.ok, true); assert.equal(items.instagram.ok, true); assert.equal(items.holds, undefined);
+  assert.equal(items.listings.ok, true, JSON.stringify(items)); assert.equal(items.youtube, undefined); assert.equal(items.instagram, undefined); assert.equal(items.tiktok, undefined); assert.equal(items.holds, undefined);
   assert.equal((await get("/api/config", {})).body.holds, undefined, "Reserve hold removed");
 });

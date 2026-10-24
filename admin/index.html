@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="/assets/css/brand.css">
 <style>
 body{background:#F5F4EF;margin:0}
-.top{position:sticky;top:0;z-index:50;background:var(--navy);color:#fff;border-bottom:1px solid rgba(201,168,76,.25)}
+.top{position:sticky;top:0;z-index:50;background:var(--navy);color:#fff;border-bottom:1px solid rgba(27,58,47,.25)}
 .top-in{display:flex;align-items:center;gap:14px;height:60px;padding:0 clamp(14px,3vw,28px)}
 .top img{height:30px}
 .top .sp{flex:1}
@@ -43,29 +43,29 @@ h2.st{font:600 24px var(--serif);color:var(--navy);margin:28px 0 12px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;border-radius:10px;padding:11px 16px;font:700 14px var(--sans);cursor:pointer;text-decoration:none;white-space:nowrap}
 .btn[disabled]{opacity:.55;cursor:wait}
 .b-gold{background:var(--gold);color:var(--navy)}.b-gold:hover{background:var(--gold-l)}
-.b-navy{background:var(--navy);color:#fff}.b-line{background:#fff;color:var(--navy);border:1.5px solid rgba(14,30,82,.18)}
+.b-navy{background:var(--navy);color:#fff}.b-line{background:#fff;color:var(--navy);border:1.5px solid rgba(26,26,26,.18)}
 .b-red{background:#fff;color:#C0392B;border:1.5px solid rgba(192,57,43,.35)}
 .b-sm{padding:7px 11px;font-size:12.5px;border-radius:8px}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .pill{display:inline-flex;align-items:center;gap:6px;font:700 11px var(--sans);padding:5px 10px;border-radius:999px;background:#EEF0F5;color:var(--mut)}
 .pill.ok{background:#E7F5EC;color:#1D7A45}.pill.no{background:#FDECEA;color:#C0392B}.pill.gold{background:#FBF4E2;color:#8A6D1E}.pill.live{background:var(--live);color:#fff}
 label.f{display:block;font:600 12.5px var(--sans);color:var(--ink);margin:12px 0 6px}
-input.i,select.i,textarea.i{width:100%;box-sizing:border-box;border:1px solid rgba(14,30,82,.16);border-radius:10px;padding:11px 12px;font:400 15px var(--sans);background:#fff;color:var(--ink)}
+input.i,select.i,textarea.i{width:100%;box-sizing:border-box;border:1px solid rgba(26,26,26,.16);border-radius:10px;padding:11px 12px;font:400 15px var(--sans);background:#fff;color:var(--ink)}
 textarea.i{min-height:70px;resize:vertical}
 .muted{color:var(--mut);font-size:13px}
 .err{color:#C0392B;font-size:13.5px;min-height:1em;margin-top:8px}
 .empty{padding:28px;text-align:center;color:var(--mut);font-size:14px}
 /* login */
-.login{max-width:400px;margin:9vh auto;background:#fff;border:1px solid var(--line);border-top:4px solid var(--gold);border-radius:18px;padding:34px;text-align:center;box-shadow:0 30px 60px rgba(14,30,82,.1)}
+.login{max-width:400px;margin:9vh auto;background:#fff;border:1px solid var(--line);border-top:4px solid var(--gold);border-radius:18px;padding:34px;text-align:center;box-shadow:0 30px 60px rgba(26,26,26,.1)}
 .login h1{font:600 32px var(--serif);color:var(--navy);margin:0 0 6px}
 .login p{color:var(--mut);font-size:14px;margin:0 0 20px}
 .login .i{margin-bottom:10px}
 /* go live */
 .mode{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.mode button{border:1.5px solid rgba(14,30,82,.14);background:#fff;border-radius:14px;padding:16px;text-align:left;cursor:pointer;font:inherit}
+.mode button{border:1.5px solid rgba(26,26,26,.14);background:#fff;border-radius:14px;padding:16px;text-align:left;cursor:pointer;font:inherit}
 .mode button b{display:block;font:700 15px var(--sans);color:var(--navy);margin-bottom:3px}
 .mode button span{font-size:12.5px;color:var(--mut)}
-.mode button.on{border-color:var(--gold);background:#FFFBF0;box-shadow:0 0 0 3px rgba(201,168,76,.18)}
+.mode button.on{border-color:var(--gold);background:#EEF3EF;box-shadow:0 0 0 3px rgba(27,58,47,.18)}
 .onair{display:flex;align-items:center;gap:14px;padding:16px;border-radius:14px;background:var(--navy);color:#fff;margin-bottom:14px;flex-wrap:wrap}
 .onair .t{flex:1;min-width:200px}.onair .t b{display:block;font:600 22px var(--serif)}.onair .t span{font-size:13px;color:rgba(255,255,255,.75)}
 .key{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:center;margin-bottom:8px}
@@ -86,8 +86,8 @@ textarea.i{min-height:70px;resize:vertical}
 .lead .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
 .lead .notes{grid-column:1/-1;font-size:13px;color:var(--mut);background:#FAF8F3;border-radius:10px;padding:10px 12px;display:none;white-space:pre-wrap}
 .lead.open .notes{display:block}
-.lead select{border:1px solid rgba(14,30,82,.16);border-radius:8px;padding:7px;font:600 12.5px var(--sans);background:#fff;color:var(--navy)}
-.ico{min-width:36px;height:36px;padding:0 10px;font:600 12.5px var(--sans);color:var(--navy);gap:4px;border-radius:9px;border:1px solid rgba(14,30,82,.14);background:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;font-size:16px}
+.lead select{border:1px solid rgba(26,26,26,.16);border-radius:8px;padding:7px;font:600 12.5px var(--sans);background:#fff;color:var(--navy)}
+.ico{min-width:36px;height:36px;padding:0 10px;font:600 12.5px var(--sans);color:var(--navy);gap:4px;border-radius:9px;border:1px solid rgba(26,26,26,.14);background:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;font-size:16px}
 .ico:hover{border-color:var(--gold)}
 .ico.wa{background:#E9F9EF;border-color:#BFE9CF;color:#127C3D}
 /* content */
@@ -106,7 +106,7 @@ textarea.i{min-height:70px;resize:vertical}
 .hist{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
 .hist button{flex-shrink:0;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font:600 12.5px var(--sans);color:var(--navy);cursor:pointer;text-align:left}
 .hist button small{display:block;color:var(--mut);font-weight:500}
-.hist button.on{border-color:var(--gold);background:#FFFBF0}
+.hist button.on{border-color:var(--gold);background:#EEF3EF}
 /* setup */
 .chk{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
 .chk:last-child{border:0}
@@ -138,19 +138,74 @@ textarea.i{min-height:70px;resize:vertical}
 @media(max-width:520px){.mode{grid-template-columns:1fr}.key{grid-template-columns:1fr auto}.key .b2{display:none}}
 </style>
 <style>
-/* brand: Hanken Grotesk, cream / near-black / deep green (same as the public site) */
+/* ===== Admin — same brand as the public site: Hanken Grotesk, cream / near-black / deep green ===== */
 @font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:100 900;font-display:swap;src:url(/assets/fonts/hanken-grotesk.woff2) format('woff2')}
 :root{--navy:#1A1A1A;--navy-2:#232323;--navy-d:#111;--gold:#1B3A2F;--gold-d:#12291F;--gold-l:#A9C2B4;--forest:#1B3A2F;--cream:#F4F1EA;--ivory:#F4F1EA;--paper:#FAF8F3;
-  --sans:'Hanken Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--serif:'Hanken Grotesk',system-ui,sans-serif;--display:'Hanken Grotesk',system-ui,sans-serif;--live:#E5484D}
-body{background:#F4F1EA!important;font-family:var(--sans)}
-h1,h2,h3,.pt{font-family:var(--sans)!important;letter-spacing:-.03em}
-.b-gold,.btn.b-gold{background:#1B3A2F!important;color:#fff!important;border-color:#1B3A2F!important}
-.mode button.on{border-color:#1B3A2F!important;background:#EEF3EF!important;box-shadow:0 0 0 3px rgba(27,58,47,.14)!important}
-.login{border-top-color:#1B3A2F!important}
+  --ink:#1A1A1A;--mut:#6E6A62;--line:#E4DFD4;--live:#E5484D;--radius:16px;
+  --sans:'Hanken Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--serif:var(--sans);--display:var(--sans)}
+html,body{background:#F4F1EA!important;color:#1A1A1A;font:400 15px/1.55 var(--sans)}
+*{font-family:inherit}
+code,.key code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+/* top bar */
+.top{background:#1A1A1A!important;border-bottom:0!important}
+.top-in{height:60px}
+.top .pill{background:rgba(255,255,255,.1)!important;color:#F4F1EA!important;border:0!important}
+.top a,.top button.lk{color:rgba(244,241,234,.75)!important}
+.top a:hover,.top button.lk:hover{color:#fff!important}
+/* sidebar */
+.shell{grid-template-columns:240px minmax(0,1fr)}
+.side{background:#FAF8F3!important;border-right:1px solid #E4DFD4!important;padding:20px 14px!important}
+.who{border-bottom:1px solid #E4DFD4!important;padding-bottom:18px!important;margin-bottom:12px!important}
+.who b{font:650 14.5px/1.2 var(--sans)!important}
+.who span{color:#1B3A2F!important;font-weight:600}
+.sep{margin:18px 12px 6px!important;font:700 10.5px/1 var(--sans)!important;letter-spacing:.16em!important;text-transform:uppercase;color:#9C978C!important}
+.tab{padding:10px 12px!important;border-radius:10px!important;font:500 14.5px/1.2 var(--sans)!important;color:#3A3935!important;gap:10px!important}
+.tab:hover{background:#ECE7DC!important;color:#1A1A1A!important}
+.tab.on{background:#1A1A1A!important;color:#fff!important}
+.tab .dot{width:8px;height:8px;border-radius:50%;background:#E5484D;flex:none}
+.tab .n{background:#1B3A2F!important}
+/* main */
+.main{padding:clamp(24px,3.4vw,48px)!important;max-width:1180px}
+.pt{font:680 clamp(30px,3vw,42px)/1.05 var(--sans)!important;letter-spacing:-.04em!important;color:#1A1A1A!important;margin:0 0 8px!important}
+.ps{font:400 16px/1.6 var(--sans)!important;color:#6E6A62!important;max-width:72ch;margin:0 0 26px!important}
+.st{font:650 20px/1.2 var(--sans)!important;letter-spacing:-.02em!important;color:#1A1A1A!important;margin:34px 0 12px!important}
+.card,.stat,.tbl,.empty{background:#fff!important;border:1px solid #E4DFD4!important;border-radius:16px!important;box-shadow:none!important}
+.card{padding:22px!important}
+.card b[style*="serif"]{font:650 19px/1.2 var(--sans)!important;color:#1A1A1A!important}
+.stat{padding:18px 20px!important}
+.stat .l{font:700 10.5px/1 var(--sans)!important;letter-spacing:.14em!important;text-transform:uppercase;color:#9C978C!important}
+.stat .v{font:680 34px/1.1 var(--sans)!important;letter-spacing:-.03em;color:#1A1A1A}
+.muted{color:#6E6A62!important}
+.empty{color:#6E6A62!important;padding:28px!important;text-align:center}
+/* buttons, pills, inputs */
+.btn{border-radius:999px!important;font:600 14px/1 var(--sans)!important;min-height:42px;padding:0 18px!important;box-shadow:none!important}
+.b-gold,.btn.b-gold{background:#1B3A2F!important;color:#fff!important;border:1px solid #1B3A2F!important}
+.b-gold:hover{background:#12291F!important}
+.b-navy,.btn.b-navy{background:#1A1A1A!important;color:#fff!important;border:1px solid #1A1A1A!important}
+.b-line,.btn.b-line{background:#fff!important;color:#1A1A1A!important;border:1px solid #D9D3C6!important}
+.b-line:hover{border-color:#1A1A1A!important}
+.pill{border-radius:999px!important;font:650 11.5px/1 var(--sans)!important;padding:6px 10px!important;background:#ECE7DC!important;color:#3A3935!important;border:0!important}
+.pill.gold{background:#E4EBE6!important;color:#1B3A2F!important}
+.pill.live{background:#E5484D!important;color:#fff!important}
+.pill.ok{background:#E4EBE6!important;color:#1B3A2F!important}
+.i,input.i,select.i,textarea.i{border:1px solid #D9D3C6!important;border-radius:12px!important;background:#fff!important;font:400 15px/1.4 var(--sans)!important;color:#1A1A1A!important}
+.i:focus{outline:2px solid #1B3A2F!important;outline-offset:1px;border-color:#1B3A2F!important}
+label.f{font:650 12px/1 var(--sans)!important;letter-spacing:.04em;color:#3A3935!important}
+.mode button{border:1px solid #D9D3C6!important;border-radius:14px!important;background:#fff!important}
+.mode button b{font:650 15px/1.2 var(--sans)!important;color:#1A1A1A!important}
+.mode button.on{border-color:#1B3A2F!important;background:#EEF3EF!important;box-shadow:0 0 0 3px rgba(27,58,47,.12)!important}
+.err{color:#B4232A!important}
+/* login */
+.login{border-top:4px solid #1B3A2F!important;border-radius:20px!important;box-shadow:0 30px 60px rgba(26,26,26,.08)!important}
+.login h1{font:680 30px/1.1 var(--sans)!important;letter-spacing:-.03em;color:#1A1A1A!important}
+/* guide inside Setup & help */
+.guide .card h3{font:650 17px/1.3 var(--sans)!important;color:#1A1A1A!important}
+.toast{background:#1A1A1A!important;border-radius:12px!important}
+@media(max-width:860px){.shell{grid-template-columns:1fr}.side{position:static!important;height:auto!important;display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;border-right:0!important;border-bottom:1px solid #E4DFD4!important;padding:10px!important}.side .who,.side .sep{display:none}.tab{width:auto!important;white-space:nowrap;flex:none}}
 </style>
 </head>
 <body>
-<div class="top"><div class="top-in"><a href="/" aria-label="Bridges Global"><b style="font:500 13px/1 var(--sans);letter-spacing:.3em;text-transform:uppercase;color:#fff">Bridges Global</b></a><span class="pill gold" style="background:rgba(201,168,76,.18);color:var(--gold-l)">Admin</span><span class="sp"></span><a class="vs" href="/" target="_blank" rel="noopener">View site ↗</a><button class="lk" id="logout" style="display:none" onclick="logout()">Log out</button></div></div>
+<div class="top"><div class="top-in"><a href="/" aria-label="Bridges Global"><b style="font:500 13px/1 var(--sans);letter-spacing:.3em;text-transform:uppercase;color:#fff">Bridges Global</b></a><span class="pill gold" style="background:rgba(27,58,47,.18);color:var(--gold-l)">Admin</span><span class="sp"></span><a class="vs" href="/" target="_blank" rel="noopener">View site ↗</a><button class="lk" id="logout" style="display:none" onclick="logout()">Log out</button></div></div>
 
 <div id="login" class="login">
   <h1>Welcome back</h1>
@@ -158,28 +213,30 @@ h1,h2,h3,.pt{font-family:var(--sans)!important;letter-spacing:-.03em}
   <form onsubmit="event.preventDefault();login()">
     <input class="i" id="pw" type="password" placeholder="Admin password (ADMIN_TOKEN)" autocomplete="current-password">
     <label class="muted" style="display:flex;gap:8px;align-items:center;justify-content:center;margin:4px 0 14px"><input type="checkbox" id="remember" checked> Keep me logged in on this device</label>
-    <button class="btn b-navy" style="width:100%">Log in</button>
+    <button class="btn b-gold" style="width:100%">Log in</button>
   </form>
   <div class="err" id="lerr"></div>
 </div>
 
 <div id="app" class="shell" style="display:none">
 <nav class="side" aria-label="Admin sections">
-  <div class="who"><div class="av"></div><div><b>Dorota Maslowska</b><span>Broker Associate · LPT Realty</span></div></div>
-  <button class="tab" data-p="home">🏠 Today</button>
-  <button class="tab" data-p="live">🔴 Go Live</button>
-  <button class="tab" data-p="leads">📥 Leads <span class="n" id="n-leads"></span></button>
-  <button class="tab" data-p="content">🎬 Today's Content</button>
-  <button class="tab" data-p="guide">🧭 How to Operate</button>
-  <button class="tab" data-p="videos">🎥 Videos &amp; recordings</button>
-  <button class="tab" data-p="listings">🏡 Listings</button>
-  <div class="sep">Tools</div>
-  <button class="tab" data-p="agents">👥 Agent streams <span class="n" id="n-agents"></span></button>
-  <button class="tab" data-p="chat">🛡 Chat moderation</button>
-  <button class="tab" data-p="followups">📣 Follow-ups</button>
-  <button class="tab" data-p="prospects">🔎 Prospects</button>
-  <button class="tab" data-p="lr">🎞 ListingReel</button>
-  <button class="tab" data-p="setup">⚙️ Setup</button>
+  <div class="who"><div class="av"></div><div><b>Dorota Maslowska</b><span>Admin · full access</span></div></div>
+  <button class="tab" data-p="home">Today</button>
+  <div class="sep">Live</div>
+  <button class="tab" data-p="live"><i class="dot"></i>Go Live</button>
+  <button class="tab" data-p="agents">Agents &amp; builders <span class="n" id="n-agents"></span></button>
+  <button class="tab" data-p="chat">Chat moderation</button>
+  <button class="tab" data-p="videos">Recordings</button>
+  <div class="sep">Leads</div>
+  <button class="tab" data-p="leads">Leads <span class="n" id="n-leads"></span></button>
+  <button class="tab" data-p="followups">Follow-ups</button>
+  <button class="tab" data-p="prospects">Prospects</button>
+  <div class="sep">Marketing</div>
+  <button class="tab" data-p="content">Daily content</button>
+  <button class="tab" data-p="listings">Listings</button>
+  <button class="tab" data-p="lr">ListingReel</button>
+  <div class="sep">Settings</div>
+  <button class="tab" data-p="setup">Setup &amp; help</button>
 </nav>
 <main class="main">
 
@@ -204,9 +261,7 @@ h1,h2,h3,.pt{font-family:var(--sans)!important;letter-spacing:-.03em}
   <h2 class="st">Newest leads</h2>
   <div id="h-leads"><div class="empty">Loading…</div></div>
   <div class="row" style="margin-top:4px"><button class="btn b-line" onclick="go('leads')">All leads →</button></div>
-  <h2 class="st">Setup</h2>
-  <div class="card" id="h-setup"><div class="empty">Loading…</div></div>
-  <div class="row" style="margin-top:10px"><button class="btn b-line" onclick="go('setup')">Test the income loop →</button></div>
+  <div id="h-setup" hidden></div>
 </section>
 
 <!-- ======================================================= GO LIVE -->
@@ -251,7 +306,7 @@ h1,h2,h3,.pt{font-family:var(--sans)!important;letter-spacing:-.03em}
 
 <!-- ======================================================= CONTENT -->
 <section class="panel" id="p-content">
-  <h1 class="pt">Today's Content</h1>
+  <h1 class="pt">Daily content</h1>
   <p class="ps" id="c-sub">A fresh short-video script every day — read it, film it with the shotlist, post it with the caption.</p>
   <div class="card" style="margin-bottom:14px">
     <div class="row" style="justify-content:space-between"><div><span class="pill gold" id="c-theme">–</span> <span class="pill" id="c-src">–</span></div><div class="row"><select class="i" id="c-status" style="width:auto;padding:8px" onchange="setContentStatus(this.value)"><option value="draft">Draft</option><option value="filmed">Filmed</option><option value="posted">Posted ✓</option></select></div></div>
@@ -268,71 +323,15 @@ h1,h2,h3,.pt{font-family:var(--sans)!important;letter-spacing:-.03em}
 </section>
 
 <!-- ======================================================= GUIDE -->
-<section class="panel guide" id="p-guide">
-  <h1 class="pt">How to Operate</h1>
-  <p class="ps">Every job on Bridges Live, in plain steps — with a button that takes you straight there. Bookmark this page on your phone.</p>
-  <div class="card">
-    <h3 style="margin-top:0">1 · Log in</h3>
-    <ol><li>Go to <b>live.bridgesglobal.co/admin</b> (bookmark it — there is no admin link on the public site).</li>
-    <li>Password: your <b>ADMIN_TOKEN</b>. Find it in Render → <b>bridges-live</b> → <b>Environment</b> → ADMIN_TOKEN (click the eye icon).</li>
-    <li>Leave "Keep me logged in on this device" ticked on your own phone. Use <b>Log out</b> (top right) on shared computers.</li></ol>
-    <h3>2 · Go live</h3>
-    <ol><li><b>🔴 Go Live</b> → type what you're showing → choose <b>Stream from my phone</b> (or <b>I'm live on TikTok / Instagram</b> to paste the link) → <b>Start My Live</b>.</li>
-    <li>Phone: open <b>Larix Broadcaster</b> and press the red button (first time: follow the 5 steps on the Go Live tab).</li>
-    <li>Within ~20 seconds you're first on the homepage and the grid with a red <b>LIVE</b> badge and the real number of viewers.</li>
-    <li>Finish: stop in Larix, then <b>End live</b> on the Go Live tab.</li></ol>
-    <div class="row"><button class="btn b-gold b-sm" onclick="go('live')">Open Go Live →</button></div>
-    <h3>3 · Where the videos and streams are</h3>
-    <ul><li><b>On the site:</b> the big player at the top of the homepage, the "Live tours &amp; recent videos" row under it, and the full grid at <a href="/live-marketplace" target="_blank">/live-marketplace</a>.</li>
-    <li>Each tile is either a <b>real live stream</b> (red LIVE badge), a <b>recent video</b> from your YouTube / Instagram / TikTok, or an <b>Upcoming</b> tile. Nothing is ever shown as live unless it really is.</li>
-    <li><b>🎥 Videos &amp; recordings</b> shows every video pulled from your accounts. Tap <b>Hide</b> on anything that isn't a property video. <b>Sync now</b> pulls the newest ones immediately (it also runs automatically every 15 minutes).</li>
-    <li>To add one video by hand, paste its YouTube / TikTok / Instagram link in <b>Add a video by link</b>.</li></ul>
-    <div class="row"><button class="btn b-navy b-sm" onclick="go('videos')">Open Videos &amp; recordings →</button></div>
-    <h3>4 · Download a recorded live stream</h3>
-    <ol><li>Every phone live is recorded automatically by Cloudflare.</li>
-    <li><b>🎥 Videos &amp; recordings</b> → <b>Recordings</b> → find the date → <b>Prepare MP4</b>.</li>
-    <li>Wait a minute or two, tap <b>Refresh</b>, then <b>Download MP4</b> — it saves to your phone or computer, ready for Instagram, TikTok or YouTube.</li>
-    <li>Tap <b>Show on site</b> to add the recording to the video grid as a replay.</li></ol>
-    <h3>5 · Where leads show up</h3>
-    <ul><li><b>📥 Leads</b> — everyone who requested a showing, filled a form, chatted or tapped WhatsApp. New ones have a gold edge and count on the 🏠 Today tab.</li>
-    <li><b>Email</b> — every new lead is emailed to you instantly with Call / WhatsApp / Email buttons.</li>
-    <li><b>HubSpot</b> — every lead is added to your CRM automatically.</li></ul>
-    <div class="row"><button class="btn b-navy b-sm" onclick="go('leads')">Open Leads →</button></div>
-    <h3>6 · Respond to a lead</h3>
-    <ol><li>In <b>📥 Leads</b> tap <b>📞 Call</b>, <b>💬 Text</b>, <b>WhatsApp</b> or <b>✉️ Email</b> — a friendly first message is already written for you.</li>
-    <li>The lead is marked <b>Contacted</b> automatically. Change the status as things move: Showing booked → Under contract → Closed (or Lost).</li>
-    <li>Each lead also gets 5 automatic follow-up emails over 14 days. Stop them in <b>📣 Follow-ups</b> once you're talking directly.</li></ol>
-    <h3>7 · Listings on the site</h3>
-    <ul><li><b>🏡 Listings</b> shows where homes for sale come from (Stellar MLS when the token is connected) and when they last updated. They refresh every hour; <b>Sync now</b> refreshes immediately.</li>
-    <li>Only real listings are shown, each with its listing brokerage. If no feed is connected, the site shows a button to your full MLS search on bridgesglobal.co.</li></ul>
-    <div class="row"><button class="btn b-navy b-sm" onclick="go('listings')">Open Listings →</button></div>
-    <h3>8 · Post today's video</h3>
-    <ol><li><b>🎬 Today's Content</b> → read the hook and script → film each shot in the shotlist.</li><li>Tap <b>Copy caption + hashtags</b>, fill in any [bracketed] numbers, post, then set the status to <b>Posted ✓</b>.</li></ol>
-    <h3>9 · Other agents</h3>
-    <ul><li>Agents apply at <a href="/become-a-streamer" target="_blank">/become-a-streamer</a>. Check their license, then <b>Approve</b> in <b>👥 Agent streams</b> — they get a private Go-Live link by email. <b>Take down</b> removes a stream immediately.</li></ul>
-    <h3>10 · Something not working?</h3>
-    <ul><li><b>⚙️ Setup</b> lists every connection (database, email, CRM, streaming, social accounts, listings) with exactly what to add in Render if one is missing.</li></ul>
-    <h3 id="connections">11 · Connections (one-time) — what to paste in Render</h3>
-    <p>Where to paste: <b>dashboard.render.com</b> → <b>bridges-live</b> → <b>Environment</b> → <b>Add Environment Variable</b> → name + value → <b>Save Changes</b> (the site restarts in about a minute). Then come back here and press the Connect button.</p>
-    <ol>
-      <li><b>AI daily scripts</b> — <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com/settings/keys</a> → <b>Create Key</b> → copy → Render <code>ANTHROPIC_API_KEY</code>. (Add a few dollars of credit under Plans &amp; Billing.)</li>
-      <li><b>YouTube</b> — <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener">console.cloud.google.com → YouTube Data API v3</a> → create/select a project → <b>Enable</b> → <b>Credentials</b> → <b>Create credentials → API key</b> → copy → Render <code>YOUTUBE_API_KEY</code>. Then 🎥 Videos → type <b>@realtor_dorota</b> → <b>Connect YouTube</b>.</li>
-      <li><b>Instagram</b> (must be a Business or Creator account) — <a href="https://developers.facebook.com/apps" target="_blank" rel="noopener">developers.facebook.com/apps</a> → <b>Create app</b> → use case <b>Manage messaging &amp; content on Instagram</b> → <b>API setup with Instagram login</b> → <b>Set up Instagram business login</b> → add the redirect URL <code>https://live.bridgesglobal.co/api/social/instagram/callback</code> → copy <b>Instagram app ID</b> and <b>Instagram app secret</b> → Render <code>INSTAGRAM_APP_ID</code>, <code>INSTAGRAM_APP_SECRET</code>. Then 🎥 Videos → <b>Connect Instagram</b> → log in → <b>Allow</b>.</li>
-      <li><b>TikTok</b> — <a href="https://developers.tiktok.com/apps" target="_blank" rel="noopener">developers.tiktok.com/apps</a> → <b>Connect an app</b> → fill in name, icon, category, Terms <code>https://live.bridgesglobal.co/terms</code>, Privacy <code>https://live.bridgesglobal.co/privacy</code> → add product <b>Login Kit</b> (web) with redirect URI <code>https://live.bridgesglobal.co/api/social/tiktok/callback</code> and scopes <b>user.info.basic</b> + <b>video.list</b> → <b>Submit for review</b> → once approved copy <b>Client key</b> + <b>Client secret</b> → Render <code>TIKTOK_CLIENT_KEY</code>, <code>TIKTOK_CLIENT_SECRET</code>. Then 🎥 Videos → <b>Connect TikTok</b> → log in as @realtor_dorota → <b>Authorize</b>.</li>
-      <li><b>MLS listings</b> (when Stellar approves your data agreement) — <a href="https://bridgedataoutput.com" target="_blank" rel="noopener">bridgedataoutput.com</a> → log in → your application → <b>API Access</b> → copy the <b>Server Token</b> → Render <code>BRIDGE_API_SERVER_TOKEN</code>. Then 🏡 Listings → <b>Sync now</b>.</li>
-      <li><b>Phone streaming</b> (optional) — Cloudflare: <code>CF_ACCOUNT_ID</code>, <code>CF_STREAM_TOKEN</code>, <code>CF_SUBDOMAIN</code> (see 🔴 Go Live).</li>
-    </ol>
-    <p>Finally run <b>⚙️ Setup → Test the income loop</b>: every line should show a green tick.</p>
-    <h3>One-time setup</h3>
-    <p><b>Emails reach your leads:</b> resend.com → Domains → Add <code>bridgesglobal.co</code> → copy the DNS records into Cloudflare DNS (DNS only) → Verify → Render: <code>RESEND_FROM=Dorota Maslowska &lt;dd@bridgesglobal.co&gt;</code>.</p>
-    <p><b>Follow-ups, video sync, listings and the daily script on time:</b> cron-job.org → Create cronjob → URL <code>https://live.bridgesglobal.co/api/cron/followups</code>, every 15 minutes, method POST, header <code>Authorization: Bearer YOUR_CRON_SECRET</code>.</p>
-  </div>
-</section>
+
 
 <!-- ======================================================= VIDEOS -->
 <section class="panel" id="p-videos">
-  <h1 class="pt">Videos &amp; recordings</h1>
-  <p class="ps">Recent videos from your social accounts fill the stream grid between lives. Hide anything that isn't a property video. Recordings of your phone lives can be downloaded or shown on the site as replays.</p>
+  <h1 class="pt">Recordings</h1>
+  <p class="ps">Every phone live is recorded by Cloudflare. Download any recording as an MP4 to post on social media.</p>
+  <h2 class="st">Recordings of your lives</h2>
+  <div id="rec-list" class="tbl"><div class="empty">Loading…</div></div>
+  <div hidden>
   <div class="grid3" id="soc-accounts"></div>
   <div class="card" style="margin-top:14px">
     <div class="row" style="justify-content:space-between"><b style="font:600 20px var(--serif);color:var(--navy)">Pull the newest videos</b><button class="btn b-gold" id="soc-sync" onclick="syncSocial()">Sync now</button></div>
@@ -343,8 +342,7 @@ h1,h2,h3,.pt{font-family:var(--sans)!important;letter-spacing:-.03em}
   </div>
   <h2 class="st">Videos on the site</h2>
   <div id="soc-list" class="tbl"><div class="empty">Loading…</div></div>
-  <h2 class="st">Recordings of your lives</h2>
-  <div id="rec-list" class="tbl"><div class="empty">Loading…</div></div>
+</div>
 </section>
 
 <!-- ======================================================= LISTINGS -->
@@ -358,7 +356,7 @@ h1,h2,h3,.pt{font-family:var(--sans)!important;letter-spacing:-.03em}
 
 <!-- ======================================================= AGENTS -->
 <section class="panel" id="p-agents">
-  <h1 class="pt">Agent streams</h1>
+  <h1 class="pt">Agents &amp; builders</h1>
   <p class="ps">Applications from <a href="/become-a-streamer" target="_blank">/become-a-streamer</a>. Verify the license (FL DBPR / TX TREC lookup) and brokerage before approving. Approved agents get their own stream key by email.</p>
   <div id="agentlist" class="tbl"><div class="empty">Loading…</div></div>
 </section>
@@ -396,13 +394,67 @@ h1,h2,h3,.pt{font-family:var(--sans)!important;letter-spacing:-.03em}
 
 <!-- ======================================================= SETUP -->
 <section class="panel" id="p-setup">
-  <h1 class="pt">Setup</h1>
+  <h1 class="pt">Setup &amp; help</h1>
   <p class="ps">What's connected. Anything with an orange dot tells you exactly what to add in Render → Environment.</p>
   <div class="card" id="loopcard" style="margin-bottom:16px">
     <div class="row" style="justify-content:space-between"><div><b style="font:600 22px var(--serif);color:var(--navy)">Test the income loop</b><p class="muted" style="margin:4px 0 0">Sends a test “Request a showing” exactly like a viewer would, then checks every step. The test goes to your own inbox and never counts as a real lead.</p></div><button class="btn b-gold" id="loopbtn" onclick="runLoop()">Run the test</button></div>
     <div id="looprows" style="margin-top:12px"></div>
   </div>
   <div class="card" id="setuplist"><div class="empty">Loading…</div></div>
+  <div class="guide"><h2 class="st">How to operate</h2>
+<div class="card">
+    <h3 style="margin-top:0">1 · Log in</h3>
+    <ol><li>Go to <b>live.bridgesglobal.co/admin</b> (bookmark it — there is no admin link on the public site).</li>
+    <li>Password: your <b>ADMIN_TOKEN</b>. Find it in Render → <b>bridges-live</b> → <b>Environment</b> → ADMIN_TOKEN (click the eye icon).</li>
+    <li>Leave "Keep me logged in on this device" ticked on your own phone. Use <b>Log out</b> (top right) on shared computers.</li></ol>
+    <h3>2 · Go live</h3>
+    <ol><li><b>🔴 Go Live</b> → type what you're showing → choose <b>Stream from my phone</b> (or <b>I'm live on TikTok / Instagram</b> to paste the link) → <b>Start My Live</b>.</li>
+    <li>Phone: open <b>Larix Broadcaster</b> and press the red button (first time: follow the 5 steps on the Go Live tab).</li>
+    <li>Within ~20 seconds you're first on the homepage and the grid with a red <b>LIVE</b> badge and the real number of viewers.</li>
+    <li>Finish: stop in Larix, then <b>End live</b> on the Go Live tab.</li></ol>
+    <div class="row"><button class="btn b-gold b-sm" onclick="go('live')">Open Go Live →</button></div>
+    <h3>3 · Where your live shows up</h3>
+    <ul><li><b>On the site:</b> the big LIVE player at the top of the homepage, the "On air &amp; up next" row, the channel list beside the player, and the full grid at <a href="/live-marketplace" target="_blank">/live-marketplace</a>.</li>
+    <li>Only real Bridges Live streams appear: a red <b>LIVE</b> badge while the camera is on, or <b>Up next</b> for a scheduled one. No YouTube or social clips are shown on the site.</li>
+    <li>A TikTok or Instagram live you paste shows as <b>Live on TikTok — watch</b> with a button to the app.</li></ul>
+    <div class="row"><button class="btn b-navy b-sm" onclick="go('live')">Open Go Live →</button></div>
+    <h3>4 · Download a recorded live stream</h3>
+    <ol><li>Every phone live is recorded automatically by Cloudflare.</li>
+    <li><b>🎥 Videos &amp; recordings</b> → <b>Recordings</b> → find the date → <b>Prepare MP4</b>.</li>
+    <li>Wait a minute or two, tap <b>Refresh</b>, then <b>Download MP4</b> — it saves to your phone or computer, ready for Instagram, TikTok or YouTube.</li>
+    <li>Tap <b>Show on site</b> to add the recording to the video grid as a replay.</li></ol>
+    <h3>5 · Where leads show up</h3>
+    <ul><li><b>📥 Leads</b> — everyone who requested a showing, filled a form, chatted or tapped WhatsApp. New ones have a gold edge and count on the 🏠 Today tab.</li>
+    <li><b>Email</b> — every new lead is emailed to you instantly with Call / WhatsApp / Email buttons.</li>
+    <li><b>HubSpot</b> — every lead is added to your CRM automatically.</li></ul>
+    <div class="row"><button class="btn b-navy b-sm" onclick="go('leads')">Open Leads →</button></div>
+    <h3>6 · Respond to a lead</h3>
+    <ol><li>In <b>📥 Leads</b> tap <b>📞 Call</b>, <b>💬 Text</b>, <b>WhatsApp</b> or <b>✉️ Email</b> — a friendly first message is already written for you.</li>
+    <li>The lead is marked <b>Contacted</b> automatically. Change the status as things move: Showing booked → Under contract → Closed (or Lost).</li>
+    <li>Each lead also gets 5 automatic follow-up emails over 14 days. Stop them in <b>📣 Follow-ups</b> once you're talking directly.</li></ol>
+    <h3>7 · Listings on the site</h3>
+    <ul><li><b>🏡 Listings</b> shows where homes for sale come from (Stellar MLS when the token is connected) and when they last updated. They refresh every hour; <b>Sync now</b> refreshes immediately.</li>
+    <li>Only real listings are shown, each with its listing brokerage. If no feed is connected, the site shows a button to your full MLS search on bridgesglobal.co.</li></ul>
+    <div class="row"><button class="btn b-navy b-sm" onclick="go('listings')">Open Listings →</button></div>
+    <h3>8 · Post today's video</h3>
+    <ol><li><b>🎬 Today's Content</b> → read the hook and script → film each shot in the shotlist.</li><li>Tap <b>Copy caption + hashtags</b>, fill in any [bracketed] numbers, post, then set the status to <b>Posted ✓</b>.</li></ol>
+    <h3>9 · Other agents</h3>
+    <ul><li>Agents apply at <a href="/become-a-streamer" target="_blank">/become-a-streamer</a>. Check their license, then <b>Approve</b> in <b>👥 Agent streams</b> — they get a private Go-Live link by email. <b>Take down</b> removes a stream immediately.</li></ul>
+    <h3>10 · Something not working?</h3>
+    <ul><li><b>⚙️ Setup</b> lists every connection (database, email, CRM, streaming, social accounts, listings) with exactly what to add in Render if one is missing.</li></ul>
+    <h3 id="connections">11 · Connections (one-time) — what to paste in Render</h3>
+    <p>Where to paste: <b>dashboard.render.com</b> → <b>bridges-live</b> → <b>Environment</b> → <b>Add Environment Variable</b> → name + value → <b>Save Changes</b> (the site restarts in about a minute). Then come back here and press the Connect button.</p>
+    <ol>
+      <li><b>AI daily scripts</b> — <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com/settings/keys</a> → <b>Create Key</b> → copy → Render <code>ANTHROPIC_API_KEY</code>. (Add a few dollars of credit under Plans &amp; Billing.)</li>
+      <li><b>MLS listings</b> (when Stellar approves your data agreement) — <a href="https://bridgedataoutput.com" target="_blank" rel="noopener">bridgedataoutput.com</a> → log in → your application → <b>API Access</b> → copy the <b>Server Token</b> → Render <code>BRIDGE_API_SERVER_TOKEN</code>. Then 🏡 Listings → <b>Sync now</b>.</li>
+      <li><b>Phone streaming</b> (optional) — Cloudflare: <code>CF_ACCOUNT_ID</code>, <code>CF_STREAM_TOKEN</code>, <code>CF_SUBDOMAIN</code> (see 🔴 Go Live).</li>
+    </ol>
+    <p>Finally run <b>Setup &amp; help → Test the income loop</b>: every line should show a green tick.</p>
+    <h3>One-time setup</h3>
+    <p><b>Emails reach your leads:</b> resend.com → Domains → Add <code>bridgesglobal.co</code> → copy the DNS records into Cloudflare DNS (DNS only) → Verify → Render: <code>RESEND_FROM=Dorota Maslowska &lt;dd@bridgesglobal.co&gt;</code>.</p>
+    <p><b>Follow-ups, video sync, listings and the daily script on time:</b> cron-job.org → Create cronjob → URL <code>https://live.bridgesglobal.co/api/cron/followups</code>, every 15 minutes, method POST, header <code>Authorization: Bearer YOUR_CRON_SECRET</code>.</p>
+  </div>
+</div>
 </section>
 </main>
 </div>
@@ -580,7 +632,7 @@ function showPost(p) {
     + ((d.on_screen_text || []).length ? '<h3 style="margin-top:16px">On-screen text</h3>' + d.on_screen_text.map(function (t) { return '<div class="line"><b>TEXT</b><span>' + esc(t) + "</span></div>"; }).join("") : "") + "</div>"
     + '<div class="cbox"><h3>Shotlist · film on your phone<span class="pill">' + shots.length + " shots · ~" + total + "s</span></h3>" + shots.map(function (s, i) { return '<div class="shot"><i>' + (i + 1) + "</i><div><b>" + esc(s.shot) + "</b><small>" + esc(s.how) + '</small></div><span class="muted">' + (s.seconds || "") + "s</span></div>"; }).join("") + "</div></div>"
     + '<div class="cbox"><h3>Caption + hashtags<button class="btn b-gold b-sm" data-copy="caption">Copy caption + hashtags</button></h3><div class="cap">' + esc(d.caption) + '</div><div class="tags">' + esc((d.hashtags || []).join(" ")) + "</div></div>"
-    + (d.compliance_check ? '<div class="cbox" style="background:#FFFBF0;border-color:rgba(201,168,76,.4)"><h3>Before you post</h3><div style="font-size:14px">' + esc(d.compliance_check) + (/bracket/i.test(d.compliance_check) ? "" : " Fill in every [bracketed] number from a current source.") + "</div></div>" : "")
+    + (d.compliance_check ? '<div class="cbox" style="background:#EEF3EF;border-color:rgba(27,58,47,.4)"><h3>Before you post</h3><div style="font-size:14px">' + esc(d.compliance_check) + (/bracket/i.test(d.compliance_check) ? "" : " Fill in every [bracketed] number from a current source.") + "</div></div>" : "")
     + '<div class="cbox"><h3>AI video tool<span class="pill' + (CONTENT.video && CONTENT.video.enabled ? " ok" : "") + '">' + (CONTENT.video && CONTENT.video.enabled ? esc(CONTENT.video.name) + " connected" : "Not connected") + '</span></h3><div class="row" style="justify-content:space-between"><span class="muted">' + (CONTENT.video && CONTENT.video.enabled ? "Send this script and shotlist to your video tool." : "Connect a tool like Higgsfield later (VIDEO_PROVIDER) — this script and shotlist will be sent to it with one tap.") + '</span><button class="btn b-navy b-sm" id="c-vid"' + (CONTENT.video && CONTENT.video.enabled ? "" : " disabled") + ">Send to video tool</button></div></div>";
   var copies = { hook: hook, script: script, caption: capAll };
   [].forEach.call($("c-body").querySelectorAll("[data-copy]"), function (b) { b.onclick = function () { copy(copies[b.getAttribute("data-copy")], "Copied"); }; });

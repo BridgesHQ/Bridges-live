@@ -236,6 +236,8 @@ function playbackProvider(url) {
   return null;
 }
 
+const ROLES = ["agent", "builder", "developer"]; // who an approved host is; all three get the same limited host dashboard
+
 // "Go Live" — a verified host registers a stream (YouTube Live / HLS from Cloudflare Stream or IVS).
 api.post("/streams", rateLimit(5), wrap(async (req, res) => {
   const b = req.body || {};
@@ -264,7 +266,7 @@ api.post("/streams", rateLimit(5), wrap(async (req, res) => {
   const stream = await db.insert("streams", {
     show_id: show.id, provider: provider || "youtube", playback_url: playbackUrl || null, status,
     room_id: `room-${crypto.randomBytes(4).toString("hex")}`, viewer_count: 0,
-    meta: { host_name: name, category, category_label: labels[category], likes: 0, cta: "showing", host_email: email, host_phone: clean(b.phone, 40), license: clean(b.license, 60), brokerage: clean(b.brokerage, 80), title, applicant: true },
+    meta: { host_name: name, category, category_label: labels[category], likes: 0, cta: "showing", host_email: email, host_phone: clean(b.phone, 40), license: clean(b.license, 60), brokerage: clean(b.brokerage, 80), title, applicant: true, role: ROLES.includes(b.role) ? b.role : "agent" },
   });
   invalidateStreams();
   await audit("stream.created", "streams", stream.id, { email, status, lead: lead?.id });
@@ -337,7 +339,7 @@ api.get("/host/stream", rateLimit(30), wrap(async (req, res) => {
   try { input = await getLiveInput(s0.meta.cf_input_uid); } catch (e) { error = e.message; }
   const pub = await getStream(s0.id);
   res.json({
-    streamId: s0.id, title: s0.meta?.title || pub?.title, host: s0.meta?.host_name, status: s0.status,
+    streamId: s0.id, title: s0.meta?.title || pub?.title, host: s0.meta?.host_name, role: s0.meta?.role || "agent", status: s0.status,
     liveNow: pub ? liveNow(pub) : false, watchUrl: `${config.appUrl}/live-marketplace?stream=${s0.id}`,
     ingest: input && { rtmpsUrl: input.rtmpsUrl, streamKey: input.streamKey, srtUrl: input.srtUrl, srtStreamId: input.srtStreamId, srtPassphrase: input.srtPassphrase, state: input.state },
     error,
@@ -538,9 +540,6 @@ admin.get("/setup", wrap(async (req, res) => {
     item("ai", "Today's Content AI (Anthropic)", aiEnabled(), aiEnabled() ? `Using ${config.anthropic.model}` : "Using the built-in templates", "Add ANTHROPIC_API_KEY in Render for fresh AI-written scripts every day."),
     item("listings", "Real listings feed (Stellar MLS)", listingSource(), listingSource() === "mlsgrid" ? "Stellar MLS via MLS Grid" : listingSource() === "stellar-mls" ? "Stellar MLS via Bridge Interactive" : listingSource() === "realtyapi" ? "RealtyAPI (non-MLS, opted in) — switch to Stellar MLS when your token arrives" : "No MLS feed yet — /listings and the homepage show the 'Search every MLS home' link to bridgesglobal.co", "Render → Environment: MLSGRID_ACCESS_TOKEN (Stellar MLS IDX via MLS Grid) or BRIDGE_API_SERVER_TOKEN (via Bridge Interactive). Then 🏠 Listings → Sync now."),
     ...(() => { const st = SOC; return [
-      item("youtube", "YouTube videos in the grid", st.youtube.configured, st.youtube.configured ? `Connected (${st.youtube.channel})` : "Not connected", st.youtube.keySet ? "🎥 Videos → Connect YouTube (type your handle)." : "Render → Environment: YOUTUBE_API_KEY, then 🎥 Videos → Connect YouTube."),
-      item("instagram", "Instagram Reels in the grid", st.instagram.configured, st.instagram.configured ? "Connected" : "Not connected", st.instagram.appSet ? "🎥 Videos → Connect Instagram." : `Render → Environment: ${st.instagram.need}.`),
-      item("tiktok", "TikTok videos in the grid", st.tiktok.configured, st.tiktok.configured ? "Connected" : "Not connected", st.tiktok.appSet ? "🎥 Videos → Connect TikTok." : `Render → Environment: ${st.tiktok.need}.`),
     ]; })(),
     item("yelp", "Yelp rating badge + review schema", !!(config.reviews.yelpKey || (config.reviews.rating && config.reviews.count)), config.reviews.yelpKey ? "Live from the Yelp API" : config.reviews.rating ? `Showing ${config.reviews.rating} ★ · ${config.reviews.count} reviews (entered by you)` : "Hidden — no real rating connected", "Render → Environment: YELP_API_KEY (Yelp Fusion), or YELP_RATING + YELP_REVIEW_COUNT copied from your Yelp page."),
     item("demo", "No demo data on the site", !config.showSeedStreams && !config.demoMode, config.showSeedStreams || config.demoMode ? "Demo streams or demo viewer counts are on" : "Only real streams and real viewer counts", "Set SHOW_SEED_STREAMS=false and DEMO_MODE=false in Render."),

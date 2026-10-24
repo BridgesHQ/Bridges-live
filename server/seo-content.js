@@ -113,6 +113,7 @@ export const PERSON = {
       "@type": ["Person"], "@id": "https://live.bridgesglobal.co/#dorota", name: "Dorota Maslowska", jobTitle: "Broker Associate",
       image: "https://live.bridgesglobal.co/assets/dorota.webp", url: "https://live.bridgesglobal.co/dorota-maslowska",
       telephone: "+1-813-781-8888", email: "dd@bridgesglobal.co", knowsLanguage: ["English", "Polish"],
+      sameAs: ["https://www.facebook.com/DorotaBRIDGES/", "https://www.zillow.com/profile/realtordorota"],
       worksFor: { "@type": "RealEstateAgent", name: "LPT Realty" }, founder: { "@id": "https://live.bridgesglobal.co/#org" },
       hasCredential: [
         { "@type": "EducationalOccupationalCredential", credentialCategory: "Real estate broker license", identifier: "BK3519799", recognizedBy: { "@type": "State", name: "Florida" } },
