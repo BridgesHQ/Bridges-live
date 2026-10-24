@@ -14,6 +14,7 @@ import { integrations } from "./leads/providers.js";
 import { scanReddit } from "./prospects/reddit.js";
 import { cloudflareEnabled, createLiveInput, getLiveInput, deleteLiveInput, hlsUrl as hlsUrlFor, listRecordings, getDownload, createDownload } from "./stream/cloudflare.js";
 import { apartmentsEnabled, searchApartments } from "./apartments/search.js";
+import { publicReadProbe } from "./security.js";
 import { publicListings, syncListings, syncListingsIfStale, listingSource } from "./listings/sync.js";
 import { youtubeVideos, socialStatus, syncSocial, syncSocialIfStale, visibleVideos, videoFromUrl, tiktokConfigured, tiktokAuthUrl, tiktokStateOk, tiktokExchangeCode, instagramAppConfigured, instagramAuthUrl, instagramExchangeCode, stateOk } from "./social/sync.js";
 import { setSetting, missingTables } from "./db.js";
@@ -541,6 +542,7 @@ admin.get("/setup", wrap(async (req, res) => {
     item("listings", "Real listings feed (Stellar MLS)", listingSource(), listingSource() === "mlsgrid" ? "Stellar MLS via MLS Grid" : listingSource() === "stellar-mls" ? "Stellar MLS via Bridge Interactive" : listingSource() === "realtyapi" ? "RealtyAPI (non-MLS, opted in) — switch to Stellar MLS when your token arrives" : "No MLS feed yet — /listings and the homepage show the 'Search every MLS home' link to bridgesglobal.co", "Render → Environment: MLSGRID_ACCESS_TOKEN (Stellar MLS IDX via MLS Grid) or BRIDGE_API_SERVER_TOKEN (via Bridge Interactive). Then 🏠 Listings → Sync now."),
     ...(() => { const st = SOC; return [
     ]; })(),
+    ...(await (async () => { const p = await publicReadProbe(); return [item("privacy", "Privacy: the public can only submit leads", p.ok !== false, p.detail, "Supabase → SQL Editor → paste backend/sql/migrations/007_security_lockdown.sql → Run.")]; })()),
     item("yelp", "Yelp rating badge + review schema", !!(config.reviews.yelpKey || (config.reviews.rating && config.reviews.count)), config.reviews.yelpKey ? "Live from the Yelp API" : config.reviews.rating ? `Showing ${config.reviews.rating} ★ · ${config.reviews.count} reviews (entered by you)` : "Hidden — no real rating connected", "Render → Environment: YELP_API_KEY (Yelp Fusion), or YELP_RATING + YELP_REVIEW_COUNT copied from your Yelp page."),
     item("demo", "No demo data on the site", !config.showSeedStreams && !config.demoMode, config.showSeedStreams || config.demoMode ? "Demo streams or demo viewer counts are on" : "Only real streams and real viewer counts", "Set SHOW_SEED_STREAMS=false and DEMO_MODE=false in Render."),
   ] });
@@ -595,6 +597,7 @@ admin.post("/loop-test", wrap(async (req, res) => {
   await audit("loop.test", "leads", leadRow?.id, { ok: result.ok });
   res.json(result);
 }));
+admin.get("/security", wrap(async (req, res) => res.json(await publicReadProbe())));
 admin.get("/loop-test", wrap(async (req, res) => res.json((await getSetting("loop_test_last")) || null)));
 
 // ------------------------------------------------------------------ social videos

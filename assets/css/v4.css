@@ -1183,3 +1183,4 @@ body.bx-content [style*="#0E1E52"],body.bx-content [style*="#0e1e52"]{background
 }
 @media(max-width:370px){.bx-nav .bx-logo b i{display:none}}
 @media(max-width:480px){.bx-nav .bx-logo{gap:8px}.bx-nav .bx-logo b{font-size:10.5px!important;letter-spacing:.18em!important}.bx-mlogin{margin-right:4px}}
+.hm-homes{border-top:1px solid var(--line)}

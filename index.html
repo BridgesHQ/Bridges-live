@@ -80,6 +80,11 @@
   <div><span class="n">03</span><div><h3>Request a showing</h3><p>One tap sends the home to a licensed broker, who confirms a private showing.</p></div></div>
 </div></div></section>
 
+<section class="rx-live hm-homes" id="homes"><div class="bx-wrap">
+  <div class="rx-row"><h2>Featured homes <em>for sale.</em></h2><a class="bx-link" href="/listings">All listings <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  <div class="bx-grid bx-g3" id="homeGrid"></div><p class="bx-attr" id="homeAttr"></p>
+  <p class="hm-small" style="margin-top:22px;color:var(--mute)">Also: <a href="/buy">Buy a home</a> · <a href="/sell">Sell your home</a> · <a href="/relocation">Relocation</a> · <a href="/home-value">Home value</a></p>
+</div></section>
 <section class="md" aria-labelledby="md-h"><div class="bx-wrap md-in">
   <figure class="md-fig"><img src="/assets/dorota.webp" alt="Dorota Maslowska, licensed real estate broker" width="640" height="800" loading="lazy"></figure>
   <div class="md-copy"><span class="bx-eyebrow">Meet your broker</span>
@@ -89,8 +94,6 @@
     <div class="md-a"><a class="bx-btn" href="/listings" data-showing data-source="Homepage — Meet Dorota">Request a showing <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="bx-link" href="/dorota-maslowska">About Dorota <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
   </div>
 </div></section>
-<section class="hm-mls"><div class="bx-wrap"><div><span class="bx-eyebrow">Listings</span><h2>Every home for sale on the MLS.</h2><p>Search all active listings, save homes and get new-listing alerts. Ask for a live tour of any one.</p></div>
-  <div class="hm-mls-a"><a class="bx-btn" href="/listings">Search listings <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><p class="hm-small">Also: <a href="/buy">Buy a home</a> · <a href="/sell">Sell your home</a> · <a href="/relocation">Relocation</a></p></div></div></section>
 
 <!--bl:answer--><section class="bx-answer" aria-label="In short"><div class="bx-wrap"><span class="bx-eyebrow">In short</span><p>Bridges Live lets you watch homes on live video, ask the agent questions on camera and request a private showing in one tap. Tours cover new construction, apartments and resale homes across Tampa Bay, Sarasota and Austin, and every request goes to Dorota Maslowska, a licensed Broker Associate with LPT Realty.</p></div></section><!--/bl:answer-->
 <!--bl:trust--><section class="wb" aria-labelledby="wb-h"><div class="bx-wrap">
@@ -154,6 +157,13 @@ BL.available.then(function(ok){if(!ok)return;BL.api('/slots?n=24').then(function
   var on=L.find(function(x){return x.kind==='live';}),nx=L.find(function(x){return x.kind!=='live';});if(on)live(on);else if(nx)upcoming(nx);}).catch(function(){});});
 RX.liveStrip($('liveTiles'),{max:8,streamsOnly:true,source:'Homepage — live tile',offLabel:'The next live tour is being scheduled.'});
 })();
+
+// Featured homes: real MLS listings when the feed is connected; otherwise the full MLS search card (never empty)
+(function(){var g=document.getElementById('homeGrid'),L=[];g.innerHTML=BXC.skeleton('home',3);
+document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('[data-home]');if(t)BXC.askHome(L[+t.getAttribute('data-home')]);});
+BL.available.then(function(ok){if(!ok){g.innerHTML=BXC.searchCard(null,true);return;}BL.api('/listings?limit=6').then(function(j){L=j.listings||[];
+g.innerHTML=L.length?L.slice(0,6).map(BXC.homeCard).join('')+(L.length<6&&L.length%3?BXC.searchCard(j.searchUrl):''):BXC.searchCard(j.searchUrl,true);
+document.getElementById('homeAttr').textContent=(L.length&&j.attribution)||'';}).catch(function(){g.innerHTML=BXC.searchCard(null,true);});});})();
 </script>
 </body>
 </html>

@@ -16,6 +16,8 @@ export const config = {
     url: (env.SUPABASE_URL || "").trim().replace(/^["']|["']$/g, "").replace(/\/(rest\/v1\/?)?$/, "").replace(/\/+$/, ""),
     serviceKey: (env.SUPABASE_SERVICE_KEY || env.SUPABASE_SERVICE_ROLE_KEY || "").trim().replace(/^["']|["']$/g, ""),
     databaseUrl: env.DATABASE_URL || "",
+    // the PUBLIC key that web pages already carry (insert-only); used to prove the public can't read anything
+    publicKey: (env.SUPABASE_PUBLISHABLE_KEY || env.SUPABASE_ANON_KEY || "sb_publishable_D9YQPfVnBjRokyHlfNeuBA_TR7npJbb").trim(),
   },
   paypal: {
     clientId: env.PAYPAL_CLIENT_ID || "",
@@ -28,7 +30,7 @@ export const config = {
   cronSecret: env.CRON_SECRET || "",
   // ---- lead pipeline (each integration switches on when its keys are present) ----
   leads: {
-    ownerEmail: env.LEAD_ALERT_EMAIL || "",          // where new-lead emails go
+    ownerEmail: env.LEAD_ALERT_EMAIL || "realtordorota@gmail.com", // where new-lead emails go
     fromName: env.LEAD_FROM_NAME || "Dorota Maslowska · Bridges Global",
     businessAddress: env.BUSINESS_ADDRESS || "",     // required in marketing emails (CAN-SPAM)
     sequence: bool(env.LEAD_SEQUENCE_ENABLED, true),

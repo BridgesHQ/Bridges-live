@@ -42,7 +42,7 @@ before(async () => {
     env: { ...process.env, PORT: String(PORT), NODE_ENV: "test", ADMIN_TOKEN: "own3r-token", SUPABASE_URL: "", SUPABASE_SERVICE_KEY: "", BL_LOCAL_DB: path.join(TMP, "db.json"), APP_URL: BASE,
       PAYPAL_CLIENT_ID: "", PAYPAL_SECRET: "", DEMO_MODE: "false", SHOW_SEED_STREAMS: "false", AUTO_APPROVE_STREAMS: "false",
       CF_ACCOUNT_ID: "acc1", CF_STREAM_TOKEN: "cf-tok", CF_SUBDOMAIN: "customer-abc.cloudflarestream.com", CF_API_BASE: `http://localhost:${FAKE}/cf`, CF_DELIVERY_BASE: `http://localhost:${FAKE}`, CF_POLL_MS: "200",
-      RESEND_API_KEY: "re_test", RESEND_FROM: "Dorota <dd@bridgesglobal.co>", RESEND_API_BASE: `http://localhost:${FAKE}/resend`, LEAD_ALERT_EMAIL: "dd@bridgesglobal.co",
+      RESEND_API_KEY: "re_test", RESEND_FROM: "Dorota <dd@bridgesglobal.co>", RESEND_API_BASE: `http://localhost:${FAKE}/resend`, LEAD_ALERT_EMAIL: "", BUSINESS_ADDRESS: "Tampa, FL",
       HUBSPOT_TOKEN: "hs-tok", HUBSPOT_API_BASE: `http://localhost:${FAKE}/hubspot` },
     stdio: "pipe",
   });
@@ -79,8 +79,8 @@ test("phone (Cloudflare) live → LIVE on the site → Request a showing → sav
   const r = await post("/api/showings", { streamId: live.stream.id, name: "Maria Viewer", email: "maria@example.com", phone: "8135550100", when: "Saturday 10am", message: "Is the lot fenced?" });
   assert.equal(r.status, 201);
   for (let i = 0; i < 50 && (!emails.length || !contacts.length); i++) await wait(100);
-  const alert = emails.find((e) => e.to.includes("dd@bridgesglobal.co"));
-  assert.ok(alert, "email alert sent to Dorota");
+  const alert = emails.find((e) => e.to.includes("realtordorota@gmail.com"));
+  assert.ok(alert, "email alert sent to realtordorota@gmail.com");
   assert.match(alert.subject + alert.text, /Maria/);
   const c = contacts[0]?.inputs?.[0];
   assert.equal(c?.id, "maria@example.com", "contact upserted in HubSpot");
@@ -121,4 +121,26 @@ test("roles: an approved builder gets ONLY their own host dashboard — never th
   const page = await fetch(BASE + "/admin");
   assert.equal(page.headers.get("cache-control"), "no-store");
   assert.match(page.headers.get("x-robots-tag") || "", /noindex/);
+});
+
+test("every lead source → realtordorota@gmail.com alert + HubSpot + admin Leads + automatic first reply", async () => {
+  const mail = (to) => emails.filter((e) => e.to.includes(to));
+  // the stream lead from the earlier test also got its automatic first reply
+  for (let i = 0; i < 40 && !mail("maria@example.com").length; i++) await wait(100);
+  assert.ok(mail("maria@example.com").length >= 1, "auto-reply / follow-up #1 sent to the stream lead");
+  // website form (Request a showing on a listing, apartments, home value…)
+  const f = await post("/api/lead-router", { first_name: "Tom", last_name: "Form", email: "tom@example.com", phone: "8135550111", source: "Website — Request a showing", notes: "3 bed in Riverview" });
+  assert.ok(f.status < 300, JSON.stringify(f.body));
+  for (let i = 0; i < 50 && (!mail("tom@example.com").length || !contacts.some((c) => c.inputs[0].id === "tom@example.com")); i++) await wait(100);
+  assert.ok(emails.some((e) => e.to.includes("realtordorota@gmail.com") && /Tom/.test(e.subject + e.text)), "form lead alert to realtordorota@gmail.com");
+  assert.ok(contacts.some((c) => c.inputs[0].id === "tom@example.com"), "form lead in HubSpot");
+  assert.ok(mail("tom@example.com").length >= 1, "auto-reply to the form lead");
+  // WhatsApp tap: no contact details exist yet, so it is logged as a lead + you get an alert (the chat itself is in WhatsApp)
+  const before = emails.length;
+  const w = await fetch(BASE + "/api/whatsapp-click", { method: "POST", body: JSON.stringify({ page_url: BASE + "/apartment-locating", label: "Apartments page", visitor: "v1" }) });
+  assert.ok(w.status < 300);
+  for (let i = 0; i < 40 && emails.length === before; i++) await wait(100);
+  assert.ok(emails.slice(before).some((e) => e.to.includes("realtordorota@gmail.com") && /WhatsApp/.test(e.subject)), "WhatsApp tap alert");
+  const all = JSON.stringify((await get("/api/admin/leads", admin)).body);
+  for (const who of ["maria@example.com", "tom@example.com", "WhatsApp"]) assert.ok(all.includes(who), `${who} in the admin Leads tab`);
 });

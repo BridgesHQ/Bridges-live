@@ -198,6 +198,7 @@ label.f{font:650 12px/1 var(--sans)!important;letter-spacing:.04em;color:#3A3935
 /* login */
 .login{border-top:4px solid #1B3A2F!important;border-radius:20px!important;box-shadow:0 30px 60px rgba(26,26,26,.08)!important}
 .login h1{font:680 30px/1.1 var(--sans)!important;letter-spacing:-.03em;color:#1A1A1A!important}
+.qg{display:grid;grid-template-columns:1fr 1fr;gap:14px}.qg .card ol{margin:10px 0 16px;padding-left:20px;line-height:1.65}.qg .card li{margin:4px 0}.qk{display:block;font:700 12px/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#1B3A2F}@media(max-width:900px){.qg{grid-template-columns:1fr}}
 /* guide inside Setup & help */
 .guide .card h3{font:650 17px/1.3 var(--sans)!important;color:#1A1A1A!important}
 .toast{background:#1A1A1A!important;border-radius:12px!important}
@@ -223,6 +224,7 @@ label.f{font:650 12px/1 var(--sans)!important;letter-spacing:.04em;color:#3A3935
   <div class="who"><div class="av"></div><div><b>Dorota Maslowska</b><span>Admin · full access</span></div></div>
   <button class="tab" data-p="home">Today</button>
   <div class="sep">Live</div>
+  <button class="tab" data-p="quick">Guide: go live &amp; leads</button>
   <button class="tab" data-p="live"><i class="dot"></i>Go Live</button>
   <button class="tab" data-p="agents">Agents &amp; builders <span class="n" id="n-agents"></span></button>
   <button class="tab" data-p="chat">Chat moderation</button>
@@ -262,6 +264,38 @@ label.f{font:650 12px/1 var(--sans)!important;letter-spacing:.04em;color:#3A3935
   <div id="h-leads"><div class="empty">Loading…</div></div>
   <div class="row" style="margin-top:4px"><button class="btn b-line" onclick="go('leads')">All leads →</button></div>
   <div id="h-setup" hidden></div>
+</section>
+
+<!-- ======================================================= ONE-PAGE GUIDE -->
+<section class="panel" id="p-quick">
+  <h1 class="pt">How to go live + handle leads</h1>
+  <p class="ps">Everything you need on one page. Bookmark it on your phone.</p>
+  <div class="qg">
+    <div class="card"><span class="qk">A · Go live from your phone (plays on your site)</span>
+      <ol><li><b>Once:</b> Render → Environment → add <code>CF_ACCOUNT_ID</code>, <code>CF_STREAM_TOKEN</code>, <code>CF_SUBDOMAIN</code> → Save.</li>
+      <li><b>Once:</b> install <b>Larix Broadcaster</b>. Here: <b>Go Live</b> → “1 · Stream from my phone” → <b>Start My Live</b> → tap <b>Copy full Larix URL</b> → in Larix: Settings → Connections → + → paste → Save.</li>
+      <li><b>Every time:</b> Go Live → type what you're showing → <b>Start My Live</b> → press the red button in Larix. Within ~20 seconds the homepage says <b>LIVE</b> and viewers see “Request a showing” beside your video.</li>
+      <li><b>Finish:</b> stop in Larix, then <b>End live</b> here.</li></ol>
+      <button class="btn b-gold" onclick="go('live')">Open Go Live</button></div>
+    <div class="card"><span class="qk">B · Already live on TikTok or Instagram</span>
+      <ol><li>Start the live in the app and copy its link.</li>
+      <li><b>Go Live</b> → “2 · I'm live on TikTok / Instagram” → paste the link → <b>Start My Live</b>.</li>
+      <li>The site shows <b>Live on TikTok — watch</b> with a button that opens the app.</li>
+      <li>When you finish, tap <b>End live</b> here so the site goes back to “off air”.</li></ol></div>
+    <div class="card"><span class="qk">C · When a lead comes in</span>
+      <ol><li>Every lead (stream, website form, WhatsApp tap) is emailed to <b>realtordorota@gmail.com</b>, added to <b>HubSpot</b>, and listed in <b>Leads</b>.</li>
+      <li>The lead gets an automatic first reply right away, then follow-ups at +1, +3, +7 and +14 days.</li>
+      <li>Reply personally within 5 minutes: <b>Leads</b> → tap <b>Call</b>, <b>WhatsApp</b> or <b>Email</b> (a first message is written for you).</li>
+      <li>Move the stage as it progresses: Contacted → Showing booked → Under contract → Closed.</li>
+      <li>Talking to them directly? <b>Follow-ups</b> → <b>Stop</b> so the automatic emails end.</li>
+      <li>“WhatsApp visitor” leads have no contact details yet: their message arrives in <b>WhatsApp Business</b>. Reply there.</li></ol>
+      <button class="btn b-gold" onclick="go('leads')">Open Leads</button></div>
+    <div class="card"><span class="qk">D · Weekly check (2 minutes)</span>
+      <ol><li><b>Setup &amp; help</b> → <b>Run the test</b>: every step of the lead loop should be green.</li>
+      <li>Check the <b>Privacy</b> line is green: the public can only submit leads, never read them.</li>
+      <li><b>Agents &amp; builders</b>: approve new applications only after checking their license.</li></ol>
+      <button class="btn b-line" onclick="go('setup')">Open Setup &amp; help</button></div>
+  </div>
 </section>
 
 <!-- ======================================================= GO LIVE -->
